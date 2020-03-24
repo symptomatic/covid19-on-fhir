@@ -98,11 +98,11 @@ hapi-fhir-cli run-server -v dstu2 -p 3100
 # R4
 hapi-fhir-cli run-server -v r4 -p 3100
 
-# load the output directory into the HAPI server (DSTU3)
-node index.js -d ../Synthea/output/fhir_dstu2/ -t 'more heartfailure patients' -w -S http://localhost:3100/baseDstu2/
+# load the output directory into the HAPI server (DSTU2 / STU3)
+node index.js -d ../Synthea/output/fhir_dstu2/ -t 'something covid releated' -w -S http://localhost:3100/baseDstu2/
 
 # load the output directory into the HAPI server (R4)
-node index.js -d ../Synthea/output/fhir/ -t 'more heartfailure patients' -w -S http://localhost:3100/baseR4/
+node index.js -d ../Synthea/output/fhir/ -t 'something covid releated' -w -S http://localhost:3100/baseR4/
 
 # confirm that data is loaded correctly
 curl http://localhost:8080/baseDstu2/Patient?_count=100
