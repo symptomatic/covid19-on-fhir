@@ -25,7 +25,7 @@ Please read the following links for background design on this project:
 - [Cholera Mist - Errors in Mapmaking and Disease Theory](https://drive.google.com/open?id=0BwZijsCqmA-GUndDQmRRbGZVMzQ)  
 - [Total Cost of Equipment Ownership - Achieving Greater Insight into Hospital Operating Costs](https://drive.google.com/file/d/0Bwzh7AfT-dKnTVdBNnE2emdyZUU/view?usp=sharing)  
 - [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
-
+- [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
 
 #### Installation  
 This project is best run on Macintosh with Chrome, and is intended to run on Linux servers in an AWS cloud environment.  Compiling to Docker is supported, but an advanced feature.
