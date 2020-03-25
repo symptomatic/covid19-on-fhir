@@ -2,6 +2,7 @@
 
 This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
 
+![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/CovidQueryPage.png)
 
 #### Design Documents  
 The primary goal behind this hackathon is to stand up a COVID19 specific version of the Epidemiology on FHIR module, so we can map hospital EHR data onto Google Maps.  Primary workflow will look something like this:
