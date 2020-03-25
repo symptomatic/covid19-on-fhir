@@ -1,4 +1,4 @@
-# COVID19 Hackathon  
+# COVID19 on FHIR Hackathon  
 
 This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
 
@@ -43,14 +43,14 @@ cd node-on-fhir
 
 # clone this package into the project
 cd packages
-git clone https://github.com/symptomatic/covid19-hackathon
+git clone https://github.com/symptomatic/covid19-on-fhir
 
 # install dependencies
 cd ..
 meteor npm install
 
 # run the application  
-meteor run --extra-packages symptomatic:covid19-hackathon --settings packages/covid19-hackathon/configs/settings.covid19.maps.json  
+meteor run --extra-packages symptomatic:covid19-on-fhir --settings packages/covid19-on-fhir/configs/settings.covid19.maps.json  
 ```
 
 
