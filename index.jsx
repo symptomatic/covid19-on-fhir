@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FhirQueryPage from './client/FhirQueryPage';
+import CovidQueryPage from './client/CovidQueryPage';
 
 import { GoFlame } from 'react-icons/go';
 
@@ -12,9 +12,9 @@ import {
 import { HeaderNavigation } from './client/HeaderNavigation';
 
 var DynamicRoutes = [{
-  'name': 'FhirQueryPage',
+  'name': 'CovidQueryPage',
   'path': '/query-fhir-provider',
-  'component': FhirQueryPage
+  'component': CovidQueryPage
 }];
 
 let FooterButtons = [{
@@ -33,13 +33,13 @@ SidebarElements = [{
 }];
 
 
-let MainPage = FhirQueryPage;
+let MainPage = CovidQueryPage;
 
 
 export { 
   DynamicRoutes, 
 
-  FhirQueryPage,
+  CovidQueryPage,
 
   HeaderNavigation,
   SidebarElements,

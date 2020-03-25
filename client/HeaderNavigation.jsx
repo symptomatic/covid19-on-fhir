@@ -207,16 +207,17 @@ export function HeaderNavigation(props){
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
           <Tab id="fetchTab" label="Fetch" />
-          <Tab id="cohortTab" label="Cohort" />
-          <Tab id="dashboardTab" label="Dashboard" />
+          <Tab id="mapTab" label="Map" />
+          {/* <Tab id="dashboardTab" label="Dashboard" />
           <Tab id="scorecardTab" label="Scorecard" />
-          <Tab id="patientInfoTab" label="Patient Information" />
+          <Tab id="patientInfoTab" label="Patient Information" /> */}
         </Tabs>
-        <dvi id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
+        <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
           <h3 id="fetchTab">{Session.get('fhirServerEndpoint')}</h3>          
-        </dvi>
+        </div>
 
         <MuiThemeProvider theme={muiTheme} >
+          <div></div>
           {/* <FormControl id="globalSearch" className={classes.searchForm}>
             <InputLabel htmlFor="input-with-icon-adornment">With a start adornment</InputLabel>
             <Input
