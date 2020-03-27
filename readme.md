@@ -5,6 +5,10 @@ This package is related to the [Datavant Pandemic Response Hackathon](https://da
 We have already completed the following data fetching utility, which queries FHIR compliant EHRs for COVID19 related LOINC and SNOMED codes.
 ![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/CovidQueryPage.png)
 
+
+Update:  We've now enabled Google Maps.  This is the canvas we are working, and making available.  Please contact us with any hospital or community public health geomapping needs.  
+![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-RawMap.png)
+
 For the remainder of the hackathon, we will be creating a heatmap like the following, to display where COVID19 outbreaks are occuring.  We intend to support housing level mapping of COVID19 data, and make this available to hospitals via the EHR app stores.
 ![FHIR Heatmap](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/design/food-desert-heatmap.jpg)  
 
@@ -31,6 +35,10 @@ Please read the following links for background design on this project:
 - [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
 - [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
 
+#### Use Cases  
+
+
+
 #### Installation  
 This project is best run on Macintosh with Chrome, and is intended to run on Linux servers in an AWS cloud environment.  Compiling to Docker is supported, but an advanced feature.
 
@@ -56,7 +64,6 @@ meteor npm install
 # run the application  
 meteor run --extra-packages symptomatic:covid19-on-fhir --settings packages/covid19-on-fhir/configs/settings.covid19.maps.json  
 ```
-
 
 
 #### Generating a synthetic dataset of COVID19 patients   
@@ -130,6 +137,13 @@ curl http://localhost:8080/baseR4/Encounter?_count=100
 - [People with blood type A may be more vulnerable to coronavirus](https://www.scmp.com/news/china/society/article/3075567/people-blood-type-may-be-more-vulnerable-coronavirus-china-study?fbclid=IwAR3BOAAY2u4AOgb9jtFYT5vxV8HaOEmNgsRq-sgM5T_poKF_JRa6OdoWzO0)  
 - [Hydroxychloroquine and azithromycin as a treatment of COVID-19](https://www.mediterranee-infection.com/wp-content/uploads/2020/03/Hydroxychloroquine_final_DOI_IJAA.pdf?fbclid=IwAR3A5tbNB49G8cNd5VprVhjnaO_j7Xx40euWEdmHaMGdcRxG1UoKWYQLu6Y)  
 - [Azithromycin induces anti-viral effects in cultured bronchial epithelial cells from COPD patients](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4923851/?fbclid=IwAR3H41tJ6zKmHueqqeqdlUKSMyjQKu8XXqusywdcp_06EXJOYebCd5P-kDU)    
+- [Clinical Pathways from the University of Chicago Medicine](https://hdsi.uchicago.edu/uchicago-medicine-covid-19-pathways/)  
+- [COVID-19: Adult Ambulatory Clinics](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Ambulatory-Clinics.pdf)    
+- [COVID-19: Adult ED](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-ED.pdf)    
+- [COVID-19: Adult Inpatient](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-Inpatient.pdf)    
+- [COVID-19: Adult Respiratory Failure and Cardiac Arrest](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-Respiratory-Failure-and-Cardiac-Arrest.pdf)  
+
+
 
 #### A Prayer for Health Care Workers  
 
