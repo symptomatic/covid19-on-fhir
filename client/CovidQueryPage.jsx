@@ -889,8 +889,7 @@ function CovidQueryPage(props){
                 style={{fontSize: '100%'}} />
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
                 <ProceduresTable
-                  id="fetchedProceduresTable"
-                  ProceduresTable={ProceduresTable}
+                  id="fetchedProceduresTable"                  
                   procedures={procedures}
                   rowsPerPage={10}
                   count={procedureCount}

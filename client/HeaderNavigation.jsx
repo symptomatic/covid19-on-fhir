@@ -174,7 +174,7 @@ export function HeaderNavigation(props){
         props.history.replace('/query-fhir-provider')
         break;
       case 1:
-        props.history.replace('/encounters-at-discharge')
+        props.history.replace('/map')
         break;
       case 2:
         props.history.replace('/cardiac-dashboard')

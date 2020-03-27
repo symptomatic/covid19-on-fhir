@@ -1,9 +1,9 @@
 import React from 'react';
 
 import CovidQueryPage from './client/CovidQueryPage';
+import GoogleMapsPage from './client/GoogleMapsPage';
 
 // import { GoFlame } from 'react-icons/go';
-
 
 import { 
   FetchButtons
@@ -15,6 +15,11 @@ var DynamicRoutes = [{
   'name': 'CovidQueryPage',
   'path': '/query-fhir-provider',
   'component': CovidQueryPage
+}, {
+  'name': 'MapPage',
+  'path': '/map',
+  'component': GoogleMapsPage,
+  'requireAuth': true
 }];
 
 let FooterButtons = [{
@@ -40,6 +45,7 @@ export {
   DynamicRoutes, 
 
   CovidQueryPage,
+  GoogleMapsPage,
 
   HeaderNavigation,
   SidebarElements,

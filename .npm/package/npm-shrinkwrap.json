@@ -1,0 +1,25 @@
+{
+  "lockfileVersion": 1,
+  "dependencies": {
+    "@mapbox/point-geometry": {
+      "version": "0.1.0",
+      "resolved": "https://registry.npmjs.org/@mapbox/point-geometry/-/point-geometry-0.1.0.tgz",
+      "integrity": "sha1-ioP5M1x4YO/6Lu7KJUMyqgru2PI="
+    },
+    "eventemitter3": {
+      "version": "1.2.0",
+      "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-1.2.0.tgz",
+      "integrity": "sha1-HIaZHYFq0eUEdQ5zh0Ik7PO+xQg="
+    },
+    "google-map-react": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/google-map-react/-/google-map-react-1.0.1.tgz",
+      "integrity": "sha512-46LXrOsprR1pcjkdpzoCO6vyydIMk0J2+ojJPxPSFspil0w9ZBiPq1eLZwSwwPlEG4YDKmtYGRUVMIt4DsoJEA=="
+    },
+    "scriptjs": {
+      "version": "2.5.9",
+      "resolved": "https://registry.npmjs.org/scriptjs/-/scriptjs-2.5.9.tgz",
+      "integrity": "sha512-qGVDoreyYiP1pkQnbnFAUIS5AjenNwwQBdl7zeos9etl+hYKWahjRTfzAZZYBv5xNHx7vNKCmaLDQZ6Fr2AEXg=="
+    }
+  }
+}
