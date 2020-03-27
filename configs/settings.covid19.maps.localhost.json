@@ -104,6 +104,12 @@
       "upstreamSync": "http://meteor-on-fhir.meteorapp.com/fhir-3.0.0", 
       "autosync": false
     },
+    "google": {
+      "maps": {
+        "apiKey": "",
+        "geodataUrl": "https://data.cityofchicago.org/resource/6zsd-86xi.geojson" 
+      }
+    },
     "modules": {
       "apps": {},
       "fhir": {
