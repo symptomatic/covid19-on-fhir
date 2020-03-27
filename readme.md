@@ -113,3 +113,38 @@ curl http://localhost:8080/baseR4/Patient?_count=100
 curl http://localhost:8080/baseR4/Encounter?_count=100
 
 ```
+
+#### References  
+- [CDC - ICD10 Codes](https://www.cdc.gov/nchs/data/icd/ICD-10-CM-Official-Coding-Gudance-Interim-Advice-coronavirus-feb-20-2020.pdf)  
+-[HL7 FHIR - COVID19 LOINC Value Set](https://chat.fhir.org/user_uploads/10155/tQQtv3GQZhC3DRmMgk59o7ly/ValueSet-covid-19-obs.json)  
+[HL7 FHIR - COVID19 SNOMED Value Set](https://confluence.ihtsdotools.org/display/snomed/SNOMED%2BCT%2BCoronavirus%2BContent)  
+- [Characteristics From the Coronavirus Disease 2019 (COVID-19) Outbreak in China
+9 charts that explain the coronavirus pandemic](https://jamanetwork.com/journals/jama/fullarticle/2762130?guestAccessKey=bdcca6fa-a48c-4028-8406-7f3d04a3e932&utm_source=For_The_Media&utm_medium=referral&utm_campaign=ftm_links&utm_content=tfl&utm_term=022420)  
+- [Merk Manual - Overview of Mechanical Ventilation](https://www.merckmanuals.com/professional/critical-care-medicine/respiratory-failure-and-mechanical-ventilation/overview-of-mechanical-ventilation)    
+- [WHO Now Officially Recommends to Avoid Taking Ibuprofen For COVID-19 Symptoms](https://www.sciencealert.com/who-recommends-to-avoid-taking-ibuprofen-for-covid-19-symptoms?fbclid=IwAR1OSm9RDEyax2bpeTagBbJpNfCfXQEJUVSpvr0HQQhVc_6vm9jTdZRWUTk)    
+- [Are patients with hypertension and diabetes mellitus at increased risk for COVID-19 infection?](https://www.thelancet.com/journals/lanres/article/PIIS2213-2600(20)30116-8/fulltext) 
+- [People with blood type A may be more vulnerable to coronavirus](https://www.scmp.com/news/china/society/article/3075567/people-blood-type-may-be-more-vulnerable-coronavirus-china-study?fbclid=IwAR3BOAAY2u4AOgb9jtFYT5vxV8HaOEmNgsRq-sgM5T_poKF_JRa6OdoWzO0)  
+- [Hydroxychloroquine and azithromycin as a treatment of COVID-19](https://www.mediterranee-infection.com/wp-content/uploads/2020/03/Hydroxychloroquine_final_DOI_IJAA.pdf?fbclid=IwAR3A5tbNB49G8cNd5VprVhjnaO_j7Xx40euWEdmHaMGdcRxG1UoKWYQLu6Y)  
+- [Azithromycin induces anti-viral effects in cultured bronchial epithelial cells from COPD patients](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4923851/?fbclid=IwAR3H41tJ6zKmHueqqeqdlUKSMyjQKu8XXqusywdcp_06EXJOYebCd5P-kDU)    
+
+#### A Prayer for Health Care Workers  
+
+May the One who blessed our ancestors
+Bless all those who put themselves at risk to care for the sick
+Physicians and nurses and orderlies
+Technicians and home health aides
+EMTs and pharmacists
+(And bless especially _______)
+Who navigate the unfolding dangers of the world each day,
+To tend to those they have sworn to help.
+Bless them in their coming home and bless them in their going out.
+Ease their fear. Sustain them.
+Source of all breath, healer of all beings,
+Protect them and restore their hope.
+Strengthen them, that they may bring strength;
+Keep them in health, that they may bring healing.
+Help them know again a time when they can breathe without fear.
+Bless the sacred work of their hands.
+May this plague pass from among us, speedily and in our days.
+
+- Rabbi Ayelet Cohen, March 2020

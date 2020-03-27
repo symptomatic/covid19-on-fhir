@@ -7,10 +7,10 @@
       "defaultVideo": "/VideoBackgrounds/GrayWaves.mp4",
       "backgroundImagePath": "/backgrounds/medical/Gradient.jpg",
       "palette": {
-        "primaryColor": "rgb(108, 183, 110)",
+        "primaryColor": "#FE5000",
         "primaryText": "rgba(255, 255, 255, 1) !important",
       
-        "secondaryColor": "rgb(108, 183, 110)",
+        "secondaryColor": "#FE5000",
         "secondaryText": "rgba(255, 255, 255, 1) !important",
       
         "cardColor": "#ffffff !important",
@@ -19,7 +19,7 @@
         "errorColor": "rgb(128,20,60) !important",
         "errorText": "#ffffff !important",
       
-        "appBarColor": "#669f64 !important",
+        "appBarColor": "#FF7034 !important",
         "appBarTextColor": "#ffffff !important",
       
         "paperColor": "#ffffff !important",

@@ -2,7 +2,7 @@ import React from 'react';
 
 import CovidQueryPage from './client/CovidQueryPage';
 
-import { GoFlame } from 'react-icons/go';
+// import { GoFlame } from 'react-icons/go';
 
 
 import { 
@@ -29,7 +29,7 @@ let FooterButtons = [{
 SidebarElements = [{
   primaryText: "Query Hospital",
   to: '/query-fhir-provider',
-  icon: <GoFlame />
+  // icon: <GoFlame />
 }];
 
 
