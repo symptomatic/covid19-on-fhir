@@ -2,7 +2,11 @@
 
 This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
 
+We have already completed the following data fetching utility, which queries FHIR compliant EHRs for COVID19 related LOINC and SNOMED codes.
 ![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/CovidQueryPage.png)
+
+For the remainder of the hackathon, we will be creating a heatmap like the following, to display where COVID19 outbreaks are occuring.  We intend to support housing level mapping of COVID19 data, and make this available to hospitals via the EHR app stores.
+![FHIR Heatmap](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/design/food-desert-heatmap.jpg)  
 
 #### Design Documents  
 The primary goal behind this hackathon is to stand up a COVID19 specific version of the Epidemiology on FHIR module, so we can map hospital EHR data onto Google Maps.  Primary workflow will look something like this:
