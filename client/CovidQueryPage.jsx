@@ -66,6 +66,9 @@ Session.setDefault('fhirKitClientEndDate', '2020-03-31');
 Session.setDefault('totalEncountersDuringDateRange', 0);
 Session.setDefault('currentEncounterSearchset', null);
 
+Session.setDefault('encounterUrl', "https://");
+Session.setDefault('conditionUrl', "https://");
+Session.setDefault('procedureUrl', "https://");
 
 function CovidQueryPage(props){
   let selectedStartDate = Session.get("fhirKitClientStartDate");
@@ -212,6 +215,22 @@ function CovidQueryPage(props){
   locationCount = useTracker(function(){    
     return Locations.find().count()
   }, []);  
+
+
+  let encounterUrl = 0;
+  encounterUrl = useTracker(function(){    
+    return Session.get('encounterUrl')
+  }, [props.lastUpdated]);  
+
+  let conditionUrl = 0;
+  conditionUrl = useTracker(function(){    
+    return Session.get('conditionUrl')
+  }, [props.lastUpdated]);  
+
+  let procedureUrl = 0;
+  procedureUrl = useTracker(function(){    
+    return Session.get('procedureUrl')
+  }, [props.lastUpdated]);  
 
   //-------------------------------------------------------------------
   // Navigation Methods
@@ -647,6 +666,8 @@ function CovidQueryPage(props){
 
     logger.trace('searchOptions', searchOptions)
 
+
+
     await fhirClient.search(searchOptions)
     .then((searchResponse) => {
       logger.debug('fetchEncounterData.searchResponse', searchResponse);
@@ -662,6 +683,9 @@ function CovidQueryPage(props){
 
       if(get(searchResponse, 'resourceType') === "Bundle"){
         logger.debug('Parsing a Bundle.')
+        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
+        Session.set('encounterUrl', get(searchResponse, "link[0].url"));
+
         let entries = get(searchResponse, 'entry', []);
         
         entries.forEach(function(entry){
@@ -739,6 +763,9 @@ function CovidQueryPage(props){
 
       if(get(searchResponse, 'resourceType') === "Bundle"){
         logger.debug('Parsing a Bundle.')
+        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
+        Session.set('conditionUrl', get(searchResponse, "link[0].url"));
+
         let entries = get(searchResponse, 'entry', []);
         
         entries.forEach(function(entry){
@@ -815,6 +842,9 @@ function CovidQueryPage(props){
 
       if(get(searchResponse, 'resourceType') === "Bundle"){
         logger.debug('Parsing a Bundle.')
+        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
+        Session.set('procedureUrl', get(searchResponse, "link[0].url"));
+
         let entries = get(searchResponse, 'entry', []);
         
         entries.forEach(function(entry){
@@ -1126,7 +1156,8 @@ function CovidQueryPage(props){
               <CardHeader 
                 id="encounterCardCount"
                 title={encountersTitle} 
-                style={{fontSize: '100%'}} />
+                subheader={encounterUrl}
+                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
                 <EncountersTable
                   id="fetchedEncountersTable"
@@ -1156,7 +1187,8 @@ function CovidQueryPage(props){
               <CardHeader 
                 id="conditionsCardCount"
                 title={conditionsTitle} 
-                style={{fontSize: '100%'}} />
+                subheader={conditionUrl}
+                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
                 <ConditionsTable
                   id="fetchedConditionsTable"
@@ -1180,7 +1212,8 @@ function CovidQueryPage(props){
               <CardHeader 
                 id="proceduresCardCount"
                 title={proceduresTitle} 
-                style={{fontSize: '100%'}} />
+                subheader={procedureUrl}
+                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
                 <ProceduresTable
                   id="fetchedProceduresTable"                  

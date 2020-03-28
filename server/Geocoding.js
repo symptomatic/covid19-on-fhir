@@ -11,13 +11,14 @@ var options = {
   // formatter: null         // 'gpx', 'string', ...
 };
 
+var geocoder;
 if(get(Meteor, 'settings.public.google.maps.apiKey')){
   options.apiKey = get(Meteor, 'settings.public.google.maps.apiKey');
+  console.log('Geocoding options: ', options)
+
+  geocoder = NodeGeocoder(options);
 }
 
-console.log('Geocoding options: ', options)
-
-var geocoder = NodeGeocoder(options);
 
 Meteor.methods({
   parseGeojson: function(data){
@@ -191,31 +192,11 @@ Meteor.methods({
     }
     console.log('lets try geocoding something...', assembledAddress);
 
-    return geocoder.geocode(assembledAddress);
-
-    // return geocoder.geocode(assembledAddress, Meteor.bindEnvironment(function ( err, data ) {
-    //   console.log('geocoded data:', data);
-
-    //   let newLocation = {
-    //     resourceType: "Location",
-    //     name: assembledAddress,
-    //     position: {
-    //       longitude: null,
-    //       latitude: null,
-    //       altitude: null
-    //     }
-    //   }  
-
-    //   if(get(data[0], "latitude")){
-    //     newLocation.position.latitude = get(data[0], "latitude");
-    //   }
-    //   if(get(data[0], "longitude")){
-    //     newLocation.position.longitude = get(data[0], "longitude");        
-    //   }
-
-    //   console.log('newLocation', newLocation)
-    //   return newLocation;
-    // }));
+    let geocodedResult;
+    if(get(Meteor, 'settings.public.google.maps.apiKey')){
+      geocodedResult = geocoder.geocode(assembledAddress);
+    }
+    return geocodedResult;
   },
   geocodeAddressToProfile: function(address){
     check(address, Object);

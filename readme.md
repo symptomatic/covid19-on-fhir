@@ -160,9 +160,25 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 - [COVID-19: Adult ED](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-ED.pdf)    
 - [COVID-19: Adult Inpatient](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-Inpatient.pdf)    
 - [COVID-19: Adult Respiratory Failure and Cardiac Arrest](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-Respiratory-Failure-and-Cardiac-Arrest.pdf)  
+- [COVID-19 Patient Impact & Hospital Capacity Module](https://www.cdc.gov/nhsn/acute-care-hospital/covid19/index.html)  
 
+#### Team Acknowledgements  
+- Chris Hafey, _DBA Backup, Business Administration_, (Fomerly Nucleus.io)  
+- Andrei Rusu, _Quality Control_, (Nightwatch.js)     
+- Jae Brodsky, _Statistician_  
+- Sarah Sims, _Business Administration_   
+- David Donohue, _Medical Advisory Board_  
 
-
+#### Acknowledgements (Product Development, Review, & Early Testing)    
+- Ken Salyards (SAMSHA, Health and Human Services)  
+- Andrea Pitkus, PhD, MLS, (UW School of Medicine and Public Health)  
+- Viet Nguyen, MD, (Board Member at Health Level Seven International)   
+- Brett Johnson (Personalized Medicine Strategic Planning)   
+- Mohit Saigal (Customer Focused IT and PM Leader)  
+- Brian Jackson (Academic Clinical Pathologist)  
+- Russell Hamm (Evangalist)  
+- Rex Stock (Evangalist)  
+ 
 #### A Prayer for Health Care Workers  
 
 May the One who blessed our ancestors  
