@@ -146,10 +146,9 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 
 #### References  
 - [CDC - ICD10 Codes](https://www.cdc.gov/nchs/data/icd/ICD-10-CM-Official-Coding-Gudance-Interim-Advice-coronavirus-feb-20-2020.pdf)  
--[HL7 FHIR - COVID19 LOINC Value Set](https://chat.fhir.org/user_uploads/10155/tQQtv3GQZhC3DRmMgk59o7ly/ValueSet-covid-19-obs.json)  
-[HL7 FHIR - COVID19 SNOMED Value Set](https://confluence.ihtsdotools.org/display/snomed/SNOMED%2BCT%2BCoronavirus%2BContent)  
-- [Characteristics From the Coronavirus Disease 2019 (COVID-19) Outbreak in China
-9 charts that explain the coronavirus pandemic](https://jamanetwork.com/journals/jama/fullarticle/2762130?guestAccessKey=bdcca6fa-a48c-4028-8406-7f3d04a3e932&utm_source=For_The_Media&utm_medium=referral&utm_campaign=ftm_links&utm_content=tfl&utm_term=022420)  
+- [HL7 FHIR - COVID19 LOINC Value Set](https://chat.fhir.org/user_uploads/10155/tQQtv3GQZhC3DRmMgk59o7ly/ValueSet-covid-19-obs.json)  
+- [HL7 FHIR - COVID19 SNOMED Value Set](https://confluence.ihtsdotools.org/display/snomed/SNOMED%2BCT%2BCoronavirus%2BContent)  
+- [Characteristics From the Coronavirus Disease 2019 (COVID-19) Outbreak in China](https://jamanetwork.com/journals/jama/fullarticle/2762130?guestAccessKey=bdcca6fa-a48c-4028-8406-7f3d04a3e932&utm_source=For_The_Media&utm_medium=referral&utm_campaign=ftm_links&utm_content=tfl&utm_term=022420)  
 - [Merk Manual - Overview of Mechanical Ventilation](https://www.merckmanuals.com/professional/critical-care-medicine/respiratory-failure-and-mechanical-ventilation/overview-of-mechanical-ventilation)    
 - [WHO Now Officially Recommends to Avoid Taking Ibuprofen For COVID-19 Symptoms](https://www.sciencealert.com/who-recommends-to-avoid-taking-ibuprofen-for-covid-19-symptoms?fbclid=IwAR1OSm9RDEyax2bpeTagBbJpNfCfXQEJUVSpvr0HQQhVc_6vm9jTdZRWUTk)    
 - [Are patients with hypertension and diabetes mellitus at increased risk for COVID-19 infection?](https://www.thelancet.com/journals/lanres/article/PIIS2213-2600(20)30116-8/fulltext) 
