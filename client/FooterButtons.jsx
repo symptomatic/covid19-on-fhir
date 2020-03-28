@@ -28,36 +28,94 @@ let fhirBaseUrl = get(Meteor, 'settings.public.interfaces.default.channel.endpoi
 // }
 
 
+//========================================================================================================
+
+import {
+  fade,
+  ThemeProvider,
+  MuiThemeProvider,
+  withStyles,
+  makeStyles,
+  createMuiTheme,
+  useTheme
+} from '@material-ui/core/styles';
+
+  // Global Theming 
+  // This is necessary for the Material UI component render layer
+  let theme = {
+    appBarColor: "#f5f5f5 !important",
+    appBarTextColor: "rgba(0, 0, 0, 1) !important",
+  }
+
+  // if we have a globally defined theme from a settings file
+  if(get(Meteor, 'settings.public.theme.palette')){
+    theme = Object.assign(theme, get(Meteor, 'settings.public.theme.palette'));
+  }
+
+  const muiTheme = createMuiTheme({
+    typography: {
+      useNextVariants: true,
+    },
+    palette: {
+      appBar: {
+        main: theme.appBarColor,
+        contrastText: theme.appBarTextColor
+      },
+      contrastThreshold: 3,
+      tonalOffset: 0.2
+    }
+  });
 
 
+  const useTabStyles = makeStyles(theme => ({
+    button: {
+      cursor: 'pointer',
+      justifyContent: 'left',
+      color: theme.appBarTextColor,
+      marginLeft: '20px',
+      marginTop: '10px'
+    }
+  }));
 
 //============================================================================================================================
 // FETCH
 
 export function FetchButtons(props){
-  function clearPatient(){
-    console.log('clearPatient!');
-    Session.set('selectedPatientId', false);
-    Session.set('selectedPatient', false);
-  }
+  const buttonClasses = useTabStyles();
+
   function clearAllData(){
-    console.log('clearPatient!');
+    console.log('Clear All Data!');
 
   }
   return (
-    <div>
-      <Button className={props.classes.button} onClick={ clearPatient.bind() } >
-        Clear Patient
-      </Button>
-      <Button className={props.classes.button} onClick={ clearAllData.bind() } >
+    <MuiThemeProvider theme={muiTheme} >
+      <Button onClick={ clearAllData.bind() } className={ buttonClasses.button }>
         Clear All Data
-      </Button>
-      {/* <Button className={props.classes.button} onClick={ queryAllEncountersForDaterange.bind(this) } >
-        1. Fetch Encounters
-      </Button> */}
-    </div>
+      </Button>      
+    </MuiThemeProvider>
   );
 }
+
+export default FetchButtons;
+
+
+export function MapButtons(props){
+  const buttonClasses = useTabStyles();
+
+  function initHospitals(){
+    console.log('Init Hospitals!');
+
+  }
+  return (
+    <MuiThemeProvider theme={muiTheme} >
+      <Button onClick={ initHospitals.bind() } className={ buttonClasses.button }>
+        Initialize Hospitals
+      </Button>      
+    </MuiThemeProvider>
+  );
+}
+
+
 
 
 

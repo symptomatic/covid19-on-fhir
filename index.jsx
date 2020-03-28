@@ -6,7 +6,8 @@ import GoogleMapsPage from './client/GoogleMapsPage';
 // import { GoFlame } from 'react-icons/go';
 
 import { 
-  FetchButtons
+  FetchButtons,
+  MapButtons
 } from './client/FooterButtons';
 
 import { HeaderNavigation } from './client/HeaderNavigation';
@@ -23,7 +24,13 @@ var DynamicRoutes = [{
 }];
 
 let FooterButtons = [{
+  pathname: '/map',
+  component: <MapButtons />
+}, {
   pathname: '/query-fhir-provider',
+  component: <FetchButtons />
+}, {
+  pathname: '/',
   component: <FetchButtons />
 }];
 
@@ -50,6 +57,9 @@ export {
   HeaderNavigation,
   SidebarElements,
   FooterButtons,
+
+  MapButtons,
+  FetchButtons,
 
   MainPage
 };

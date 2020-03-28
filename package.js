@@ -16,6 +16,7 @@ Package.onUse(function(api) {
     api.use('session');
     api.use('mongo');
     api.use('http');
+    api.use('ejson');
     api.use('fourseven:scss');
 
     api.use('browser-policy@1.1.0')
@@ -25,6 +26,7 @@ Package.onUse(function(api) {
     api.addFiles('lib/TestingMethods.js');
     api.addFiles('server/ProxyMethods.js', 'server');
     api.addFiles('server/BrowserPolicies.js', 'server');
+    api.addFiles('server/Geocoding.js', 'server');
 
     api.addFiles('geodata/illinois-epa-toxic-inventory-sites.geojson', 'client', {isAsset: true});
     
@@ -32,5 +34,6 @@ Package.onUse(function(api) {
 });
 
 Npm.depends({
-    "google-map-react":"1.0.1"
-  });
+    "google-map-react":"1.0.1",
+    "node-geocoder": "3.26.0"
+});

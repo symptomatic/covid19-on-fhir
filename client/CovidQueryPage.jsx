@@ -9,6 +9,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
@@ -21,7 +22,7 @@ import JSON5 from 'json5';
 
 import moment from 'moment';
 
-import { Patients, Encounters, Observations, EncountersTable, ConditionsTable, ProceduresTable } from 'meteor/clinical:hl7-fhir-data-infrastructure';
+import { Patients, Encounters, Observations, EncountersTable, ConditionsTable, ProceduresTable, LocationsTable } from 'meteor/clinical:hl7-fhir-data-infrastructure';
 
 import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
 import { useTracker } from './Tracker';
@@ -77,10 +78,26 @@ function CovidQueryPage(props){
   const rowsPerPage = get(Meteor, 'settings.public.defaults.rowsPerPage', 25);
 
 
-  let [patients, setPatients] = useState([]);
+  let [patients,   setPatients]   = useState([]);
   let [encounters, setEncounters] = useState([]);
   let [conditions, setConditions] = useState([]);
   let [procedures, setProcedures] = useState([]);
+  let [locations,  setLocations]  = useState([]);
+
+  let [checkedTested,  setCheckedTested]  = useState(true);
+  let [checkedFever,  setCheckedFever]  = useState(true);
+  let [checkedCough,  setCheckedCough]  = useState(true);
+  let [checkedDyspnea,  setCheckedDyspnea]  = useState(true);
+  let [checkedVentilator,  setCheckedVentilator]  = useState(true);
+  let [checkedCovid19,  setCheckedCovid19]  = useState(true);
+  let [checkedSuspectedCovid19,  setCheckedSuspectedCovid19]  = useState(true);
+  let [checkedHydroxychloroquine,  setCheckedHydroxychloroquine]  = useState(false);
+  let [checkedBloodTypeA,  setCheckedBloodTypeA]  = useState(false);
+  let [checkedSmoker,  setCheckedSmoker]  = useState(false);
+  let [checkedHypertension,  setCheckedHypertension]  = useState(false);
+  let [checkedTamiflu,  setCheckedTamiflu]  = useState(false);
+  let [checkedSerumAntibodies,  setCheckedSerumAntibodies]  = useState(false);
+  
 
   let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'));
 
@@ -104,7 +121,7 @@ function CovidQueryPage(props){
 
   let encounterCursor;
   encounterCursor = useTracker(function(){    
-    logger.debug('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
+    logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
     return Encounters.find();
   }, [props.lastUpdated]);  
 
@@ -146,6 +163,18 @@ function CovidQueryPage(props){
   }
 
 
+  let locationsCursor;
+  locationsCursor = useTracker(function(){
+    // this console logging statement may be creating a side effect
+    // that triggers the re-render
+    //logger.debug('CovidQueryPage.Procedures.find()', Procedures.find().fetch());
+    return Locations.find();
+  }, [props.lastUpdated]); 
+  if(locationsCursor){
+    locations = locationsCursor.fetch();
+  }
+
+
   //-------------------------------------------------------------------
   // Progress Bars
 
@@ -179,8 +208,13 @@ function CovidQueryPage(props){
     return Procedures.find().count()
   }, []);  
 
+  let locationCount = 0;
+  locationCount = useTracker(function(){    
+    return Locations.find().count()
+  }, []);  
+
   //-------------------------------------------------------------------
-  // Button Methods
+  // Navigation Methods
 
   function openPage(url){
     logger.debug('client.app.patient.PatientSidebar.openPage', url);
@@ -189,6 +223,133 @@ function CovidQueryPage(props){
     }
   }
 
+  //-------------------------------------------------------------------
+  // Toggle Methods
+
+  function handleToggleFever(props){
+    logger.warn('CovidQueryPage.handleToggleFever()');
+
+    if(checkedFever){
+      setCheckedFever(false);
+    } else {
+      setCheckedFever(true);
+    }
+  }
+  function handleToggleCough(props){
+    logger.warn('CovidQueryPage.handleToggleCough()');
+
+    if(checkedCough){
+      setCheckedCough(false);
+    } else {
+      setCheckedCough(true);
+    }
+  }
+  function handleToggleDyspnea(props){
+    logger.warn('CovidQueryPage.handleToggleDyspnea()');
+
+    if(checkedDyspnea){
+      setCheckedDyspnea(false);
+    } else {
+      setCheckedDyspnea(true);
+    }
+  }
+  function handleToggleVentilator(props){
+    logger.warn('CovidQueryPage.handleToggleDyspnea()');
+
+    if(checkedVentilator){
+      setCheckedVentilator(false);
+    } else {
+      setCheckedVentilator(true);
+    }
+  }
+  function handleToggleTested(props){
+    logger.warn('CovidQueryPage.handleToggleTested()');
+
+    if(checkedVentilator){
+      checkedTested(false);
+    } else {
+      setCheckedTested(true);
+    }
+  }
+  function handleToggleSuspectedCovid19(props){
+    logger.warn('CovidQueryPage.handleToggleSuspectedCovid19()');
+
+    if(checkedSuspectedCovid19){
+      setCheckedSuspectedCovid19(false);
+    } else {
+      setCheckedSuspectedCovid19(true);
+    }
+  }
+  function handleToggleCovid19(props){
+    logger.warn('CovidQueryPage.handleToggleCovid19()');
+
+    if(checkedCovid19){
+      setCheckedCovid19(false);
+    } else {
+      setCheckedCovid19(true);
+    }
+  }
+
+  function handleToggleHydroxychloroquine(props){
+    logger.warn('CovidQueryPage.handleToggleHydroxychloroquine()');
+
+    if(checkedHydroxychloroquine){
+      setCheckedHydroxychloroquine(false);
+    } else {
+      setCheckedHydroxychloroquine(true);
+    }
+  }
+  function handleToggleBloodTypeA(props){
+    logger.warn('CovidQueryPage.handleToggleBloodTypeA()');
+
+    if(checkedBloodTypeA){
+      setCheckedBloodTypeA(false);
+    } else {
+      setCheckedBloodTypeA(true);
+    }
+  }
+  function handleToggleSmoker(props){
+    logger.warn('CovidQueryPage.handleToggleSmoker()');
+
+    if(checkedSmoker){
+      setCheckedSmoker(false);
+    } else {
+      setCheckedSmoker(true);
+    }
+  }
+  function handleToggleHypertension(props){
+    logger.warn('CovidQueryPage.handleToggleHypertension()');
+
+    if(checkedHypertension){
+      setCheckedHypertension(false);
+    } else {
+      setCheckedHypertension(true);
+    }
+  }
+  function handleToggleTamiflu(props){
+    logger.warn('CovidQueryPage.handleToggleTamiflu()');
+
+    if(checkedTamiflu){
+      setCheckedTamiflu(false);
+    } else {
+      setCheckedTamiflu(true);
+    }
+  }
+  function handleToggleSerumAntibodies(props){
+    logger.warn('CovidQueryPage.handleToggleSerumAntibodies()');
+
+    if(checkedSerumAntibodies){
+      setCheckedSerumAntibodies(false);
+    } else {
+      setCheckedSerumAntibodies(true);
+    }
+  }
+
+  
+  
+
+  //-------------------------------------------------------------------
+  // Button Methods
 
   function handleFetchEncounters(props){
     logger.warn('CovidQueryPage.handleFetchEncounters()');
@@ -210,6 +371,66 @@ function CovidQueryPage(props){
     fetchProcedureData(props, function(){
       fetchPatientsFromFhirArray(props, Procedures.find().fetch());
     });
+  }
+
+  function handleGeocodeAddresses(props){
+    logger.warn('CovidQueryPage.handleGeocodeAddresses()');
+    logger.debug('CovidQueryPage.handleGeocodeAddresses().patients?', patients);
+
+    patients.forEach(function(patient){
+      Meteor.call('geocodePatientAddress', patient, function(error, result){
+        if(error){
+          console.log('geocodeAddress.error', error)
+        }
+        if(result){
+          console.log('geocodeAddress.result', result)
+ 
+          if(get(result, 'resourceType') === "Location"){
+            Locations.insert(result);
+          }
+        }
+      })
+    });
+
+    // Meteor.call('geocodePatientAddresses', patients, function(error, results){
+    //   if(error){
+    //     console.log('geocodeAddress.error', error)
+    //   }
+    //   if(results){
+    //     console.log('geocodeAddress.results', results)
+
+    //     if(Array.isArray(results)){
+    //       results.forEach(function(location){
+    //         Locations.insert(location);
+    //       })
+    //     }
+    //   }
+    // })
+  }
+
+  function clearProcedures(){
+    logger.warn('CovidQueryPage.clearProcedures()');
+    Procedures.remove({});
+  }
+  function clearEncounters(){
+    logger.warn('CovidQueryPage.clearEncounters()');
+    Encounters.remove({});
+  }
+  function clearConditions(){
+    logger.warn('CovidQueryPage.clearConditions()');
+    Conditions.remove({});
+  }
+  function clearPatients(){
+    logger.warn('CovidQueryPage.clearPatients()');
+    Patients.remove({});
+  }
+  function clearLocations(){
+    logger.warn('CovidQueryPage.clearLocations()');
+    Locations.remove({});
+  }
+
+  function generateGeoJson(){
+    logger.warn('CovidQueryPage.generateGeoJson()');
   }
 
   //-------------------------------------------------------------------
@@ -736,6 +957,8 @@ function CovidQueryPage(props){
   let encountersTitle = 'Encounters';
   let conditionsTitle = 'Conditions';
   let proceduresTitle = 'Procedures';
+  let locationsTitle = 'Locations';
+
 
   if(typeof Patients === "object"){
     patientTitle = patientCount + ' Patients';
@@ -752,6 +975,9 @@ function CovidQueryPage(props){
   if(typeof Procedures === "object"){
     proceduresTitle = procedureCount + ' Procedures';
   }
+  if(typeof Locations === "object"){
+    locationsTitle = locationCount + ' Locations';
+  }
 
   
   selectedStartDate = moment(selectedStartDate).format("YYYY-MM-DD");
@@ -759,16 +985,16 @@ function CovidQueryPage(props){
     
 
   return (
-    <PageCanvas id='fetchDataFromHospitalPage' headerHeight={128} >
+    <PageCanvas id='fetchDataFromHospitalPage' headerHeight={158} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
-        <Grid container spacing={3}>
+        <Grid container spacing={3} >
           <Grid item xs={4}>
-            <CardHeader 
-              title="Fetch Covid Data" 
-              subheader="Fetching data related to COVID19 coronavirus symptoms."
-              style={{fontSize: '100%'}} />
-
-            <StyledCard>
+            
+            <StyledCard style={{minHeight: '280px'}}>
+              <CardHeader 
+                title="Fetch Covid Data" 
+                subheader="Fetching data related to COVID19 coronavirus symptoms."
+                style={{fontSize: '100%'}} />
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item xs={8}>
@@ -823,14 +1049,78 @@ function CovidQueryPage(props){
               </CardActions>              
             </StyledCard>            
           </Grid>
-          <Grid item xs={6}>
-            <StyledCard>
-
+          <Grid item xs={4}>
+            <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
+              <CardHeader                 
+                title="Options" 
+                style={{fontSize: '100%'}} />
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
+                <div>
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedDyspnea" />}
+                    label="Testing Encounter"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedFever} onChange={handleToggleFever.bind(this)} name="checkedFever" />}
+                    label="Fever"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedCough} onChange={handleToggleCough.bind(this)} name="checkedCough" />}
+                    label="Cough"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedDyspnea} onChange={handleToggleDyspnea.bind(this)} name="checkedDyspnea" />}
+                    label="Dyspnea (Shortness of Breath)"
+                  />
+                </div>
+                <div>
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedFever" />}
+                    label="Smoker"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedFever" />}
+                    label="Hypertension"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedFever" />}
+                    label="Blood Type A"
+                  />
+                </div>
+                <div>
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedFever" />}
+                    label="Tamiflu"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedFever" />}
+                    label="Hydroxychloroquine"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedFever" />}
+                    label="Ventilators"
+                  />
+                </div>
+                <div>
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedDyspnea" />}
+                    label="Suspected Covid19"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedDyspnea" />}
+                    label="Covid19"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedFever" />}
+                    label="Serum Antibodies"
+                  />
+                </div>
+              </CardContent>
             </StyledCard>
           </Grid>
         </Grid>
 
-        <Grid container spacing={3}>          
+        <Grid container spacing={3} style={{paddingBottom: '80px'}}>          
           <Grid item xs={4}>
             <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px'}}>
               <CardHeader 
@@ -854,10 +1144,11 @@ function CovidQueryPage(props){
                   hideEndDateTime
                   calculateDuration={false}
                   hideHistory
-                  multiline
-                  hideType
                 />
               </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="clearEncountersBtn" color="primary" className={classes.button} onClick={clearEncounters.bind(this)} >Clear</Button> 
+              </CardActions> 
             </StyledCard>
           </Grid>
           <Grid item xs={4}>
@@ -879,6 +1170,9 @@ function CovidQueryPage(props){
                   displayBarcode={false}
                 />
               </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
+              </CardActions> 
             </StyledCard>
           </Grid>
           <Grid item xs={4}>
@@ -893,23 +1187,26 @@ function CovidQueryPage(props){
                   procedures={procedures}
                   rowsPerPage={10}
                   count={procedureCount}
-                  hideActionIcons={true}
-                  hideCategory={true}
-                  hideCheckboxes={true}
-                  hideIdentifier={true}
-                  hideSubject={true}
-                  hideBodySite={true}
-                  hidePerformer={true}
-                  hidePerformedDateEnd={true}
-                  hideBarcode={true}
-                  hideNotes={true}
-                  hideActionButton={true}
+                  hideActionIcons
+                  hideCategory
+                  hideCheckboxes
+                  hideIdentifier
+                  hideSubject
+                  hideBodySite
+                  hidePerformer
+                  hidePerformedDateEnd
+                  hideBarcode
+                  hideNotes
+                  hideActionButton
                 />
               </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="clearProceduresBtn" color="primary" className={classes.button} onClick={clearProcedures.bind(this)} >Clear</Button> 
+              </CardActions> 
             </StyledCard>
           </Grid>
           <Grid item xs={4}>
-            <StyledCard id="fetchedPatientsCard">
+            <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
               <CardHeader 
                 id="patientCardCount"
                 title={patientTitle}  
@@ -921,12 +1218,49 @@ function CovidQueryPage(props){
                   hideIdentifier
                   hideMaritalStatus
                   rowsPerPage={10}
-                  count={patients.length}
+                  count={patientCount}
                   hideActionIcons
                   hideLanguage
+                  hideCountry
                   showCounts={false}
                   hideActive
               />
+              </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="geocodePatientAddresses" color="primary" variant="contained" className={classes.button} onClick={handleGeocodeAddresses.bind(this)} >Geocode Addresses</Button> 
+                <Button id="clearPatientsBtn" color="primary" className={classes.button} onClick={clearPatients.bind(this)} >Clear</Button> 
+              </CardActions> 
+            </StyledCard>
+          </Grid>
+          <Grid item xs={4}>
+            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px'}}>
+              <CardHeader 
+                id="geocodedLocationsCount"
+                title={locationsTitle}  
+                style={{fontSize: '100%'}} />
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+                <LocationsTable
+                  id="geocodedLocationsTable"
+                  locations={locations}
+                  rowsPerPage={10}
+                  count={locationCount}
+              />
+              </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="clearLocationsBtn" color="primary" className={classes.button} onClick={clearLocations.bind(this)} >Clear</Button> 
+                <Button id="generateGeoJsonBtn" color="primary" variant="contained" className={classes.button} onClick={generateGeoJson.bind(this)} >Generate GeoJson</Button> 
+              </CardActions> 
+            </StyledCard>
+          </Grid>
+          <Grid item xs={4}>
+            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px'}}>
+              <CardHeader 
+                id="geoJsonPreview"
+                title="GeoJson"
+                style={{fontSize: '100%'}} />
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+                
+                
               </CardContent>
             </StyledCard>
           </Grid>

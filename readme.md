@@ -35,8 +35,6 @@ Please read the following links for background design on this project:
 - [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
 - [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
 
-#### Use Cases  
-
 
 
 #### Installation  
@@ -125,6 +123,30 @@ curl http://localhost:8080/baseR4/Encounter?_count=100
 
 ```
 
+#### FAQ  
+
+_Who is your intended user?_  
+We're following the data, and haven't applied security rules or roles yet.  I'm soliciting feedback and opinion on which to prioritize first, but am trying to keep the map reusable for a number of different use cases.   
+
+The underlying mapping technology has applications for just about every stakeholder, but there seems to be particular need at the population health level (placement of testing centers, tracking overall spread), the field dispatch level (EMTs, police, social workers), and the individual patient levels.
+
+Those are probably the 3 stakeholders we'll be focusing on.  There's a lot of overlap, though.  Similar to Radiology in that regard.  Who is the intended user of an X-Ray?  Well, anybody who has an interest.  People take their own learnings away from maps depending on their needs.  But the layers we add on obviously have specific interest groups.  
+
+I'm probably going to lay down hospital markers first (for the Chicagoland area); then do patient address markers for COVID19 positive patients with synthetic data.  And then assess how we want to apply the security rules and roles access from there.    
+
+
+_Do you have addresses of COVID 19 patients or would that be a HIPAA/privacy issue?_  
+Yes, we can actually get to the addresses of COVID19 patients via FHIR.  They will be patients who have visited hospitals or drive through clinics and been part of the official health networks, rather than self-reported data.  But we can get to that data for the hackathon.  As for HIPAA, that use case will need to be installed with Provider Launch Context and run from a HIPAA zone (but we've already set our database up in one, and are preparing for that).  We were initially worried that we would need to bounce data through Google geocoding servers to map addresses into latitude/longitude (which we will probably do with the online demo and synthetic data), but we have a lead on a docker image of a geocoding server that we can run from within our own HIPAA zone.  So, full steam ahead with COVID19 patient address data in a HIPAA compliant manner.  
+
+_What do you mean by testing sites?_
+When we talk testing sites, we are generally discussing the work involved in setting up drive-through testing sites.  [CVS is hiring something like 50,000 workers right now](https://www.linkedin.com/posts/suemedina_cvs-health-to-provide-bonuses-add-benefits-activity-6647831289669971968-TDfL), and the way this pandemic is going, we're likely to wind up having a drive-through testing center in ever CVS, Walgreens, and Walmart parking lot.    That lends itself to a structural map layer, and knowing where testing sites are and are not will help in routing patients to the closest one in early and later phases of the pandemic.  Further in the pandemic cycle, we will want to know where to put testing centers when hotspots crop up.  There will be gaps in geospatial coverage (pandemics are population density based, and geospatial in nature).  
+
+Update (courtesy Andrea Pitkus, PhD, MLS):  Currently, drive through testing isn't a COVID-19 testing center.  It is a Drive Through Specimen Collection Center, and the specimens are sent to a a CLIA certified (or NY or WA compliant) laboratory which performs these moderate to high complexity tests with trained laboratory professionals.  Some of the testing centers are clear across the county.  It depends on with which the testing collection sites have their contracts.  
+
+For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or performed at a closer LabCorp laboratory.  They could also contract with NorthShore University Health System as they are performing testing in your area.  Walmart and CVS have contracts with Quest Diagnostics, so those may be sent to the Wooddale, IL facility performing COVID-19 testing for the upper Midwest.  If state/government entities are setting up these sites, they may be performed by state public health labs.   
+
+
+
 #### References  
 - [CDC - ICD10 Codes](https://www.cdc.gov/nchs/data/icd/ICD-10-CM-Official-Coding-Gudance-Interim-Advice-coronavirus-feb-20-2020.pdf)  
 -[HL7 FHIR - COVID19 LOINC Value Set](https://chat.fhir.org/user_uploads/10155/tQQtv3GQZhC3DRmMgk59o7ly/ValueSet-covid-19-obs.json)  
@@ -147,22 +169,23 @@ curl http://localhost:8080/baseR4/Encounter?_count=100
 
 #### A Prayer for Health Care Workers  
 
-May the One who blessed our ancestors
-Bless all those who put themselves at risk to care for the sick
-Physicians and nurses and orderlies
-Technicians and home health aides
-EMTs and pharmacists
-(And bless especially _______)
-Who navigate the unfolding dangers of the world each day,
-To tend to those they have sworn to help.
-Bless them in their coming home and bless them in their going out.
-Ease their fear. Sustain them.
-Source of all breath, healer of all beings,
-Protect them and restore their hope.
-Strengthen them, that they may bring strength;
-Keep them in health, that they may bring healing.
-Help them know again a time when they can breathe without fear.
-Bless the sacred work of their hands.
-May this plague pass from among us, speedily and in our days.
+May the One who blessed our ancestors  
+Bless all those who put themselves at risk to care for the sick  
+Physicians and nurses and orderlies  
+Technicians and home health aides  
+EMTs and pharmacists  
+(And bless especially _______)  
+Who navigate the unfolding dangers of the world each day,  
+To tend to those they have sworn to help.  
+Bless them in their coming home and bless them in their going out.  
+Ease their fear. Sustain them.  
+Source of all breath, healer of all beings,  
+Protect them and restore their hope.  
+Strengthen them, that they may bring strength;  
+Keep them in health, that they may bring healing.  
+Help them know again a time when they can breathe without fear.  
+Bless the sacred work of their hands.  
+May this plague pass from among us, speedily and in our days.  
 
-- Rabbi Ayelet Cohen, March 2020
+- Rabbi Ayelet Cohen, March 2020  
+

@@ -26,7 +26,6 @@ import {
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-// import { IoIosSearch } from 'react-icons/io';
 import { green } from '@material-ui/core/colors';
 
 import { get } from 'lodash';
