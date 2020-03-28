@@ -2,15 +2,12 @@
 
 This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
 
-We have already completed the following data fetching utility, which queries FHIR compliant EHRs for COVID19 related LOINC and SNOMED codes.
-![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/CovidQueryPage.png)
+The COVID19 on FHIR project's primary utility is the query page, which fetches coronavirus related conditions, procedures, medications, and encounters using LOINC and SNOMED codes identified by our network of collaborators.  We can query by date range, select clinical parameters of interest, fetch the data from over 87% of hospitals in the US, extract the patient home addresses, geocode them, and generate a map layer to be loaded into Google Maps.  
+![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-Geocoding-Workflow-Page.png)
 
+The second component of the project is Google Maps, and our ability to layer FHIR data on top of it.  We have access to the full API, including markers, heatmaps, reverse geocoding, routing, and many other features.  
+![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-Map-SampleData.png)
 
-Update:  We've now enabled Google Maps.  This is the canvas we are working, and making available.  Please contact us with any hospital or community public health geomapping needs.  
-![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-RawMap.png)
-
-For the remainder of the hackathon, we will be creating a heatmap like the following, to display where COVID19 outbreaks are occuring.  We intend to support housing level mapping of COVID19 data, and make this available to hospitals via the EHR app stores.
-![FHIR Heatmap](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/design/food-desert-heatmap.jpg)  
 
 #### Design Documents  
 The primary goal behind this hackathon is to stand up a COVID19 specific version of the Epidemiology on FHIR module, so we can map hospital EHR data onto Google Maps.  Primary workflow will look something like this:
