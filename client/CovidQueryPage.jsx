@@ -100,8 +100,8 @@ function CovidQueryPage(props){
 
   let [checkedTested,  setCheckedTested]  = useState(false);
   let [checkedFever,  setCheckedFever]  = useState(true);
-  let [checkedCough,  setCheckedCough]  = useState(true);
-  let [checkedDyspnea,  setCheckedDyspnea]  = useState(true);
+  let [checkedCough,  setCheckedCough]  = useState(false);
+  let [checkedDyspnea,  setCheckedDyspnea]  = useState(false);
   let [checkedVentilator,  setCheckedVentilator]  = useState(true);
   let [checkedOxygenAdministration,  setCheckedOxygenAdministration]  = useState(true);
   let [checkedCovid19,  setCheckedCovid19]  = useState(true);
@@ -1216,6 +1216,7 @@ function CovidQueryPage(props){
                       fullWidth
                       margin="normal"
                       onChange={handleFhirEndpointChange}
+                      disabled
                     />
 
                   </Grid>
@@ -1413,7 +1414,6 @@ function CovidQueryPage(props){
                   marks
                   min={0}
                   max={100}
-                  disabled                  
                 />
 
                 <Typography gutterBottom>
@@ -1428,7 +1428,6 @@ function CovidQueryPage(props){
                   marks
                   min={0}
                   max={100}
-                  disabled
                 />
 
               </CardContent>
@@ -1580,10 +1579,10 @@ function CovidQueryPage(props){
                 title="GeoJson"
                 subheader={geoJsonLayerFeaturesCount ? geoJsonLayerFeaturesCount + ' Features' : ''}
                 style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll', height: '500px'}}>
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll', maxHeight: '500px'}}>
                 
-                <div style={{position: 'absolute', overflowY: 'scroll', height: '630px', width: '100%'}}>
-                  <pre style={{overflow: 'scroll', height: '450px', width: '100%'}}>
+                <div style={{position: 'absolute', overflowY: 'scroll', maxHeight: '630px', width: '100%'}}>
+                  <pre style={{overflow: 'scroll', maxHeight: '450px', width: '100%'}}>
                     { JSON.stringify(geoJsonLayer, null, 2) }
                   </pre>
                 </div>
