@@ -1,6 +1,6 @@
 Package.describe({
     name: 'symptomatic:covid19-on-fhir',
-    version: '0.3.3',
+    version: '0.3.4',
     summary: 'COVID19 Hackathon',
     git: 'https://github.com/symptomatic/covid19-hackathon',
     documentation: 'README.md'
@@ -17,11 +17,12 @@ Package.onUse(function(api) {
     api.use('mongo');
     api.use('http');
     api.use('ejson');
+    api.use('random');
     api.use('fourseven:scss');
 
     api.use('browser-policy@1.1.0')
 
-    api.use('clinical:hl7-fhir-data-infrastructure@6.2.2');
+    api.use('clinical:hl7-fhir-data-infrastructure@6.3.1');
 
     api.addFiles('stylesheets/maps.css', 'client');
 

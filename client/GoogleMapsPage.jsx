@@ -9,6 +9,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 
 import { Session } from 'meteor/session';
+import { Random } from 'meteor/session';
 
 import { get, cloneDeep } from 'lodash';
 
@@ -403,12 +404,12 @@ export class GoogleMapsPage extends React.Component {
 
 
             // } else {
-              console.log('Defaulting to the City of Chicago EPA toxic inventory.')
+              //console.log('Defaulting to the City of Chicago EPA toxic inventory.')
               //map.data.loadGeoJson(geodataUrl);
               // map.data.addGeoJson(geoJsonLayer);  
 
 
-
+              console.log('Ohai, which geodataUrl are we fetching:  ' + geodataUrl)
               HTTP.get(geodataUrl, function(error, data){
                 var geojson = EJSON.parse(data.content);
                 console.log('loadGeoJson', geojson);
@@ -422,7 +423,7 @@ export class GoogleMapsPage extends React.Component {
                   // need to guard against too far away points 
                   // -0.408386, 53.2734499
                   if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
-                    dataLayer.push(new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]')));
+                    dataLayer.push({location: new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]')), weight: 5});
                   }
                 })
 
@@ -446,22 +447,18 @@ export class GoogleMapsPage extends React.Component {
                 
 
 
-
-
                 console.log('Constructed a datalayer to render.', dataLayer)
 
                 if(process.env.NODE_ENV === "test"){
                   console.log('dataLayer', dataLayer);
                 }
 
-                map.data.addGeoJson(geoJsonLayer);  
+                // map.data.addGeoJson(geoJsonLayer);  
                 map.data.loadGeoJson(geodataUrl);
 
                 // // load US state outline polygons from a GeoJson file
                 // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
 
-
-                // map.data.loadGeoJson(baseUrl + 'geodata/covid19-patients-synthea.geojson');
 
                 // if we turn on the heatmap
                 var heatmap = new maps.visualization.HeatmapLayer({
@@ -469,8 +466,11 @@ export class GoogleMapsPage extends React.Component {
                   map: map
                 });
 
-                heatmap.set('radius', 50);
+                heatmap.set('radius', 10);
                 heatmap.set('opacity', 0.5);
+                heatmap.set('dissipating', false);
+                heatmap.set('maxIntensity', 50);
+                
                 heatmap.set('gradient', [
                   'rgba(255, 255, 255, 0)',
                   'rgba(251, 251, 213, 1)',
@@ -481,7 +481,7 @@ export class GoogleMapsPage extends React.Component {
                   'rgba(240, 151, 71, 1)',
                   'rgba(238, 135, 47, 1)',
                   'rgba(236, 118, 23, 1)',
-                  'rgba(210, 80, 0, 1)',
+                  'rgba(210, 80, 0, 1)'
                 ]);
                 
                 heatmap.setMap(map);

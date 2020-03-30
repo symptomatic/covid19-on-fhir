@@ -12,6 +12,15 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Slider from '@material-ui/core/Slider';
+import Typography from '@material-ui/core/Typography';
+
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+
 
 import { get, has } from 'lodash';
 import { Meteor } from 'meteor/meteor';
@@ -405,6 +414,12 @@ function CovidQueryPage(props){
   //-------------------------------------------------------------------
   // Button Methods
 
+  function geocodeCentroid(props){
+    logger.warn('CovidQueryPage.geocodeCentroid()');
+
+  }
+
+
   function handleFetchEncounters(props){
     logger.warn('CovidQueryPage.handleFetchEncounters()');
 
@@ -495,6 +510,16 @@ function CovidQueryPage(props){
       "features": []
     }
 
+    let proximityCount = Locations.find({_location: {$near: {
+      $geometry: {
+        type: 'Point',
+        coordinates: [-88.0020589, 42.01136169999999]
+      },
+      // Convert [mi] to [km] to [m]
+      $maxDistance: 50 * 1.60934 * 1000
+    }}}).count();
+
+    console.log('Found ' + proximityCount + ' locations within 50 miles of the search origin.')
 
     let count = 0;
     Locations.find({_location: {$near: {
@@ -503,28 +528,31 @@ function CovidQueryPage(props){
         coordinates: [-88.0020589, 42.01136169999999]
       },
       // Convert [mi] to [km] to [m]
-      $maxDistance: 10 * 1.60934 * 1000
+      $maxDistance: 50 * 1.60934 * 1000
     }}}).forEach(function(location){
       count++;
-      let newFeature = { 
-        "type": "Feature", 
-        "properties": { 
-          "id": (count).toString(),                 // 60004NRTHR600WU
-          "primary_type": "POSITIVE",                           // NORTHROP CORP DEFENSE SYSTEMS DIV
-          "location_zip": get(location, 'address.postalCode'),      
-          "location_address": get(location, 'address.line[0]'),    
-          "location_city": get(location, 'address.city'),                    
-          "location_state": get(location, 'address.state'),
-          "longitude": (get(location, 'position.longitude')).toString(),
-          "latitude": (get(location, 'position.latitude')).toString()        
-        }, 
-        "geometry": { 
-          "type": "Point", 
-          "coordinates": [ get(location, 'position.longitude'), get(location, 'position.latitude') ] 
-        }
-      }
 
-      newGeoJson.features.push(newFeature);
+      if(get(location, 'position.longitude') && get(location, 'position.latitude')){
+        let newFeature = { 
+          "type": "Feature", 
+          "properties": { 
+            "id": (count).toString(),                 
+            "primary_type": "POSITIVE",                           
+            "location_zip": get(location, 'address.postalCode'),      
+            "location_address": get(location, 'address.line[0]'),    
+            "location_city": get(location, 'address.city'),                    
+            "location_state": get(location, 'address.state'),
+            "longitude": (get(location, 'position.longitude')).toFixed(9).toString(),
+            "latitude": (get(location, 'position.latitude')).toFixed(9).toString()        
+          }, 
+          "geometry": { 
+            "type": "Point", 
+            "coordinates": [ Number((get(location, 'position.longitude')).toFixed(9)), Number((get(location, 'position.latitude')).toFixed(9)) ] 
+          }
+        }
+  
+        newGeoJson.features.push(newFeature);
+      }      
     })
 
     console.log('newGeoJson', newGeoJson)
@@ -1167,7 +1195,7 @@ function CovidQueryPage(props){
         <Grid container spacing={3} >
           <Grid item xs={4}>
             
-            <StyledCard style={{minHeight: '280px'}}>
+            <StyledCard style={{minHeight: '380px'}}>
               <CardHeader 
                 title="Fetch Covid Data" 
                 subheader="Fetching data related to COVID19 coronavirus symptoms."
@@ -1232,79 +1260,182 @@ function CovidQueryPage(props){
                 title="Options" 
                 style={{fontSize: '100%'}} />
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
-                <div>
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedTested" />}
-                    label="Testing Encounter"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedFever} onChange={handleToggleFever.bind(this)} name="checkedFever" />}
-                    label="Fever"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedCough} onChange={handleToggleCough.bind(this)} name="checkedCough" />}
-                    label="Cough"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedDyspnea} onChange={handleToggleDyspnea.bind(this)} name="checkedDyspnea" />}
-                    label="Dyspnea (Shortness of Breath)"
-                  />
-                </div>
-                <div>
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedSmoker" />}
-                    label="Smoker"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedHypertension" />}
-                    label="Hypertension"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedBloodTypeA" />}
-                    label="Blood Type A"
-                  />
-                </div>
-                <div>
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedVaccinated} onChange={handleToggleVaccinated.bind(this)} name="checkedVacinated" />}
-                    label="Vaccinated"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedTamiflu" />}
-                    label="Tamiflu"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedHydroxychloroquine" />}
-                    label="Hydroxychloroquine"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedVentilator" />}
-                    label="Ventilators"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedOxygenAdministration} onChange={handleToggleOxygenAdministration.bind(this)} name="checkedOxygenAdministration" />}
-                    label="Oxygen Administration"
-                  />
-                </div>
-                <div>
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedSuspectedCovid19" />}
-                    label="Suspected Covid19"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedCovid19" />}
-                    label="Covid19"
-                  />
-                  <FormControlLabel                
-                    control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedSerumAntibodies" />}
-                    label="Serum Antibodies"
-                  />
-                </div>
+                <Table size="small">
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
+                        <Typography >
+                          Symptoms
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedFever} onChange={handleToggleFever.bind(this)} name="checkedFever" />}
+                          label="Fever"
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedCough} onChange={handleToggleCough.bind(this)} name="checkedCough" />}
+                          label="Cough"
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedDyspnea} onChange={handleToggleDyspnea.bind(this)} name="checkedDyspnea" />}
+                          label="Dyspnea (Shortness of Breath)"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography >
+                          Risk Factors
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedSmoker" />}
+                          label="Smoker"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedHypertension" />}
+                          label="Hypertension"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedBloodTypeA" />}
+                          label="Blood Type A"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography >
+                        Medications
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedVaccinated} onChange={handleToggleVaccinated.bind(this)} name="checkedVacinated" />}
+                          label="Vaccinated"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedTamiflu" />}
+                          label="Tamiflu"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedHydroxychloroquine" />}
+                          label="Hydroxychloroquine"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography >
+                          Procedures
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedVentilator" />}
+                          label="Ventilators"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedOxygenAdministration} onChange={handleToggleOxygenAdministration.bind(this)} name="checkedOxygenAdministration" />}
+                          label="Oxygen Administration"
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedTested" />}
+                          label="Testing Encounter"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography >
+                        Conditions
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedSuspectedCovid19" />}
+                          label="Suspected Covid19"
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedCovid19" />}
+                          label="Covid19"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedSerumAntibodies" />}
+                          label="Serum Antibodies"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </CardContent>
             </StyledCard>
           </Grid>
-        </Grid>
+          <Grid item xs={4}>
+            <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
+              <CardHeader                 
+                title="Map Options" 
+                style={{fontSize: '100%'}} />
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
+                <Grid container style={{paddingBottom: '20px'}}>
+                  <Grid item xs={6} style={{paddingRight: '10px'}}>
+                    <TextField 
+                      id="mapCenterAddress" 
+                      label="Map Centrer" 
+                      helperText="This should be an address.  We will geocode it." 
+                      defaultValue="Chicago, IL"
+                      disabled
+                      fullWidth />
+                  </Grid>
+                  <Grid item xs={6} style={{paddingLeft: '10px'}}>
+                    <TextField 
+                      id="searchProximity" 
+                      label="Search Proximity" 
+                      helperText="This should be a number (in miles)." 
+                      defaultValue={50}
+                      disabled
+                      fullWidth />
+                  </Grid>
+                </Grid>
 
+                <Typography gutterBottom>
+                  Opacity
+                </Typography>
+                <Slider
+                  defaultValue={50}
+                  //getAriaValueText={valuetext}
+                  aria-labelledby="discrete-slider"
+                  valueLabelDisplay="auto"
+                  step={10}
+                  marks
+                  min={0}
+                  max={100}
+                  disabled                  
+                />
+
+                <Typography gutterBottom>
+                  Radius
+                </Typography>
+                <Slider
+                  defaultValue={10}
+                  //getAriaValueText={valuetext}
+                  aria-labelledby="discrete-slider"
+                  valueLabelDisplay="auto"
+                  step={10}
+                  marks
+                  min={0}
+                  max={100}
+                  disabled
+                />
+
+              </CardContent>
+                <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                  <Button id="geocodeCentroidButton" color="primary" className={classes.button} onClick={geocodeCentroid.bind(this)} >Geocode</Button> 
+                </CardActions> 
+            </StyledCard>
+          </Grid>
+        </Grid>        
         <Grid container spacing={3} style={{paddingBottom: '80px'}}>          
           <Grid item xs={4}>
             <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px'}}>
@@ -1447,11 +1578,13 @@ function CovidQueryPage(props){
                 title="GeoJson"
                 subheader={geoJsonLayerFeaturesCount ? geoJsonLayerFeaturesCount + ' Features' : ''}
                 style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll',}}>
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll', height: '500px'}}>
                 
-                <pre >
-                  { JSON.stringify(geoJsonLayer, null, 2) }
-                </pre>
+                <div style={{position: 'absolute', overflowY: 'scroll', height: '630px', width: '100%'}}>
+                  <pre style={{overflow: 'scroll', height: '450px', width: '100%'}}>
+                    { JSON.stringify(geoJsonLayer, null, 2) }
+                  </pre>
+                </div>
               </CardContent>
               <CardActions style={{display: 'inline-flex', width: '100%'}} >
                 <Button id="clearGeoJson" color="primary" className={classes.button} onClick={clearGeoJson.bind(this)} >Clear</Button> 
