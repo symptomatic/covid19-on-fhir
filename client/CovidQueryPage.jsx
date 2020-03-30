@@ -70,6 +70,8 @@ Session.setDefault('encounterUrl', "https://");
 Session.setDefault('conditionUrl', "https://");
 Session.setDefault('procedureUrl', "https://");
 
+Session.setDefault('geoJsonLayer', "");
+
 function CovidQueryPage(props){
   let selectedStartDate = Session.get("fhirKitClientStartDate");
   let selectedEndDate = Session.get("fhirKitClientEndDate");
@@ -87,11 +89,12 @@ function CovidQueryPage(props){
   let [procedures, setProcedures] = useState([]);
   let [locations,  setLocations]  = useState([]);
 
-  let [checkedTested,  setCheckedTested]  = useState(true);
+  let [checkedTested,  setCheckedTested]  = useState(false);
   let [checkedFever,  setCheckedFever]  = useState(true);
   let [checkedCough,  setCheckedCough]  = useState(true);
   let [checkedDyspnea,  setCheckedDyspnea]  = useState(true);
   let [checkedVentilator,  setCheckedVentilator]  = useState(true);
+  let [checkedOxygenAdministration,  setCheckedOxygenAdministration]  = useState(true);
   let [checkedCovid19,  setCheckedCovid19]  = useState(true);
   let [checkedSuspectedCovid19,  setCheckedSuspectedCovid19]  = useState(true);
   let [checkedHydroxychloroquine,  setCheckedHydroxychloroquine]  = useState(false);
@@ -100,6 +103,7 @@ function CovidQueryPage(props){
   let [checkedHypertension,  setCheckedHypertension]  = useState(false);
   let [checkedTamiflu,  setCheckedTamiflu]  = useState(false);
   let [checkedSerumAntibodies,  setCheckedSerumAntibodies]  = useState(false);
+  let [checkedVaccinated,  setCheckedVaccinated]  = useState(false);
   
 
   let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'));
@@ -232,6 +236,16 @@ function CovidQueryPage(props){
     return Session.get('procedureUrl')
   }, [props.lastUpdated]);  
 
+
+  let geoJsonLayer = 0;
+  let geoJsonLayerFeaturesCount = 0;
+  geoJsonLayer = useTracker(function(){    
+    return Session.get('geoJsonLayer')
+  }, [props.lastUpdated]);  
+  if(geoJsonLayer && Array.isArray(geoJsonLayer.features)){
+    geoJsonLayerFeaturesCount = geoJsonLayer.features.length
+  }
+
   //-------------------------------------------------------------------
   // Navigation Methods
 
@@ -273,7 +287,7 @@ function CovidQueryPage(props){
     }
   }
   function handleToggleVentilator(props){
-    logger.warn('CovidQueryPage.handleToggleDyspnea()');
+    logger.warn('CovidQueryPage.handleToggleVentilator()');
 
     if(checkedVentilator){
       setCheckedVentilator(false);
@@ -281,10 +295,20 @@ function CovidQueryPage(props){
       setCheckedVentilator(true);
     }
   }
+  function handleToggleOxygenAdministration(props){
+    logger.warn('CovidQueryPage.handleToggleOxygenAdministration()');
+
+    if(checkedOxygenAdministration){
+      setCheckedOxygenAdministration(false);
+    } else {
+      setCheckedOxygenAdministration(true);
+    }
+  }
+  
   function handleToggleTested(props){
     logger.warn('CovidQueryPage.handleToggleTested()');
 
-    if(checkedVentilator){
+    if(checkedTested){
       checkedTested(false);
     } else {
       setCheckedTested(true);
@@ -363,6 +387,17 @@ function CovidQueryPage(props){
       setCheckedSerumAntibodies(true);
     }
   }
+  function handleToggleVaccinated(props){
+    logger.warn('CovidQueryPage.handleToggleVaccinated()');
+
+    if(checkedVaccinated){
+      setCheckedVaccinated(false);
+    } else {
+      setCheckedVaccinated(true);
+    }
+  }
+
+  
 
   
   
@@ -405,7 +440,7 @@ function CovidQueryPage(props){
           console.log('geocodeAddress.result', result)
  
           if(get(result, 'resourceType') === "Location"){
-            Locations.insert(result);
+            Locations.insert(result, {filter: false, validate: false});
           }
         }
       })
@@ -447,9 +482,53 @@ function CovidQueryPage(props){
     logger.warn('CovidQueryPage.clearLocations()');
     Locations.remove({});
   }
+  function clearGeoJson(){
+    logger.warn('CovidQueryPage.clearGeoJson()');
+    Session.set('geoJsonLayer', "")
+  }
 
   function generateGeoJson(){
     logger.warn('CovidQueryPage.generateGeoJson()');
+
+    let newGeoJson = {
+      "type": "FeatureCollection",
+      "features": []
+    }
+
+
+    let count = 0;
+    Locations.find({_location: {$near: {
+      $geometry: {
+        type: 'Point',
+        coordinates: [-88.0020589, 42.01136169999999]
+      },
+      // Convert [mi] to [km] to [m]
+      $maxDistance: 10 * 1.60934 * 1000
+    }}}).forEach(function(location){
+      count++;
+      let newFeature = { 
+        "type": "Feature", 
+        "properties": { 
+          "id": (count).toString(),                 // 60004NRTHR600WU
+          "primary_type": "POSITIVE",                           // NORTHROP CORP DEFENSE SYSTEMS DIV
+          "location_zip": get(location, 'address.postalCode'),      
+          "location_address": get(location, 'address.line[0]'),    
+          "location_city": get(location, 'address.city'),                    
+          "location_state": get(location, 'address.state'),
+          "longitude": (get(location, 'position.longitude')).toString(),
+          "latitude": (get(location, 'position.latitude')).toString()        
+        }, 
+        "geometry": { 
+          "type": "Point", 
+          "coordinates": [ get(location, 'position.longitude'), get(location, 'position.latitude') ] 
+        }
+      }
+
+      newGeoJson.features.push(newFeature);
+    })
+
+    console.log('newGeoJson', newGeoJson)
+    Session.set('geoJsonLayer', newGeoJson)
   }
 
   //-------------------------------------------------------------------
@@ -735,14 +814,52 @@ function CovidQueryPage(props){
 
 
     let conditionsArray = [];
+
     let searchOptions = { 
       resourceType: 'Condition',
-      searchParams: {
-        code: "49727002,267036007,386661006,840539006"
-      } 
+      searchParams: {} 
     };
-    searchOptions.searchParams["onset-date"] = [];
 
+    let conditionsToSearchFor = [];
+    let conditionsToSearchForString = "";
+    
+    // these are our toggles
+    // http://www.snomed.org/news-and-events/articles/jan-2020-sct-intl-edition-release
+    if(checkedFever){
+      conditionsToSearchFor.push("386661006")
+    }
+    if(checkedCough){
+      conditionsToSearchFor.push("49727002")
+    }
+    if(checkedDyspnea){
+      conditionsToSearchFor.push("267036007")
+    }
+    if(checkedCovid19){
+      conditionsToSearchFor.push("840539006")
+      conditionsToSearchFor.push("840533007")
+    }
+    if(checkedSuspectedCovid19){
+      conditionsToSearchFor.push("840544004")
+      conditionsToSearchFor.push("840546002")
+
+    }
+    if(checkedSerumAntibodies){
+      conditionsToSearchFor.push("840536004")
+    }
+
+    // we're being a bit sloppy with this algorithm because it needs to get out the door
+    conditionsToSearchFor.forEach(function(snomedCode){
+      // adding a comma after each snomed code
+      conditionsToSearchForString = conditionsToSearchForString + snomedCode + ",";
+    })
+    if(conditionsToSearchFor.length > 0){
+      // and then dropping the last comma;
+      // blah, but it works
+      searchOptions.searchParams.code = conditionsToSearchForString.substring(0, conditionsToSearchForString.length - 1);
+    }
+
+
+    searchOptions.searchParams["onset-date"] = [];
     searchOptions.searchParams["onset-date"][0] = "ge" + selectedStartDate;
     searchOptions.searchParams["onset-date"][1] = "le" +  selectedEndDate;
 
@@ -822,6 +939,36 @@ function CovidQueryPage(props){
         code: "371908008"
       }
     };
+
+
+    let proceduresToSearchFor = [];
+    let proceduresToSearchForString = "";
+    
+    // these are our toggles
+    // http://www.snomed.org/news-and-events/articles/jan-2020-sct-intl-edition-release
+    if(checkedVaccinated){
+      proceduresToSearchFor.push("840534001")
+    }
+    if(checkedVentilator){
+      proceduresToSearchFor.push("371908008")
+    }
+    if(checkedOxygenAdministration){
+      proceduresToSearchFor.push("371908008")
+    }
+
+
+    // we're being a bit sloppy with this algorithm because it needs to get out the door
+    proceduresToSearchFor.forEach(function(snomedCode){
+      // adding a comma after each snomed code
+      proceduresToSearchForString = proceduresToSearchForString + snomedCode + ",";
+    })
+    if(proceduresToSearchFor.length > 0){
+      // and then dropping the last comma;
+      // blah, but it works
+      searchOptions.searchParams.code = proceduresToSearchForString.substring(0, proceduresToSearchForString.length - 1);
+    }
+
+
     searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
     searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
 
@@ -1087,7 +1234,7 @@ function CovidQueryPage(props){
               <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
                 <div>
                   <FormControlLabel
-                    control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedDyspnea" />}
+                    control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedTested" />}
                     label="Testing Encounter"
                   />
                   <FormControlLabel                
@@ -1105,43 +1252,51 @@ function CovidQueryPage(props){
                 </div>
                 <div>
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedSmoker" />}
                     label="Smoker"
                   />
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedHypertension" />}
                     label="Hypertension"
                   />
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedBloodTypeA" />}
                     label="Blood Type A"
                   />
                 </div>
                 <div>
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedVaccinated} onChange={handleToggleVaccinated.bind(this)} name="checkedVacinated" />}
+                    label="Vaccinated"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedTamiflu" />}
                     label="Tamiflu"
                   />
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedHydroxychloroquine" />}
                     label="Hydroxychloroquine"
                   />
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedVentilator" />}
                     label="Ventilators"
+                  />
+                  <FormControlLabel                
+                    control={<Checkbox checked={checkedOxygenAdministration} onChange={handleToggleOxygenAdministration.bind(this)} name="checkedOxygenAdministration" />}
+                    label="Oxygen Administration"
                   />
                 </div>
                 <div>
                   <FormControlLabel
-                    control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedDyspnea" />}
+                    control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedSuspectedCovid19" />}
                     label="Suspected Covid19"
                   />
                   <FormControlLabel
-                    control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedDyspnea" />}
+                    control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedCovid19" />}
                     label="Covid19"
                   />
                   <FormControlLabel                
-                    control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedFever" />}
+                    control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedSerumAntibodies" />}
                     label="Serum Antibodies"
                   />
                 </div>
@@ -1266,7 +1421,7 @@ function CovidQueryPage(props){
             </StyledCard>
           </Grid>
           <Grid item xs={4}>
-            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px'}}>
+            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px' }}>
               <CardHeader 
                 id="geocodedLocationsCount"
                 title={locationsTitle}  
@@ -1286,15 +1441,21 @@ function CovidQueryPage(props){
             </StyledCard>
           </Grid>
           <Grid item xs={4}>
-            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px'}}>
+            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px',  maxHeight: '660px'}}>
               <CardHeader 
                 id="geoJsonPreview"
                 title="GeoJson"
+                subheader={geoJsonLayerFeaturesCount ? geoJsonLayerFeaturesCount + ' Features' : ''}
                 style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll',}}>
                 
-                
+                <pre >
+                  { JSON.stringify(geoJsonLayer, null, 2) }
+                </pre>
               </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="clearGeoJson" color="primary" className={classes.button} onClick={clearGeoJson.bind(this)} >Clear</Button> 
+              </CardActions> 
             </StyledCard>
           </Grid>
         </Grid>   

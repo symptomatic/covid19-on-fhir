@@ -123,6 +123,10 @@ Meteor.methods({
           longitude: null,
           latitude: null,
           altitude: null
+        },
+        _location: { 
+          type: "Point", 
+          coordinates: []
         }
       }  
 
@@ -131,6 +135,10 @@ Meteor.methods({
       }
       if(get(geocodedAddress[0], "longitude")){
         newLocation.position.longitude = get(geocodedAddress[0], "longitude");        
+      }
+
+      if(get(geocodedAddress[0], "latitude") && get(geocodedAddress[0], "longitude")){
+        newLocation._location.coordinates = [ get(location, 'position.longitude'), get(location, 'position.latitude') ] 
       }
 
       fhirLocations.push(newLocation);
@@ -155,6 +163,10 @@ Meteor.methods({
         longitude: null,
         latitude: null,
         altitude: null
+      },
+      _location: { 
+        type: "Point", 
+        coordinates: []
       }
     }  
 
@@ -163,6 +175,9 @@ Meteor.methods({
     }
     if(get(geocodedAddress[0], "longitude")){
       newLocation.position.longitude = get(geocodedAddress[0], "longitude");        
+    }
+    if(get(geocodedAddress[0], "latitude") && get(geocodedAddress[0], "longitude")){
+      newLocation._location.coordinates = [ get(geocodedAddress[0], 'longitude'), get(geocodedAddress[0], 'latitude') ] 
     }
 
     console.log('newLocation', newLocation)

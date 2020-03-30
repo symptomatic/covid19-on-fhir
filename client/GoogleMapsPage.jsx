@@ -10,7 +10,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 
 import { Session } from 'meteor/session';
 
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 
 import { MapDot } from './MapDot';
 
@@ -37,15 +37,14 @@ export class GoogleMapsPage extends React.Component {
         }
       },
       center: {
-        lat: 41.8359496, 
-        lng: -87.8317244
+        lat: 41.8748903,
+        lng: -87.7035464
       },
-      zoom: 14,
+      zoom: 13.9,
       layers: {
         heatmap: true,
         points: true
       },
-      geodataUrl: '/packages/symptomatic_covid19-on-fhir/geodata/illinois-epa-toxic-inventory-sites.geojson',
       options: {
         panControl: false,
         mapTypeControl: false,
@@ -210,7 +209,8 @@ export class GoogleMapsPage extends React.Component {
             ]
           }
         ]
-      }
+      },
+      geoJsonLayer: Session.get('geoJsonLayer')
     };
 
     data.apiKey = get(Meteor, 'settings.public.google.maps.apiKey', '');
@@ -236,32 +236,265 @@ export class GoogleMapsPage extends React.Component {
     var map;
     var globalGoogle;
 
+    let geoJsonLayer = this.data.geoJsonLayer;
+
     if(process.env.NODE_ENV !== "test"){
       map = <GoogleMapReact
            id="googleMap"
            defaultCenter={this.data.center}
            defaultZoom={this.data.zoom}
            options={this.data.options}
-           
            bootstrapURLKeys={{
             key: this.data.apiKey,
             libraries: 'visualization'
-          }}
+           }}
+           yesIWantToUseGoogleMapApiInternals
            onGoogleApiLoaded={function({map, maps}){
+
+
+            //----------------------------------------------------------------------------------------------------
+            // Diagnostics
+
             if(process.env.NODE_ENV === "test"){
                 console.log('maps', maps)
                 console.log('map', map)
             }
+            
+            //----------------------------------------------------------------------------------------------------
+            // Layers
 
-            var directionsDisplay;
-            var directionsService;
+            let myLayers = new maps.MVCObject();
+            myLayers.setValues({
+              hospitals: null,
+              laboratories: null,
+              patientHomes: map
+            });
+
+            let hospitalMarker = new google.maps.Marker({
+              map: map,
+              draggable: true,
+              // animation: google.maps.Animation.DROP,
+              position: {lat: 41.8955885, lng: -87.6208858}
+            });
+            hospitalMarker.bindTo('map', myLayers, 'parks');
+
+            //show the hospitals
+            myLayers.set('hospitals', map);
+
+            //hide the laboratories
+            myLayers.set('laboratories', null);
+
+            //----------------------------------------------------------------------------------------------------
+
+
+
+            // map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_Health_Service_Areas.geojson');
+            //map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_HSA_Hospitals.geojson');
+
+            var dataLayer = [];
+            var markerArray = [];
+            var baseUrl = Meteor.absoluteUrl();
+            if(get(Meteor, 'settings.public.baseUrl')){
+              baseUrl = get(Meteor, 'settings.public.baseUrl');
+            }
+
+            var geodataUrl = baseUrl + '/packages/symptomatic_covid19-on-fhir/geodata/covid19-patients-synthea.geojson';
+            //var geodataUrl = 'https://data.cityofchicago.org/resource/6zsd-86xi.geojson';
+            if(get(self, "data.geodataUrl")){
+              geodataUrl = get(self, "data.geodataUrl");
+            }
+
+            if(process.env.NODE_ENV === "test"){
+                console.log('geodataUrl', geodataUrl);
+            }
+
+            // if(get(self, 'data.geoJsonLayer')){ 
+
+            //   let geoJsonLayer = get(self, 'data.geoJsonLayer')
+
+            //   console.log('self.data.geoJsonLayer', geoJsonLayer);
+
+            //   // let geoJsonLayer = Session.get('geoJsonLayer');
+
+            //   // if(Array.isArray(geoJsonLayer.features)){
+            //   //   console.log('Found an array of features to render.')
+            //   //   self.data.geoJsonLayer.features.forEach(function(datum){
+            //   //     if(get(datum, 'geometry.coordinates[0]') && get(datum, 'geometry.coordinates[1]')){
+            //   //       dataLayer.push(new maps.LatLng(get(datum, 'geometry.coordinates[1]'), get(datum, 'geometry.coordinates[0]')));
+            //   //     }
+            //   //   })
+            //   // }
+
+              
+            //   // console.log('Constructed a COVID19 datalayer to render.', dataLayer)
+
+           
+
+            //   // var heatmap = new maps.visualization.HeatmapLayer({
+            //   //   data: dataLayer,
+            //   //   map: map
+            //   // });
+
+            //   // heatmap.set('radius', 50);
+            //   // heatmap.set('opacity', 0.5);
+            //   // heatmap.set('gradient', [
+            //   //   'rgba(255, 255, 255, 0)',
+            //   //   'rgba(251, 251, 213, 1)',
+            //   //   'rgba(249, 234, 189, 1)',
+            //   //   'rgba(247, 217, 165, 1)',
+            //   //   'rgba(243, 184, 118, 1)',
+            //   //   'rgba(242, 168, 94, 1)',
+            //   //   'rgba(240, 151, 71, 1)',
+            //   //   'rgba(238, 135, 47, 1)',
+            //   //   'rgba(236, 118, 23, 1)',
+            //   //   'rgba(210, 80, 0, 1)',
+            //   // ]);
+
+            //   // heatmap.setMap(map);   
+              
+            //   //map.data.loadGeoJson(geodataUrl);
+
+            //   HTTP.get(geodataUrl, function(error, data){
+            //     //var geojson = EJSON.parse(data.content);
+                
+            //     console.log('geoJsonLayer', geoJsonLayer)
+            //     geoJsonLayer.features.forEach(function(datum){
+            //       if(get(datum, 'geometry.coordinates[0]') && get(datum, 'geometry.coordinates[1]')){
+            //         dataLayer.push(new maps.LatLng(get(datum, 'geometry.coordinates[1]'), get(datum, 'geometry.coordinates[0]')));
+            //       }
+            //     })
+
+            //     console.log('Constructed a COVID19 datalayer to render.', dataLayer)
+
+            //     map.data.loadGeoJson(geodataUrl);
+            //     // map.data.loadGeoJson(geodataUrl);
+
+            //     // // load US state outline polygons from a GeoJson file
+            //     // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
+
+
+            //     // map.data.loadGeoJson(baseUrl + 'geodata/covid19-patients-synthea.geojson');
+            //     // console.log('Trying to render a COVID17 geojson layer.')
+ 
+
+            //     // if we turn on the heatmap
+            //     var heatmap = new maps.visualization.HeatmapLayer({
+            //       data: dataLayer,
+            //       map: map
+            //     });
+
+            //     heatmap.set('radius', 50);
+            //     heatmap.set('opacity', 0.5);
+            //     heatmap.set('gradient', [
+            //       'rgba(255, 255, 255, 0)',
+            //       'rgba(251, 251, 213, 1)',
+            //       'rgba(249, 234, 189, 1)',
+            //       'rgba(247, 217, 165, 1)',
+            //       'rgba(243, 184, 118, 1)',
+            //       'rgba(242, 168, 94, 1)',
+            //       'rgba(240, 151, 71, 1)',
+            //       'rgba(238, 135, 47, 1)',
+            //       'rgba(236, 118, 23, 1)',
+            //       'rgba(210, 80, 0, 1)',
+            //     ]);
+                
+            //     heatmap.setMap(map);
+            //   });
+
+
+            // } else {
+              console.log('Defaulting to the City of Chicago EPA toxic inventory.')
+              //map.data.loadGeoJson(geodataUrl);
+              // map.data.addGeoJson(geoJsonLayer);  
+
+
+
+              HTTP.get(geodataUrl, function(error, data){
+                var geojson = EJSON.parse(data.content);
+                console.log('loadGeoJson', geojson);
+
+                //geojson = cloneDeep(geoJsonLayer)
+                //console.log('self.data.clonedGeojsonLayer', clonedGeojsonLayer);
+
+                geojson.features.forEach(function(feature){
+                  //console.log('geojson.feature', feature);
+
+                  // need to guard against too far away points 
+                  // -0.408386, 53.2734499
+                  if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
+                    dataLayer.push(new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]')));
+                  }
+                })
+
+                // geoJsonLayer.features.forEach(function(feature){
+                //   console.log('geoJsonLayer.feature', feature);
+  
+                //   // need to guard against too far away points 
+                //   // -0.408386, 53.2734499
+                //   if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
+                //     let newLatLng = new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]'));
+                //     dataLayer.push(newLatLng);
+                //     markerArray.push(new maps.Marker({
+                //       position: newLatLng,
+                //       map: map,
+                //       icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC'
+                //       // icon: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
+                //       // label: labels[i % labels.length]
+                //     }));
+                //   }
+                // })
+                
+
+
+
+
+                console.log('Constructed a datalayer to render.', dataLayer)
+
+                if(process.env.NODE_ENV === "test"){
+                  console.log('dataLayer', dataLayer);
+                }
+
+                map.data.addGeoJson(geoJsonLayer);  
+                map.data.loadGeoJson(geodataUrl);
+
+                // // load US state outline polygons from a GeoJson file
+                // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
+
+
+                // map.data.loadGeoJson(baseUrl + 'geodata/covid19-patients-synthea.geojson');
+
+                // if we turn on the heatmap
+                var heatmap = new maps.visualization.HeatmapLayer({
+                  data: dataLayer,
+                  map: map
+                });
+
+                heatmap.set('radius', 50);
+                heatmap.set('opacity', 0.5);
+                heatmap.set('gradient', [
+                  'rgba(255, 255, 255, 0)',
+                  'rgba(251, 251, 213, 1)',
+                  'rgba(249, 234, 189, 1)',
+                  'rgba(247, 217, 165, 1)',
+                  'rgba(243, 184, 118, 1)',
+                  'rgba(242, 168, 94, 1)',
+                  'rgba(240, 151, 71, 1)',
+                  'rgba(238, 135, 47, 1)',
+                  'rgba(236, 118, 23, 1)',
+                  'rgba(210, 80, 0, 1)',
+                ]);
+                
+                heatmap.setMap(map);
+              });
+            //}
+
 
             map.data.setStyle({
               // raw binary data (extremely fast!)
-              //icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC'
+              icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC',
   
               // load from a content delivery network
-              //icon: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
+              // icon: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
 
               // load from Meteor server
               //icon: Meteor.absoluteUrl() + 'geodata/icons/purple-dot.png'
@@ -270,29 +503,20 @@ export class GoogleMapsPage extends React.Component {
               //icon: 'https://mts.googleapis.com/vt/icon/name=icons/spotlight/spotlight-waypoint-a.png&text=A&psize=16&font=fonts/Roboto-Regular.ttf&color=ff333333&ax=44&ay=48&scale=1'
 
               // load a Symbol
-              icon: {
-                // a custom designed path (must be less than 22x22 pixels)
-                //path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
-
-                path: maps.SymbolPath.CIRCLE,
-                fillColor: '#EB6600',
-                fillOpacity: 0.1,
-                strokeColor: '',
-                strokeWeight: 0.5,
-                scale: 5
-              },
+              // icon: {
+              //   path: maps.SymbolPath.CIRCLE,
+              //   fillColor: '#EB6600',
+              //   fillOpacity: 0.1,
+              //   strokeColor: '',
+              //   strokeWeight: 0.5,
+              //   scale: 5
+              // },
               fillColor: '#ffffff',
               fillOpacity: 0.2,
               strokeColor: '#EB6600',
               strokeWeight: 0.5
-              //icon: new maps.MarkerImage(
-              //  'http://www.gettyicons.com/free-icons/108/gis-gps/png/24/needle_left_yellow_2_24.png',
-              //  new maps.Size(24, 24),
-              //  new maps.Point(0, 0),
-              //  new maps.Point(0, 24)
-              //)
 
-              // and some labels 
+              // Text Label
               //label: {
               //  color: "blue",
               //  fontFamily: "Courier",
@@ -302,96 +526,13 @@ export class GoogleMapsPage extends React.Component {
               //}
             });
 
-            // map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_Health_Service_Areas.geojson');
-            //map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_HSA_Hospitals.geojson');
-
-            var dataLayer = [];
-            var baseUrl = Meteor.absoluteUrl();
-            if(get(Meteor, 'settings.public.baseUrl')){
-              baseUrl = get(Meteor, 'settings.public.baseUrl');
-            }
-
-            // var geodataUrl = baseUrl + 'geodata/illinois-epa-toxic-inventory-sites.geojson';
-            var geodataUrl = 'https://data.cityofchicago.org/resource/6zsd-86xi.geojson';
-            geodataUrl = self.data.geodataUrl;
-
-            if(process.env.NODE_ENV === "test"){
-                console.log('geodataUrl', geodataUrl);
-            }
-
-            HTTP.get(geodataUrl, function(error, data){
-              var geojson = EJSON.parse(data.content);
-              if(process.env.NODE_ENV === "test"){
-                console.log('loadGeoJson', geojson);
-              }
-              geojson.features.forEach(function(datum){
-                if(datum.geometry && datum.geometry.coordinates && datum.geometry.coordinates[0] && datum.geometry.coordinates[1]){
-                  dataLayer.push(new maps.LatLng(datum.geometry.coordinates[1], datum.geometry.coordinates[0]));
-                }
-              })
-              if(process.env.NODE_ENV === "test"){
-                console.log('dataLayer', dataLayer);
-              }
-
-
-              map.data.loadGeoJson(geodataUrl);
-              // map.data.loadGeoJson(baseUrl + 'geodata/illinois-epa-toxic-inventory-sites.geojson');
-
-              // // we sometimes also want to load the data twice
-              // // do we need to double fetch?  or can we just pass data in here?
-              // // if(self.data.layers.points){
-              //   map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/illinois-epa-toxic-inventory-sites.geojson');
-              //   console.log('map.data', map.data);
-              // // }
-
-
-              // if we turn on the heatmap
-              var heatmap = new maps.visualization.HeatmapLayer({
-                data: dataLayer,
-                map: map
-              });
-              var gradient = [
-                'rgba(255, 255, 255, 0)',
-                'rgba(251, 251, 213, 1)',
-                'rgba(249, 234, 189, 1)',
-                'rgba(247, 217, 165, 1)',
-                'rgba(243, 184, 118, 1)',
-                'rgba(242, 168, 94, 1)',
-                'rgba(240, 151, 71, 1)',
-                'rgba(238, 135, 47, 1)',
-                'rgba(236, 118, 23, 1)',
-                'rgba(210, 80, 0, 1)',
-
-                // 'rgba(235, 102, 0, 0)',
-                // 'rgba(236, 118, 23, 1)',
-                // 'rgba(238, 135, 47, 1)',
-                // 'rgba(240, 151, 71, 1)',
-                // 'rgba(242, 168, 94, 1)',
-                // 'rgba(243, 184, 118, 1)',
-                // 'rgba(245, 201, 142, 1)',
-                // 'rgba(247, 217, 165, 1)',
-                // 'rgba(247, 217, 165, 1)',
-                // 'rgba(249, 234, 189, 1)',
-                // 'rgba(251, 251, 213, 1)',
-                // 'rgba(253, 252, 230, 1)'
-              ]
-              heatmap.set('gradient', gradient);
-              heatmap.set('radius', 50);
-              heatmap.set('opacity', 0.5);
-              heatmap.setMap(map);
-            });
-
-
           }}
-         >
-
-            
+         >            
 
           {/* <div className='homeBox' lat={this.data.center.lat} lng={ this.data.center.lng} style={{width: '180px'}}>            
             <MapOrbital />
             <MapDot />
-          </div> */}
-          
+          </div> */}          
 
          </GoogleMapReact>;
     } else {

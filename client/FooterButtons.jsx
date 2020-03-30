@@ -2,13 +2,14 @@ import React from 'react';
 
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
+import { HTTP } from 'meteor/http';
 
 import { Button } from '@material-ui/core';
 
 import { get } from 'lodash';
 import JSON5 from 'json5';
 
-
+import LocationMethods from '../lib/LocationMethods';
 
 let apiKey = get(Meteor, 'settings.public.interfaces.default.auth.username', '');
 let usePseudoCodes = get(Meteor, 'settings.public.usePseudoCodes', false);
@@ -85,7 +86,12 @@ export function FetchButtons(props){
 
   function clearAllData(){
     console.log('Clear All Data!');
-
+    Patients.remove({});
+    Encounters.remove({})
+    Conditions.remove({});
+    Procedures.remove({});
+    Locations.remove({});
+    Session.set('geoJsonLayer', "");    
   }
   return (
     <MuiThemeProvider theme={muiTheme} >
@@ -105,11 +111,25 @@ export function MapButtons(props){
   function initHospitals(){
     console.log('Init Hospitals!');
 
+    LocationMethods.initializeHospitals();
+  }
+  function epaToxicInventory(){
+    console.log('epaToxicInventory')
+    var geodataUrl = 'https://data.cityofchicago.org/resource/6zsd-86xi.geojson';
+    HTTP.get(geodataUrl, {}, function(error, response){
+      if(error){console.log('error', error)}
+      if(response){
+        Session.set('geoJsonLayer', JSON.parse(get(response, 'content')));
+      }
+    })
   }
   return (
     <MuiThemeProvider theme={muiTheme} >
       <Button onClick={ initHospitals.bind() } className={ buttonClasses.button }>
         Initialize Hospitals
+      </Button>      
+      <Button onClick={ epaToxicInventory.bind() } className={ buttonClasses.button }>
+        Sample Data
       </Button>      
     </MuiThemeProvider>
   );

@@ -1,0 +1,32 @@
+{
+  "type": "FeatureCollection",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "features": [
+    { 
+      "type": "Feature", 
+      "properties": { 
+        "_TRI_FACIL": "60004NRTHR600WU", 
+        "V_TRI_FACI": "NORTHROP CORP DEFENSE SYSTEMS DIV", 
+        "addrtype": "600 W UNIVERSITY", 
+        "addrlocat": "ARLINGTON HEIGHTS" 
+      }, 
+      "geometry": { 
+        "type": "Point", 
+        "coordinates": [ -87.9919838, 42.133253 ] 
+      }
+    },
+    { 
+      "type": "Feature", 
+      "properties": { 
+        "_TRI_FACIL": "66201GTWYT4PITZ", 
+        "V_TRI_FACI": "GATEWAY TERMINALS LLC", 
+        "addrtype": "4 PITZMAN AVE", 
+        "addrlocat": "SAUGET" 
+      }, 
+      "geometry": { 
+        "type": "Point", 
+        "coordinates": [ -90.179825200003492, 38.601957699997506 ] 
+      } 
+    }
+  ]
+}
