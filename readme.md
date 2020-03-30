@@ -3,10 +3,10 @@
 This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
 
 The COVID19 on FHIR project's primary utility is the query page, which fetches coronavirus related conditions, procedures, medications, and encounters using LOINC and SNOMED codes identified by our network of collaborators.  We can query by date range, select clinical parameters of interest, fetch the data from over 87% of hospitals in the US, extract the patient home addresses, geocode them, and generate a map layer to be loaded into Google Maps.  
-![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-Geocoding-Workflow-Page.png)
+![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geocoding.png)
 
 The second component of the project is Google Maps, and our ability to layer FHIR data on top of it.  We have access to the full API, including markers, heatmaps, reverse geocoding, routing, and many other features.  
-![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-hackathon/master/screenshots/Covid19-Map-SampleData.png)
+![Covid19Geomapping-SyntheaHeatmap](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geomapping-SyntheaHeatmap.png)
 
 
 #### Design Documents  
