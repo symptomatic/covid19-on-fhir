@@ -163,6 +163,8 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 - [COVID-19 Patient Impact & Hospital Capacity Module](https://www.cdc.gov/nhsn/acute-care-hospital/covid19/index.html)  
 
 #### Team Acknowledgements  
+- Jason Walonoski, _Bioinformatics_ (Synthea)
+- James Agnew, _FHIR Hosting_ (Smile CDR)
 - Chris Hafey, _DBA Backup, Business Administration_, (Fomerly Nucleus.io)  
 - Andrei Rusu, _Quality Control_, (Nightwatch.js)     
 - Jae Brodsky, _Statistician_  
