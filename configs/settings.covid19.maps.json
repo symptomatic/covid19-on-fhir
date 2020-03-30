@@ -1,6 +1,6 @@
 {
   "public": {
-    "title": "Covid19 on FHIR",
+    "title": "Covid19 Geomapping",
     "fhirVersion": "R4",
     "theme": {
       "showVideoBackground": false,
