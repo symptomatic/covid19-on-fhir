@@ -1131,11 +1131,13 @@ function CovidQueryPage(props){
 
 
   function handleStartDateChange(event, newDate){
-    Session.set('fhirKitClientStartDate', moment(newDate).format("YYYY-MM-DD"))
+    Session.set('fhirKitClientStartDate', moment(newDate).format("YYYY-MM-DD"));
+    Session.set('lastUpdated', new Date())
   }
 
   function handleEndDateChange(event, newDate){
     Session.set('fhirKitClientEndDate', moment(newDate).format("YYYY-MM-DD"))
+    Session.set('lastUpdated', new Date())
   }
 
 

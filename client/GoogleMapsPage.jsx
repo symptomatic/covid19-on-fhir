@@ -264,36 +264,50 @@ export class GoogleMapsPage extends React.Component {
             //----------------------------------------------------------------------------------------------------
             // Layers
 
-            let myLayers = new maps.MVCObject();
-            myLayers.setValues({
-              hospitals: null,
-              laboratories: null,
-              patientHomes: map
-            });
+            // let myLayers = new maps.MVCObject();
+            // myLayers.setValues({
+            //   hospitals: null,
+            //   laboratories: null,
+            //   patientHomes: map
+            // });
 
-            let hospitalMarker = new google.maps.Marker({
-              map: map,
-              draggable: true,
-              // animation: google.maps.Animation.DROP,
-              position: {lat: 41.8955885, lng: -87.6208858}
-            });
-            hospitalMarker.bindTo('map', myLayers, 'parks');
+            // let hospitalMarker = new google.maps.Marker({
+            //   map: map,
+            //   draggable: true,
+            //   // animation: google.maps.Animation.DROP,
+            //   position: {lat: 41.8955885, lng: -87.6208858}
+            // });
+            // hospitalMarker.bindTo('map', myLayers, 'parks');
 
-            //show the hospitals
-            myLayers.set('hospitals', map);
+            // //show the hospitals
+            // myLayers.set('hospitals', map);
 
-            //hide the laboratories
-            myLayers.set('laboratories', null);
+            // //hide the laboratories
+            // myLayers.set('laboratories', null);
 
             //----------------------------------------------------------------------------------------------------
 
+            // // load US state outline polygons from a GeoJson file
+            // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
 
-
-            // map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_Health_Service_Areas.geojson');
-            //map.data.loadGeoJson(Meteor.absoluteUrl() + '/geodata/2014_HSA_Hospitals.geojson');
 
             var dataLayer = [];
             var markerArray = [];
+
+            let heatMapGradient = [
+              'rgba(255, 255, 255, 0)',
+              'rgba(251, 251, 213, 1)',
+              'rgba(249, 234, 189, 1)',
+              'rgba(247, 217, 165, 1)',
+              'rgba(243, 184, 118, 1)',
+              'rgba(242, 168, 94, 1)',
+              'rgba(240, 151, 71, 1)',
+              'rgba(238, 135, 47, 1)',
+              'rgba(236, 118, 23, 1)',
+              'rgba(210, 80, 0, 1)'
+            ];
+
+
             var baseUrl = Meteor.absoluteUrl();
             if(get(Meteor, 'settings.public.baseUrl')){
               baseUrl = get(Meteor, 'settings.public.baseUrl');
@@ -309,143 +323,39 @@ export class GoogleMapsPage extends React.Component {
                 console.log('geodataUrl', geodataUrl);
             }
 
-            // if(get(self, 'data.geoJsonLayer')){ 
-
-            //   let geoJsonLayer = get(self, 'data.geoJsonLayer')
-
-            //   console.log('self.data.geoJsonLayer', geoJsonLayer);
-
-            //   // let geoJsonLayer = Session.get('geoJsonLayer');
-
-            //   // if(Array.isArray(geoJsonLayer.features)){
-            //   //   console.log('Found an array of features to render.')
-            //   //   self.data.geoJsonLayer.features.forEach(function(datum){
-            //   //     if(get(datum, 'geometry.coordinates[0]') && get(datum, 'geometry.coordinates[1]')){
-            //   //       dataLayer.push(new maps.LatLng(get(datum, 'geometry.coordinates[1]'), get(datum, 'geometry.coordinates[0]')));
-            //   //     }
-            //   //   })
-            //   // }
-
+            if(geoJsonLayer){
+              geoJsonLayer.features.forEach(function(feature){
+                if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
+                  dataLayer.push({location: new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]')), weight: 5});
+                }
+              })
               
-            //   // console.log('Constructed a COVID19 datalayer to render.', dataLayer)
+              map.data.addGeoJson(geoJsonLayer, { idPropertyName: 'id' });
 
-           
+              // if we turn on the heatmap
+              var heatmap = new maps.visualization.HeatmapLayer({
+                data: dataLayer,
+                map: map
+              });
 
-            //   // var heatmap = new maps.visualization.HeatmapLayer({
-            //   //   data: dataLayer,
-            //   //   map: map
-            //   // });
+              heatmap.set('radius', 10);
+              heatmap.set('opacity', 0.5);
+              heatmap.set('dissipating', false);
+              heatmap.set('maxIntensity', 50);
+              heatmap.set('gradient', heatMapGradient);
+              heatmap.setMap(map);
 
-            //   // heatmap.set('radius', 50);
-            //   // heatmap.set('opacity', 0.5);
-            //   // heatmap.set('gradient', [
-            //   //   'rgba(255, 255, 255, 0)',
-            //   //   'rgba(251, 251, 213, 1)',
-            //   //   'rgba(249, 234, 189, 1)',
-            //   //   'rgba(247, 217, 165, 1)',
-            //   //   'rgba(243, 184, 118, 1)',
-            //   //   'rgba(242, 168, 94, 1)',
-            //   //   'rgba(240, 151, 71, 1)',
-            //   //   'rgba(238, 135, 47, 1)',
-            //   //   'rgba(236, 118, 23, 1)',
-            //   //   'rgba(210, 80, 0, 1)',
-            //   // ]);
-
-            //   // heatmap.setMap(map);   
-              
-            //   //map.data.loadGeoJson(geodataUrl);
-
-            //   HTTP.get(geodataUrl, function(error, data){
-            //     //var geojson = EJSON.parse(data.content);
-                
-            //     console.log('geoJsonLayer', geoJsonLayer)
-            //     geoJsonLayer.features.forEach(function(datum){
-            //       if(get(datum, 'geometry.coordinates[0]') && get(datum, 'geometry.coordinates[1]')){
-            //         dataLayer.push(new maps.LatLng(get(datum, 'geometry.coordinates[1]'), get(datum, 'geometry.coordinates[0]')));
-            //       }
-            //     })
-
-            //     console.log('Constructed a COVID19 datalayer to render.', dataLayer)
-
-            //     map.data.loadGeoJson(geodataUrl);
-            //     // map.data.loadGeoJson(geodataUrl);
-
-            //     // // load US state outline polygons from a GeoJson file
-            //     // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
-
-
-            //     // map.data.loadGeoJson(baseUrl + 'geodata/covid19-patients-synthea.geojson');
-            //     // console.log('Trying to render a COVID17 geojson layer.')
- 
-
-            //     // if we turn on the heatmap
-            //     var heatmap = new maps.visualization.HeatmapLayer({
-            //       data: dataLayer,
-            //       map: map
-            //     });
-
-            //     heatmap.set('radius', 50);
-            //     heatmap.set('opacity', 0.5);
-            //     heatmap.set('gradient', [
-            //       'rgba(255, 255, 255, 0)',
-            //       'rgba(251, 251, 213, 1)',
-            //       'rgba(249, 234, 189, 1)',
-            //       'rgba(247, 217, 165, 1)',
-            //       'rgba(243, 184, 118, 1)',
-            //       'rgba(242, 168, 94, 1)',
-            //       'rgba(240, 151, 71, 1)',
-            //       'rgba(238, 135, 47, 1)',
-            //       'rgba(236, 118, 23, 1)',
-            //       'rgba(210, 80, 0, 1)',
-            //     ]);
-                
-            //     heatmap.setMap(map);
-            //   });
-
-
-            // } else {
-              //console.log('Defaulting to the City of Chicago EPA toxic inventory.')
-              //map.data.loadGeoJson(geodataUrl);
-              // map.data.addGeoJson(geoJsonLayer);  
-
-
+            } else {              
               console.log('Ohai, which geodataUrl are we fetching:  ' + geodataUrl)
               HTTP.get(geodataUrl, function(error, data){
                 var geojson = EJSON.parse(data.content);
                 console.log('loadGeoJson', geojson);
 
-                //geojson = cloneDeep(geoJsonLayer)
-                //console.log('self.data.clonedGeojsonLayer', clonedGeojsonLayer);
-
                 geojson.features.forEach(function(feature){
-                  //console.log('geojson.feature', feature);
-
-                  // need to guard against too far away points 
-                  // -0.408386, 53.2734499
                   if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
                     dataLayer.push({location: new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]')), weight: 5});
                   }
                 })
-
-                // geoJsonLayer.features.forEach(function(feature){
-                //   console.log('geoJsonLayer.feature', feature);
-  
-                //   // need to guard against too far away points 
-                //   // -0.408386, 53.2734499
-                //   if(get(feature, 'geometry.coordinates[0]') && get(feature, 'geometry.coordinates[1]')){                    
-                //     let newLatLng = new maps.LatLng(get(feature, 'geometry.coordinates[1]'), get(feature, 'geometry.coordinates[0]'));
-                //     dataLayer.push(newLatLng);
-                //     markerArray.push(new maps.Marker({
-                //       position: newLatLng,
-                //       map: map,
-                //       icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAiklEQVR42mNgQIAoIF4NxGegdCCSHAMzEC+NUlH5v9rF5f+ZoCAwHaig8B8oPhOmKC1NU/P//7Q0DByrqgpSGAtSdOCAry9WRXt9fECK9oIUPXwYFYVV0e2ICJCi20SbFAuyG5uiECUlkKIQmOPng3y30d0d7Lt1bm4w301jQAOgcNoIDad1yOEEAFm9fSv/VqtJAAAAAElFTkSuQmCC'
-                //       // icon: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png'
-                //       // label: labels[i % labels.length]
-                //     }));
-                //   }
-                // })
-                
-
 
                 console.log('Constructed a datalayer to render.', dataLayer)
 
@@ -456,10 +366,6 @@ export class GoogleMapsPage extends React.Component {
                 // map.data.addGeoJson(geoJsonLayer);  
                 map.data.loadGeoJson(geodataUrl);
 
-                // // load US state outline polygons from a GeoJson file
-                // map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/states.js', { idPropertyName: 'STATE' });
-
-
                 // if we turn on the heatmap
                 var heatmap = new maps.visualization.HeatmapLayer({
                   data: dataLayer,
@@ -469,25 +375,11 @@ export class GoogleMapsPage extends React.Component {
                 heatmap.set('radius', 10);
                 heatmap.set('opacity', 0.5);
                 heatmap.set('dissipating', false);
-                heatmap.set('maxIntensity', 50);
-                
-                heatmap.set('gradient', [
-                  'rgba(255, 255, 255, 0)',
-                  'rgba(251, 251, 213, 1)',
-                  'rgba(249, 234, 189, 1)',
-                  'rgba(247, 217, 165, 1)',
-                  'rgba(243, 184, 118, 1)',
-                  'rgba(242, 168, 94, 1)',
-                  'rgba(240, 151, 71, 1)',
-                  'rgba(238, 135, 47, 1)',
-                  'rgba(236, 118, 23, 1)',
-                  'rgba(210, 80, 0, 1)'
-                ]);
-                
+                heatmap.set('maxIntensity', 50);                
+                heatmap.set('gradient', heatMapGradient);
                 heatmap.setMap(map);
               });
-            //}
-
+            }              
 
             map.data.setStyle({
               // raw binary data (extremely fast!)
