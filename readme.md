@@ -1,33 +1,12 @@
 # COVID19 on FHIR Hackathon  
 
-This package is related to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/).
+This project implements [HL7 SANER - Situation Awareness for Novel Epidemic Response](https://github.com/AudaciousInquiry/saner-ig), and was submitted to the [Datavant Pandemic Response Hackathon](https://datavant.com/pandemic-response-hackathon/) and the [MIT Covid19 Challenge](https://covid19challenge.mit.edu/).  
 
-The COVID19 on FHIR project's primary utility is the query page, which fetches coronavirus related conditions, procedures, medications, and encounters using LOINC and SNOMED codes identified by our network of collaborators.  We can query by date range, select clinical parameters of interest, fetch the data from over 87% of hospitals in the US, extract the patient home addresses, geocode them, and generate a map layer to be loaded into Google Maps.  
+The COVID19 on FHIR project's primary purpose is to query FHIR servers for COVID19 related data. We support fetching conditions, procedures, medications, encounters, and devices, using LOINC and SNOMED codes identified by our network of collaborators.  
+
 ![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geocoding.png)
 
 
-#### Design Documents  
-The primary goal behind this hackathon is to stand up a COVID19 specific version of the Epidemiology on FHIR module, so we can map hospital EHR data onto Google Maps.  Primary workflow will look something like this:
-
-- Query hospital FHIR compliant EHRs for COVID19 related LOINC and SNOMED codes.  
-- Do patient demographic lookups with the received patient Ids to determine home addresses.  
-- Geocode the home addresses into latitude/longitude, and assemble into a geojson file.  
-- Display housing markers on Google Maps.  
-- Display a heatmap on Google Maps.  
-
-Secondary goals, include:  
-
-- Beacon functionality to announce "I am quarantining at this location." or "I need assistance at this location".  
-- Loading up static reference files, such as locations of hospitals and testing centers.    
-- Proximity analysis for closest testing centers.  
-
-Please read the following links for background design on this project:  
-
-- [Epidemiology on FHIR Slidedeck](https://docs.google.com/presentation/d/1pHMpB_VmkfPz0a7hRyxeDX8HG9NzZyQCK7oLxAGMPFk/edit?usp=sharing)  
-- [Cholera Mist - Errors in Mapmaking and Disease Theory](https://drive.google.com/open?id=0BwZijsCqmA-GUndDQmRRbGZVMzQ)  
-- [Total Cost of Equipment Ownership - Achieving Greater Insight into Hospital Operating Costs](https://drive.google.com/file/d/0Bwzh7AfT-dKnTVdBNnE2emdyZUU/view?usp=sharing)  
-- [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
-- [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
 
 
 #### Installation  
@@ -59,7 +38,11 @@ meteor run --extra-packages symptomatic:covid19-on-fhir --settings packages/covi
 
 #### Generating a synthetic dataset of COVID19 patients   
 
-Please note that we are working with the [Covid19 branch](https://github.com/synthetichealth/synthea/tree/covid19) of the Synthea project.   
+Please see the following documentation for synthetic patient data.
+
+- [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
+- [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
+
 
 ```
 # download synthea
