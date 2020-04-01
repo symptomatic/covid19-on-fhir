@@ -207,7 +207,7 @@ jobs:
     # run the app
     - run: 
         name: Starting Meteor
-        command: meteor run --settings configs/settings.nodeonfhir.json | tee meteor-output.log
+        command: cd ../node-on-fhir && meteor run --settings packages/covid19-on-fhir/configs/settings.covid19.maps.json | tee meteor-output.log
         background: true
         no_output_timeout: 10m
         when: on_success    # always, on_success, on_fail 
@@ -218,7 +218,7 @@ jobs:
         when: on_success    # always, on_success, on_fail 
         command: | 
             sleep 420
-            meteor npm run-script circle-nightwatch -- --tag circle 
+            cd ../node-on-fhir && meteor npm run-script circle-nightwatch -- --tag circle 
 
 
     # # Save dependency cache
