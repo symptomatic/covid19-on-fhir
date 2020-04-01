@@ -188,13 +188,13 @@ jobs:
 
     # - run: if [ meteor list | grep 'symptomatic:theming' | wc -l $eq 1 ]; then meteor remove symptomatic:theming ; else echo "Meteor seems to be cached"; fi;
 
-    - run: 
-        name: Running static code analysis (lint)
-        no_output_timeout: 10m
-        when: on_success    # always, on_success, on_fail 
-        command: | 
-            sleep 120 
-            meteor npm run-script lint  
+    # - run: 
+    #     name: Running static code analysis (lint)
+    #     no_output_timeout: 10m
+    #     when: on_success    # always, on_success, on_fail 
+    #     command: | 
+    #         sleep 120 
+    #         meteor npm run-script lint  
 
     # - run: 
     #     name: Running verification tests
