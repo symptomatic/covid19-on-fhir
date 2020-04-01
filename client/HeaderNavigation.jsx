@@ -173,18 +173,15 @@ export function HeaderNavigation(props){
         props.history.replace('/query-fhir-provider')
         break;
       case 1:
-        props.history.replace('/map')
+        props.history.replace('/geocoding')
         break;
       case 2:
-        props.history.replace('/cardiac-dashboard')
+        props.history.replace('/map')
         break;
       case 3:
-        props.history.replace('/measure-reports-expansion-page')
+        props.history.replace('/reporting')
         break;
-      case 4:
-        props.history.replace('/sunburst-graph')
-        break;
-    }   
+      }   
 
     // if(window.Carousel){
     //   window.Carousel.goToSlide(newIndex + 2);
@@ -206,7 +203,9 @@ export function HeaderNavigation(props){
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
           <Tab id="fetchTab" label="Fetch" />
+          <Tab id="geocodingTab" label="Geocoding" />
           <Tab id="mapTab" label="Map" />
+          <Tab id="reportTab" label="Reporting" />
           {/* <Tab id="dashboardTab" label="Dashboard" />
           <Tab id="scorecardTab" label="Scorecard" />
           <Tab id="patientInfoTab" label="Patient Information" /> */}

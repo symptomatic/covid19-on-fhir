@@ -5,9 +5,6 @@ This package is related to the [Datavant Pandemic Response Hackathon](https://da
 The COVID19 on FHIR project's primary utility is the query page, which fetches coronavirus related conditions, procedures, medications, and encounters using LOINC and SNOMED codes identified by our network of collaborators.  We can query by date range, select clinical parameters of interest, fetch the data from over 87% of hospitals in the US, extract the patient home addresses, geocode them, and generate a map layer to be loaded into Google Maps.  
 ![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geocoding.png)
 
-The second component of the project is Google Maps, and our ability to layer FHIR data on top of it.  We have access to the full API, including markers, heatmaps, reverse geocoding, routing, and many other features.  
-![Covid19Geomapping-SyntheaHeatmap](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geomapping-SyntheaHeatmap.png)
-
 
 #### Design Documents  
 The primary goal behind this hackathon is to stand up a COVID19 specific version of the Epidemiology on FHIR module, so we can map hospital EHR data onto Google Maps.  Primary workflow will look something like this:
@@ -31,7 +28,6 @@ Please read the following links for background design on this project:
 - [Total Cost of Equipment Ownership - Achieving Greater Insight into Hospital Operating Costs](https://drive.google.com/file/d/0Bwzh7AfT-dKnTVdBNnE2emdyZUU/view?usp=sharing)  
 - [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
 - [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
-
 
 
 #### Installation  

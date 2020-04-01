@@ -1,6 +1,6 @@
 Package.describe({
     name: 'symptomatic:covid19-on-fhir',
-    version: '0.3.4',
+    version: '0.4.0',
     summary: 'COVID19 Hackathon',
     git: 'https://github.com/symptomatic/covid19-hackathon',
     documentation: 'README.md'
@@ -20,26 +20,10 @@ Package.onUse(function(api) {
     api.use('random');
     api.use('fourseven:scss');
 
-    api.use('browser-policy@1.1.0')
+    api.use('clinical:hl7-fhir-data-infrastructure@6.3.2');
 
-    api.use('clinical:hl7-fhir-data-infrastructure@6.3.1');
-
-    api.addFiles('stylesheets/maps.css', 'client');
-
-    api.addFiles('lib/TestingMethods.js');
-    // api.addFiles('lib/LocationMethods.js', 'client');
-    
+    api.addFiles('lib/TestingMethods.js');    
     api.addFiles('server/ProxyMethods.js', 'server');
-    api.addFiles('server/BrowserPolicies.js', 'server');
-    api.addFiles('server/Geocoding.js', 'server');
-
-    api.addFiles('geodata/illinois-epa-toxic-inventory-sites.geojson', 'client', {isAsset: true});
-    api.addFiles('geodata/covid19-patients-synthea.geojson', 'client', {isAsset: true});
     
     api.mainModule('index.jsx', 'client');
-});
-
-Npm.depends({
-    "google-map-react":"1.1.7",
-    "node-geocoder": "3.26.0"
 });
