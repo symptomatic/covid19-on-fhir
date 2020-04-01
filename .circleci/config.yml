@@ -13,7 +13,7 @@
 
 # This is a test
 
-version: 2.0
+version: 2
 jobs:
   build:
     working_directory: ~/symptomatic/covid19-on-fhir
@@ -135,36 +135,36 @@ jobs:
     - run: meteor --version
     - run: locale
 
-     # Download our boilerplate
-     - run: cd .. && git clone https://github.com/symptomatic/node-on-fhir
+    # Download our boilerplate
+    - run: cd .. && git clone https://github.com/symptomatic/node-on-fhir
  
-     # check that we have the right version of meteor
-     - run: cd ../node-on-fhir && meteor --version
-     - run: ls -la
+    # check that we have the right version of meteor
+    - run: cd ../node-on-fhir && meteor --version
+    - run: ls -la
  
-     # take a look around the filesystem (debugging)
-     - run: cd ../node-on-fhir && ls -la
+    # take a look around the filesystem (debugging)
+    - run: cd ../node-on-fhir && ls -la
 
-     # create the package directory
-     - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir
+    # create the package directory
+    - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir
 
-     # copy repo files into new directory
-     - run: cp -R ./* ../node-on-fhir/packages/covid19-on-fhir
+    # copy repo files into new directory
+    - run: cp -R ./* ../node-on-fhir/packages/covid19-on-fhir
 
-     # check that they got copied into place
-     - run: cd ../node-on-fhir/packages/covid19-on-fhir && pwd
-     - run: cd ../node-on-fhir/packages && ls -la
+    # check that they got copied into place
+    - run: cd ../node-on-fhir/packages/covid19-on-fhir && pwd
+    - run: cd ../node-on-fhir/packages && ls -la
 
-     # install dependencies
-     - run: cd ../node-on-fhir && meteor npm install
+    # install dependencies
+    - run: cd ../node-on-fhir && meteor add symptomatic:covid19-on-fhir
+    - run: cd ../node-on-fhir && meteor npm install
 
-     # install test runner
-     - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@3.6.0 chromedriver
-     - run: cd ../node-on-fhir && meteor add dispatch:mocha practicalmeteor:chai
-     - run: cd ../node-on-fhir && meteor add symptomatic:covid19-on-fhir
-     - run: cd ../node-on-fhir && mkdir imports 
+    # install test runner
+    - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@3.6.0 chromedriver
+    - run: cd ../node-on-fhir && meteor add dispatch:mocha practicalmeteor:chai
+    - run: cd ../node-on-fhir && mkdir imports 
 
-     - run: cp tests/nightwatch/walkthroughs/helloCovid.js ../node-on-fhir/imports/
+    - run: cp tests/nightwatch/walkthroughs/helloCovid.js ../node-on-fhir/imports/
 
     # #- make sure we have our tests
     # - run: cd webapp/tests && ls -la

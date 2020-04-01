@@ -44,7 +44,6 @@ Please see the following documentation for synthetic patient data.
 - [Synthea Module for COVID19](https://github.com/synthetichealth/synthea/issues/679)  
 - [Synthea Pipeline Diagram - March20th](https://github.com/symptomatic/covid19-hackathon/blob/master/screenshots/Synthea-Pipeline-March20th.png)
 
-
 ```
 # download synthea
 git clone https://github.com/PatientInsight/Synthea.git
