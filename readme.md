@@ -6,7 +6,13 @@ The COVID19 on FHIR project's primary purpose is to query FHIR servers for COVID
 
 ![CovidQueryPage](https://raw.githubusercontent.com/symptomatic/covid19-on-fhir/master/screenshots/Covid19Geocoding.png)
 
+#### Prerequisites & Related Projects    
+This project is intended to be used with the following platform libraries and projects:  
 
+- [Meteor Javascript Framework](https://www.meteor.com/)  
+- [Node on FHIR](https://github.com/symptomatic/node-on-fhir)  
+- [Covid19 Geomapping](https://github.com/symptomatic/covid19-geomapping)  
+- [Synthea - Covid19 Module](https://github.com/synthetichealth/synthea/issues/679)  
 
 
 #### Installation  
