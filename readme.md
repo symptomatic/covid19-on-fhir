@@ -26,13 +26,14 @@ cd node-on-fhir
 # clone this package into the project
 cd packages
 git clone https://github.com/symptomatic/covid19-on-fhir
+git clone https://github.com/symptomatic/covid19-geomapping
 
 # install dependencies
 cd ..
 meteor npm install
 
 # run the application  
-meteor run --extra-packages symptomatic:covid19-on-fhir --settings packages/covid19-on-fhir/configs/settings.covid19.maps.json  
+meteor run --extra-packages symptomatic:covid19-on-fhir,symptomatic:covid19-geomapping --settings packages/covid19-on-fhir/configs/settings.covid19.maps.json  
 ```
 
 
