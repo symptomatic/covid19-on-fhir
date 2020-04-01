@@ -131,11 +131,9 @@ jobs:
     - run: pwd
     - run: ls -la
 
-
     # Lets see if we can get some config info 
     - run: meteor --version
     - run: locale
-
 
      # Download our boilerplate
      - run: cd .. && git clone https://github.com/symptomatic/node-on-fhir
@@ -167,8 +165,6 @@ jobs:
      - run: cd ../node-on-fhir && mkdir imports 
 
      - run: cp tests/nightwatch/walkthroughs/helloCovid.js ../node-on-fhir/imports/
-
-     
 
     # #- make sure we have our tests
     # - run: cd webapp/tests && ls -la
