@@ -13,7 +13,7 @@
 
 # This is a test
 
-version: 2.1
+version: 2.0
 jobs:
   build:
     working_directory: ~/symptomatic/covid19-on-fhir
@@ -139,7 +139,6 @@ jobs:
 
      # Download our boilerplate
      - run: cd .. && git clone https://github.com/symptomatic/node-on-fhir
-     # - run: git clone https://github.com/meteor/todos -b react
  
      # check that we have the right version of meteor
      - run: cd ../node-on-fhir && meteor --version
