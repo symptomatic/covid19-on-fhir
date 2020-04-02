@@ -197,18 +197,26 @@ export function HeaderNavigation(props){
   // function openPage(url){
   //   props.history.replace(url)
   // }
-  
+  let geocodingTab;
+  let mapTab;
+  if(Package["symptomatic:covid19-geomapping"]){
+    geocodingTab = <Tab id="geocodingTab" label="Geocoding" />
+    mapTab = <Tab id="mapTab" label="Map" />
+  }
+
+  let reportingTab;
+  if(Package["symptomatic:covid19-reporting"]){
+    reportingTab = <Tab id="reportTab" label="Reporting" />
+  }
+
   return (        
     <div style={{display: 'contents'}}>
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
           <Tab id="fetchTab" label="Fetch" />
-          <Tab id="geocodingTab" label="Geocoding" />
-          <Tab id="mapTab" label="Map" />
-          <Tab id="reportTab" label="Reporting" />
-          {/* <Tab id="dashboardTab" label="Dashboard" />
-          <Tab id="scorecardTab" label="Scorecard" />
-          <Tab id="patientInfoTab" label="Patient Information" /> */}
+          { geocodingTab }
+          { mapTab }
+          { reportingTab }
         </Tabs>
         <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
           <h3 id="fetchTab">{Session.get('fhirServerEndpoint')}</h3>          

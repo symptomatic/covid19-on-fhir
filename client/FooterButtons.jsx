@@ -46,12 +46,20 @@ import {
 
 
   const useTabStyles = makeStyles(theme => ({
-    button: {
+    west_button: {
       cursor: 'pointer',
       justifyContent: 'left',
       color: theme.appBarTextColor,
       marginLeft: '20px',
       marginTop: '10px'
+    },
+    east_button: {
+      cursor: 'pointer',
+      justifyContent: 'left',
+      color: theme.appBarTextColor,
+      right: '20px',
+      marginTop: '15px',
+      position: 'absolute'
     }
   }));
 
@@ -70,10 +78,17 @@ export function FetchButtons(props){
     Locations.remove({});
     Session.set('geoJsonLayer', "");    
   }
+  function toggleDialog(){
+    console.log('Toggle dialog open/close.')
+    Session.toggle('mainAppDialogOpen');
+  }
   return (
     <MuiThemeProvider theme={muiTheme} >
-      <Button onClick={ clearAllData.bind() } className={ buttonClasses.button }>
+      <Button onClick={ clearAllData.bind() } className={ buttonClasses.west_button }>
         Clear All Data
+      </Button> 
+      <Button onClick={ toggleDialog.bind() } className={ buttonClasses.east_button }>
+        Info
       </Button>      
     </MuiThemeProvider>
   );

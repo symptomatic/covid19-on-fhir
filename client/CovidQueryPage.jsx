@@ -82,6 +82,7 @@ Session.setDefault('currentEncounterSearchset', null);
 Session.setDefault('encounterUrl', "https://");
 Session.setDefault('conditionUrl', "https://");
 Session.setDefault('procedureUrl', "https://");
+Session.setDefault('deviceUrl', "https://");
 
 Session.setDefault('geoJsonLayer', "");
 
@@ -433,6 +434,16 @@ function CovidQueryPage(props){
       fetchPatientsFromFhirArray(props, Procedures.find().fetch());
     });
   }
+  function handleFetchDevices(props){
+    logger.warn('CovidQueryPage.handleFetchDevices()');
+
+    fetchDeviceData(props, function(){
+      fetchPatientsFromFhirArray(props, Devices.find().fetch());
+    });
+  }
+
+  
+
 
   function handleGeocodeAddresses(props){
     logger.warn('CovidQueryPage.handleGeocodeAddresses()');
@@ -932,6 +943,103 @@ function CovidQueryPage(props){
     });
   }
 
+
+
+  async function fetchDeviceData(props, callback){
+    logger.debug('Fetch device data from the following endpoint: ' + fhirServerEndpoint);
+
+
+    let devicesArray = [];
+    let searchOptions = { 
+      resourceType: 'Device', 
+      searchParams: { 
+        type: ""
+      }
+    };
+
+    let proceduresToSearchFor = [];
+    let proceduresToSearchForString = "";
+    
+    // these are our toggles
+    // http://www.snomed.org/news-and-events/articles/jan-2020-sct-intl-edition-release
+    if(checkedVentilator){
+      proceduresToSearchFor.push("706172005")
+    }
+    // if(checkedOxygenAdministration){
+    //   proceduresToSearchFor.push("371908008")
+    // }
+
+    // we're being a bit sloppy with this algorithm because it needs to get out the door
+    proceduresToSearchFor.forEach(function(snomedCode){
+      // adding a comma after each snomed code
+      proceduresToSearchForString = proceduresToSearchForString + snomedCode + ",";
+    })
+    if(proceduresToSearchFor.length > 0){
+      // and then dropping the last comma;
+      // blah, but it works
+      searchOptions.searchParams.type = proceduresToSearchForString.substring(0, proceduresToSearchForString.length - 1);
+    }
+
+
+    logger.trace('searchOptions', searchOptions)
+
+    await fhirClient.search(searchOptions)
+    .then((searchResponse) => {
+      logger.debug('fetchDeviceData.searchResponse', searchResponse);
+      let devicesArray = [];
+
+      if(get(searchResponse, 'resourceType') === "Bundle"){
+        logger.debug('Parsing a Bundle.')
+        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
+        Session.set('deviceUrl', get(searchResponse, "link[0].url"));
+
+        let entries = get(searchResponse, 'entry', []);
+        
+        entries.forEach(function(entry){
+          if(get(entry, 'resource.resourceType') === "Device"){
+
+             // checking for duplicates along the way
+            if(!Procedures.findOne({id: get(entry, 'resource.id')})){
+              logger.trace('doesnt exist, upserting');
+
+              let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
+              logger.trace('Just received new procedure: ' + procedureId);
+  
+              if(!get(entry, 'resource.id')){
+                entry.resource.id = procedureId;
+              } 
+              if(!get(entry, 'resource._id')){
+                entry.resource._id = procedureId;
+              }
+  
+              devicesArray.push(get(entry, 'resource'))
+            }     
+          }
+        })        
+      }
+
+      devicesArray = recursiveProcedureQuery(fhirClient, searchResponse, devicesArray, function(error, result){
+        logger.info("We just finished the recursive query and received the following result: " + result)
+      });
+
+      return devicesArray;
+    })
+    .then((devicesArray) => {
+      // console.log('devicesArray', devicesArray);
+      setProcedures(devicesArray);
+      if(typeof callback === "function"){
+        callback();
+      }
+      return devicesArray;
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
+
+
+
+
   async function fetchProcedureData(props, callback){
     logger.debug('Fetch procedure data from the following endpoint: ' + fhirServerEndpoint);
 
@@ -1117,7 +1225,12 @@ function CovidQueryPage(props){
     Session.set('lastUpdated', new Date())
   }
 
+  function handleFetchConformanceStatement(){
+    logger.trace('handleFetchConformanceStatement')
 
+    Session.set('mainAppDialogOpen', true)
+
+  }
   function handleFhirEndpointChange(event){
     logger.trace('handleFhirEndpointChange', event.target.value)
 
@@ -1187,9 +1300,16 @@ function CovidQueryPage(props){
                 title="FHIR Server Query" 
                 subheader="Fetching data related to COVID19 coronavirus symptoms."
                 style={{fontSize: '100%'}} />
+              <Button 
+                id="fetchConformanceStatement" 
+                color="primary" 
+                variant="contained" 
+                className={classes.button} onClick={handleFetchConformanceStatement.bind(this)} 
+                style={{float: 'right', right: '0px', marginTop: '-70px'}}
+              >Conformance Statement</Button> 
               <CardContent>
                 <Grid container spacing={3}>
-                  <Grid item xs={8}>
+                  <Grid item xs={12}>
                     <TextField
                       id="fhirQueryUrl"
                       name="fhirQueryUrl"
@@ -1203,9 +1323,10 @@ function CovidQueryPage(props){
                       onChange={handleFhirEndpointChange}
                       disabled
                     />
-
                   </Grid>
-                  <Grid item xs={2}>
+                </Grid>
+                <Grid container spacing={3}>
+                  <Grid item xs={4}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1219,7 +1340,7 @@ function CovidQueryPage(props){
                       />
                     </div>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={4}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1235,18 +1356,8 @@ function CovidQueryPage(props){
                   </Grid>
                 </Grid>
               </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} >Fetch Encounters</Button> 
-                <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} >Fetch Conditions</Button> 
-                <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} >Fetch Procedures</Button> 
-              </CardActions>              
-            </StyledCard>   
-            <DynamicSpacer />
-            <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
-              <CardHeader                 
-                title="Clinical Parameters" 
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
+              <DynamicSpacer />
+              <CardContent>
                 <Table size="small">
                   <TableBody>
                     <TableRow>
@@ -1357,7 +1468,14 @@ function CovidQueryPage(props){
                   </TableBody>
                 </Table>
               </CardContent>
-            </StyledCard>         
+              <DynamicSpacer />
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} >Fetch Encounters</Button> 
+                <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} >Fetch Conditions</Button> 
+                <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} >Fetch Procedures</Button> 
+                <Button id="fetchDevicesButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchDevices.bind(this)} >Fetch Devices</Button> 
+              </CardActions>              
+            </StyledCard>          
           </Grid>
           <Grid item xs={4}>
             <CardHeader 
