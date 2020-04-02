@@ -141,7 +141,7 @@ function CovidQueryPage(props){
 
   let encounterCursor;
   encounterCursor = useTracker(function(){    
-    logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
+    // logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
     return Encounters.find();
   }, [props.lastUpdated]);  
 
@@ -1228,7 +1228,19 @@ function CovidQueryPage(props){
   function handleFetchConformanceStatement(){
     logger.trace('handleFetchConformanceStatement')
 
-    Session.set('mainAppDialogOpen', true)
+
+    HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
+      let parsedConformanceStatement = JSON5.parse(get(conformanceStatement, "content"))
+      console.log('Conformance Statement', parsedConformanceStatement);
+      Session.set('mainAppDialogContent', parsedConformanceStatement);
+      Session.set('mainAppDialogComponent', false);
+      Session.set('lastUpdated', new Date())
+      Session.set('mainAppDialogOpen', true);
+    })
+
+    fhirClient.smartAuthMetadata().then((smartFhirUrls) => {
+      console.log('smartAuthMetadata', smartFhirUrls);
+    });
 
   }
   function handleFhirEndpointChange(event){

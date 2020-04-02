@@ -25,6 +25,25 @@ function DynamicSpacer(props){
   return <br className="dynamicSpacer" style={{height: '40px'}}/>;
 }
 
+//==============================================================================================
+// THEMING
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
+  },
+  button: {
+    margin: theme.spacing(1)
+  }
+}));
+
+//==============================================================================================
+// MAIN COMPONENT
 
 function InfoPage(props){
 
@@ -39,27 +58,25 @@ function InfoPage(props){
     
 
   return (
-    <PageCanvas id='infoPage' headerHeight={158} >
-      <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
-        <Grid container spacing={3} >
-          <Grid item xs={4}>
-            <StyledCard style={{minHeight: '380px'}}>
-              <CardHeader 
-                title="Covid19 Project Info" 
-                subheader="Fetching data related to COVID19 coronavirus symptoms."
-                style={{fontSize: '100%'}} />
-              <CardContent>
-                - SANER
-                - Datavant
-                - MIT 
-                - GitHub Repo
-                - Zoom Controls
-                - Team Acknowledgements
-              </CardContent>
-            </StyledCard>          
-          </Grid>
-        </Grid>        
-      </MuiPickersUtilsProvider>            
+    <PageCanvas id='infoPage' headerHeight={148} >
+      <Grid container spacing={3} justify="center" >
+        <Grid item xs={4}>
+          <StyledCard height="auto">
+            <CardHeader 
+              title="Covid19 Project Info" 
+              subheader="Fetching data related to COVID19 coronavirus symptoms."
+              style={{fontSize: '100%'}} />
+            <CardContent>
+              - SANER
+              - Datavant
+              - MIT 
+              - GitHub Repo
+              - Zoom Controls
+              - Team Acknowledgements
+            </CardContent>
+          </StyledCard>          
+        </Grid>
+      </Grid>        
     </PageCanvas>
   );
 }

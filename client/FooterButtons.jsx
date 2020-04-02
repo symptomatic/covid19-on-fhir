@@ -66,6 +66,14 @@ import {
 //============================================================================================================================
 // FETCH
 
+export function SampleDialogComponent(props){
+  return(
+    <div>
+      This is a sample component!
+    </div>
+  )
+}
+
 export function FetchButtons(props){
   const buttonClasses = useTabStyles();
 
@@ -76,20 +84,23 @@ export function FetchButtons(props){
     Conditions.remove({});
     Procedures.remove({});
     Locations.remove({});
+
     Session.set('geoJsonLayer', "");    
   }
   function toggleDialog(){
     console.log('Toggle dialog open/close.')
+    Session.set('mainAppDialogComponent', "SampleDialogComponent");
+    Session.set('lastUpdated', new Date())
     Session.toggle('mainAppDialogOpen');
   }
   return (
     <MuiThemeProvider theme={muiTheme} >
       <Button onClick={ clearAllData.bind() } className={ buttonClasses.west_button }>
         Clear All Data
-      </Button> 
+      </Button>
       <Button onClick={ toggleDialog.bind() } className={ buttonClasses.east_button }>
-        Info
-      </Button>      
+        Dialog
+      </Button>
     </MuiThemeProvider>
   );
 }

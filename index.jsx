@@ -6,7 +6,8 @@ import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 
 import { 
-  FetchButtons
+  FetchButtons,
+  SampleDialogComponent
 } from './client/FooterButtons';
 
 import { HeaderNavigation } from './client/HeaderNavigation';
@@ -29,6 +30,10 @@ var DynamicRoutes = [{
   'component': TermsAndConditionsPage
 }];
 
+let DialogComponents = [{
+  name: "SampleDialogComponent",
+  component: <SampleDialogComponent />
+}]
 
 let FooterButtons = [{
   pathname: '/query-fhir-provider',
@@ -57,6 +62,7 @@ export {
 
   FooterButtons,
   SidebarElements,
+  DialogComponents,
 
   MainPage
 };
