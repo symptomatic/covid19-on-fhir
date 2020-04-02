@@ -1232,8 +1232,8 @@ function CovidQueryPage(props){
     HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
       let parsedConformanceStatement = JSON5.parse(get(conformanceStatement, "content"))
       console.log('Conformance Statement', parsedConformanceStatement);
-      Session.set('mainAppDialogContent', parsedConformanceStatement);
-      Session.set('mainAppDialogComponent', false);
+      Session.set('mainAppDialogJson', parsedConformanceStatement);
+      Session.set('mainAppDialogComponent', "ConformanceCheck");
       Session.set('lastUpdated', new Date())
       Session.set('mainAppDialogOpen', true);
     })

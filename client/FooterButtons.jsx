@@ -89,7 +89,8 @@ export function FetchButtons(props){
   }
   function toggleDialog(){
     console.log('Toggle dialog open/close.')
-    Session.set('mainAppDialogComponent', "SampleDialogComponent");
+    Session.set('mainAppDialogJson', false);
+    Session.set('mainAppDialogComponent', "AboutDialog");
     Session.set('lastUpdated', new Date())
     Session.toggle('mainAppDialogOpen');
   }
@@ -99,7 +100,7 @@ export function FetchButtons(props){
         Clear All Data
       </Button>
       <Button onClick={ toggleDialog.bind() } className={ buttonClasses.east_button }>
-        Dialog
+        Info Dialog
       </Button>
     </MuiThemeProvider>
   );

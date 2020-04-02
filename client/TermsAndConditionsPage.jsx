@@ -67,7 +67,7 @@ function TermsAndConditionsPage(props){
               title="Terms and Conditions" 
               style={{fontSize: '100%'}} />
             <CardContent>
-              Lorem ipsum...
+              This application is MIT licensed.  
             </CardContent>
           </StyledCard>          
         </Grid>

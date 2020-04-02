@@ -1,9 +1,10 @@
 import React from 'react';
 
 import CovidQueryPage from './client/CovidQueryPage';
-import InfoPage from './client/InfoPage';
+import AboutDialog from './client/AboutDialog';
 import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
+import ConformanceCheck from './client/ConformanceCheck';
 
 import { 
   FetchButtons,
@@ -17,9 +18,9 @@ var DynamicRoutes = [{
   'path': '/query-fhir-provider',
   'component': CovidQueryPage
 }, {
-  'name': 'InfoPage',
+  'name': 'AboutDialog',
   'path': '/info',
-  'component': InfoPage
+  'component': AboutDialog
 }, {
   'name': 'PrivacyPage',
   'path': '/privacy',
@@ -33,6 +34,12 @@ var DynamicRoutes = [{
 let DialogComponents = [{
   name: "SampleDialogComponent",
   component: <SampleDialogComponent />
+}, {
+  name: "ConformanceCheck",
+  component: <ConformanceCheck />
+}, {
+  name: "AboutDialog",
+  component: <AboutDialog />
 }]
 
 let FooterButtons = [{

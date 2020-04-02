@@ -67,7 +67,7 @@ function PrivacyPage(props){
               title="Privacy Page" 
               style={{fontSize: '100%'}} />
             <CardContent>
-              Lorem ipsum...
+              This application does not store data on servers.  It fetches data directly from a FHIR compliant server to the user's browser.  All data is flushed when the application is shut down.  
             </CardContent>
           </StyledCard>          
         </Grid>

@@ -35,6 +35,11 @@
     "defaults": {
       "route": "/example-route",
       "landingPage": "/example-route",
+      "landingModal": {
+        "open": true,
+        "title": "Welcome to Covid19 Geomapping on FHIR",
+        "component": "AboutDialog"
+      },
       "dateFormat": "YYYY-MM-DD",
       "prominantHeader": true,
 
