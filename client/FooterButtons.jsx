@@ -46,17 +46,33 @@ import {
 
 
   const useTabStyles = makeStyles(theme => ({
-    button: {
+    west_button: {
       cursor: 'pointer',
       justifyContent: 'left',
       color: theme.appBarTextColor,
       marginLeft: '20px',
       marginTop: '10px'
+    },
+    east_button: {
+      cursor: 'pointer',
+      justifyContent: 'left',
+      color: theme.appBarTextColor,
+      right: '20px',
+      marginTop: '15px',
+      position: 'absolute'
     }
   }));
 
 //============================================================================================================================
 // FETCH
+
+export function SampleDialogComponent(props){
+  return(
+    <div>
+      This is a sample component!
+    </div>
+  )
+}
 
 export function FetchButtons(props){
   const buttonClasses = useTabStyles();
@@ -68,13 +84,24 @@ export function FetchButtons(props){
     Conditions.remove({});
     Procedures.remove({});
     Locations.remove({});
+
     Session.set('geoJsonLayer', "");    
+  }
+  function toggleDialog(){
+    console.log('Toggle dialog open/close.')
+    Session.set('mainAppDialogJson', false);
+    Session.set('mainAppDialogComponent', "AboutDialog");
+    Session.set('lastUpdated', new Date())
+    Session.toggle('mainAppDialogOpen');
   }
   return (
     <MuiThemeProvider theme={muiTheme} >
-      <Button onClick={ clearAllData.bind() } className={ buttonClasses.button }>
+      <Button onClick={ clearAllData.bind() } className={ buttonClasses.west_button }>
         Clear All Data
-      </Button>      
+      </Button>
+      <Button onClick={ toggleDialog.bind() } className={ buttonClasses.east_button }>
+        Info Dialog
+      </Button>
     </MuiThemeProvider>
   );
 }

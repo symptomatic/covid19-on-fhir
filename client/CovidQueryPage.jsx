@@ -82,6 +82,7 @@ Session.setDefault('currentEncounterSearchset', null);
 Session.setDefault('encounterUrl', "https://");
 Session.setDefault('conditionUrl', "https://");
 Session.setDefault('procedureUrl', "https://");
+Session.setDefault('deviceUrl', "https://");
 
 Session.setDefault('geoJsonLayer', "");
 
@@ -140,7 +141,7 @@ function CovidQueryPage(props){
 
   let encounterCursor;
   encounterCursor = useTracker(function(){    
-    logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
+    // logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
     return Encounters.find();
   }, [props.lastUpdated]);  
 
@@ -433,6 +434,16 @@ function CovidQueryPage(props){
       fetchPatientsFromFhirArray(props, Procedures.find().fetch());
     });
   }
+  function handleFetchDevices(props){
+    logger.warn('CovidQueryPage.handleFetchDevices()');
+
+    fetchDeviceData(props, function(){
+      fetchPatientsFromFhirArray(props, Devices.find().fetch());
+    });
+  }
+
+  
+
 
   function handleGeocodeAddresses(props){
     logger.warn('CovidQueryPage.handleGeocodeAddresses()');
@@ -932,6 +943,103 @@ function CovidQueryPage(props){
     });
   }
 
+
+
+  async function fetchDeviceData(props, callback){
+    logger.debug('Fetch device data from the following endpoint: ' + fhirServerEndpoint);
+
+
+    let devicesArray = [];
+    let searchOptions = { 
+      resourceType: 'Device', 
+      searchParams: { 
+        type: ""
+      }
+    };
+
+    let proceduresToSearchFor = [];
+    let proceduresToSearchForString = "";
+    
+    // these are our toggles
+    // http://www.snomed.org/news-and-events/articles/jan-2020-sct-intl-edition-release
+    if(checkedVentilator){
+      proceduresToSearchFor.push("706172005")
+    }
+    // if(checkedOxygenAdministration){
+    //   proceduresToSearchFor.push("371908008")
+    // }
+
+    // we're being a bit sloppy with this algorithm because it needs to get out the door
+    proceduresToSearchFor.forEach(function(snomedCode){
+      // adding a comma after each snomed code
+      proceduresToSearchForString = proceduresToSearchForString + snomedCode + ",";
+    })
+    if(proceduresToSearchFor.length > 0){
+      // and then dropping the last comma;
+      // blah, but it works
+      searchOptions.searchParams.type = proceduresToSearchForString.substring(0, proceduresToSearchForString.length - 1);
+    }
+
+
+    logger.trace('searchOptions', searchOptions)
+
+    await fhirClient.search(searchOptions)
+    .then((searchResponse) => {
+      logger.debug('fetchDeviceData.searchResponse', searchResponse);
+      let devicesArray = [];
+
+      if(get(searchResponse, 'resourceType') === "Bundle"){
+        logger.debug('Parsing a Bundle.')
+        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
+        Session.set('deviceUrl', get(searchResponse, "link[0].url"));
+
+        let entries = get(searchResponse, 'entry', []);
+        
+        entries.forEach(function(entry){
+          if(get(entry, 'resource.resourceType') === "Device"){
+
+             // checking for duplicates along the way
+            if(!Procedures.findOne({id: get(entry, 'resource.id')})){
+              logger.trace('doesnt exist, upserting');
+
+              let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
+              logger.trace('Just received new procedure: ' + procedureId);
+  
+              if(!get(entry, 'resource.id')){
+                entry.resource.id = procedureId;
+              } 
+              if(!get(entry, 'resource._id')){
+                entry.resource._id = procedureId;
+              }
+  
+              devicesArray.push(get(entry, 'resource'))
+            }     
+          }
+        })        
+      }
+
+      devicesArray = recursiveProcedureQuery(fhirClient, searchResponse, devicesArray, function(error, result){
+        logger.info("We just finished the recursive query and received the following result: " + result)
+      });
+
+      return devicesArray;
+    })
+    .then((devicesArray) => {
+      // console.log('devicesArray', devicesArray);
+      setProcedures(devicesArray);
+      if(typeof callback === "function"){
+        callback();
+      }
+      return devicesArray;
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
+
+
+
+
   async function fetchProcedureData(props, callback){
     logger.debug('Fetch procedure data from the following endpoint: ' + fhirServerEndpoint);
 
@@ -1117,7 +1225,24 @@ function CovidQueryPage(props){
     Session.set('lastUpdated', new Date())
   }
 
+  function handleFetchConformanceStatement(){
+    logger.trace('handleFetchConformanceStatement')
 
+
+    HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
+      let parsedConformanceStatement = JSON5.parse(get(conformanceStatement, "content"))
+      console.log('Conformance Statement', parsedConformanceStatement);
+      Session.set('mainAppDialogJson', parsedConformanceStatement);
+      Session.set('mainAppDialogComponent', "ConformanceCheck");
+      Session.set('lastUpdated', new Date())
+      Session.set('mainAppDialogOpen', true);
+    })
+
+    fhirClient.smartAuthMetadata().then((smartFhirUrls) => {
+      console.log('smartAuthMetadata', smartFhirUrls);
+    });
+
+  }
   function handleFhirEndpointChange(event){
     logger.trace('handleFhirEndpointChange', event.target.value)
 
@@ -1172,8 +1297,161 @@ function CovidQueryPage(props){
   
   selectedStartDate = moment(selectedStartDate).format("YYYY-MM-DD");
   selectedEndDate = moment(selectedEndDate).format("YYYY-MM-DD");
-    
+  
 
+
+  let encountersCard;
+  if(encounterCount > 0){
+    encountersCard = <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="encountersCardCount"
+        title={encountersTitle} 
+        subheader={encounterUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <EncountersTable
+          id="fetchedEncountersTable"
+          encounters={encounters}
+          rowsPerPage={10}
+          count={totalEncountersDuringDateRange}
+          hideCheckboxes
+          hideTypeCode
+          hideReasonCode
+          hideReason
+          barcodes={false}
+          hideIdentifier
+          hideStatus
+          hideActionIcons
+          hideEndDateTime
+          calculateDuration={false}
+          hideHistory
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearEncountersBtn" color="primary" className={classes.button} onClick={clearEncounters.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  }   
+
+  let conditionsCard;
+  if(conditionCount > 0){
+    conditionsCard= <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="conditionsCardCount"
+        title={conditionsTitle} 
+        subheader={conditionUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ConditionsTable
+          id="fetchedConditionsTable"
+          conditions={conditions}
+          rowsPerPage={10}
+          count={conditionCount}
+          displayPatientName={false}
+          displayAsserterName={false}
+          displayEvidence={false}
+          displayEndDate={false}
+          displayBarcode={false}
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } 
+
+
+  let proceduresCard;
+  if(procedureCount > 0){
+    proceduresCard = <StyledCard id="fetchedProceduresCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="proceduresCardCount"
+        title={proceduresTitle} 
+        subheader={procedureUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ProceduresTable
+          id="fetchedProceduresTable"                  
+          procedures={procedures}
+          rowsPerPage={10}
+          count={procedureCount}
+          hideActionIcons
+          hideCategory
+          hideCheckboxes
+          hideIdentifier
+          hideSubject
+          hideBodySite
+          hidePerformer
+          hidePerformedDateEnd
+          hideBarcode
+          hideNotes
+          hideActionButton
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearProceduresBtn" color="primary" className={classes.button} onClick={clearProcedures.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } 
+  
+  
+  let devicesCard;
+  if(deviceCount > 0){
+    devicesCard = <StyledCard id="devicesCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="devicesCardCount"
+        title={deviceTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <DevicesTable />
+      </CardContent>
+    </StyledCard> 
+  } 
+
+  let noDataCard;
+  if(!encountersCard && !conditionsCard && !proceduresCard && !devicesCard){
+    noDataCard = <StyledCard style={{minHeight: '200px', marginBottom: '40px'}} disabled>
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px', paddingTop: '50px', textAlign: 'center'}}>
+        <CardHeader 
+          title="No Data"       
+          subheader="Please query the FHIR server for data."
+          style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+            
+      </CardContent>
+    </StyledCard>
+  }
+
+  let patientsCard;
+  if(patientCount > 0){
+    patientsCard = <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
+      <CardHeader 
+        id="patientCardCount"
+        title={patientTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <PatientTable
+          id="fetchedPatientsTable"
+          patients={patients}
+          hideIdentifier
+          hideMaritalStatus
+          rowsPerPage={10}
+          paginationCount={patientCount}
+          hideActionIcons
+          hideLanguage
+          hideCountry
+          showCounts={false}
+          hideActive
+      />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="geocodePatientAddresses" color="primary" variant="contained" className={classes.button} onClick={handleGeocodeAddresses.bind(this)} >Geocode Addresses</Button> 
+        <Button id="clearPatientsBtn" color="primary" className={classes.button} onClick={clearPatients.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } else {
+    patientsCard = noDataCard;
+  }
+  
   return (
     <PageCanvas id='fetchDataFromHospitalPage' headerHeight={158} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
@@ -1187,9 +1465,16 @@ function CovidQueryPage(props){
                 title="FHIR Server Query" 
                 subheader="Fetching data related to COVID19 coronavirus symptoms."
                 style={{fontSize: '100%'}} />
+              <Button 
+                id="fetchConformanceStatement" 
+                color="primary" 
+                variant="contained" 
+                className={classes.button} onClick={handleFetchConformanceStatement.bind(this)} 
+                style={{float: 'right', right: '0px', marginTop: '-70px'}}
+              >Conformance Statement</Button> 
               <CardContent>
                 <Grid container spacing={3}>
-                  <Grid item xs={8}>
+                  <Grid item xs={12}>
                     <TextField
                       id="fhirQueryUrl"
                       name="fhirQueryUrl"
@@ -1203,9 +1488,10 @@ function CovidQueryPage(props){
                       onChange={handleFhirEndpointChange}
                       disabled
                     />
-
                   </Grid>
-                  <Grid item xs={2}>
+                </Grid>
+                <Grid container spacing={3}>
+                  <Grid item xs={4}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1219,7 +1505,7 @@ function CovidQueryPage(props){
                       />
                     </div>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={4}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1235,18 +1521,8 @@ function CovidQueryPage(props){
                   </Grid>
                 </Grid>
               </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} >Fetch Encounters</Button> 
-                <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} >Fetch Conditions</Button> 
-                <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} >Fetch Procedures</Button> 
-              </CardActions>              
-            </StyledCard>   
-            <DynamicSpacer />
-            <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
-              <CardHeader                 
-                title="Clinical Parameters" 
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
+              <DynamicSpacer />
+              <CardContent>
                 <Table size="small">
                   <TableBody>
                     <TableRow>
@@ -1357,138 +1633,30 @@ function CovidQueryPage(props){
                   </TableBody>
                 </Table>
               </CardContent>
-            </StyledCard>         
+              <DynamicSpacer />
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} >Fetch Encounters</Button> 
+                <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} >Fetch Conditions</Button> 
+                <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} >Fetch Procedures</Button> 
+                <Button id="fetchDevicesButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchDevices.bind(this)} >Fetch Devices</Button> 
+              </CardActions>              
+            </StyledCard>          
           </Grid>
           <Grid item xs={4}>
-            <CardHeader 
-                title="Step 2 - Received Data" 
-                style={{fontSize: '100%'}} />  
-            <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="encounterCardCount"
-                title={encountersTitle} 
-                subheader={encounterUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <EncountersTable
-                  id="fetchedEncountersTable"
-                  encounters={encounters}
-                  rowsPerPage={10}
-                  count={totalEncountersDuringDateRange}
-                  hideCheckboxes
-                  hideTypeCode
-                  hideReasonCode
-                  hideReason
-                  barcodes={false}
-                  hideIdentifier
-                  hideStatus
-                  hideActionIcons
-                  hideEndDateTime
-                  calculateDuration={false}
-                  hideHistory
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearEncountersBtn" color="primary" className={classes.button} onClick={clearEncounters.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="conditionsCardCount"
-                title={conditionsTitle} 
-                subheader={conditionUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <ConditionsTable
-                  id="fetchedConditionsTable"
-                  conditions={conditions}
-                  rowsPerPage={10}
-                  count={conditionCount}
-                  displayPatientName={false}
-                  displayAsserterName={false}
-                  displayEvidence={false}
-                  displayEndDate={false}
-                  displayBarcode={false}
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="fetchedProceduresCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="proceduresCardCount"
-                title={proceduresTitle} 
-                subheader={procedureUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <ProceduresTable
-                  id="fetchedProceduresTable"                  
-                  procedures={procedures}
-                  rowsPerPage={10}
-                  count={procedureCount}
-                  hideActionIcons
-                  hideCategory
-                  hideCheckboxes
-                  hideIdentifier
-                  hideSubject
-                  hideBodySite
-                  hidePerformer
-                  hidePerformedDateEnd
-                  hideBarcode
-                  hideNotes
-                  hideActionButton
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearProceduresBtn" color="primary" className={classes.button} onClick={clearProcedures.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="devicesCard" style={{minHeight: '240px'}}>
-              <CardHeader 
-                id="devicesCardCount"
-                title={deviceTitle}  
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <DevicesTable />
-              </CardContent>
-            </StyledCard>   
-
-
+            <CardHeader title="Step 2 - Received Data" style={{fontSize: '100%'}} />  
+            { encountersCard }
+            { conditionsCard }
+            { proceduresCard }
+            { devicesCard }   
+            { noDataCard }
           </Grid>
           
           <Grid item xs={4}>
             <CardHeader 
                 title="Step 3 - Patient Demographic Lookup" 
                 style={{fontSize: '100%'}} />  
-            <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
-              <CardHeader 
-                id="patientCardCount"
-                title={patientTitle}  
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <PatientTable
-                  id="fetchedPatientsTable"
-                  patients={patients}
-                  hideIdentifier
-                  hideMaritalStatus
-                  rowsPerPage={10}
-                  paginationCount={patientCount}
-                  hideActionIcons
-                  hideLanguage
-                  hideCountry
-                  showCounts={false}
-                  hideActive
-              />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="geocodePatientAddresses" color="primary" variant="contained" className={classes.button} onClick={handleGeocodeAddresses.bind(this)} >Geocode Addresses</Button> 
-                <Button id="clearPatientsBtn" color="primary" className={classes.button} onClick={clearPatients.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
+            { patientsCard }
+
             {/* <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
               <CardHeader                 
                 title="Map Options" 
