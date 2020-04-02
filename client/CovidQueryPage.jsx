@@ -1285,8 +1285,161 @@ function CovidQueryPage(props){
   
   selectedStartDate = moment(selectedStartDate).format("YYYY-MM-DD");
   selectedEndDate = moment(selectedEndDate).format("YYYY-MM-DD");
-    
+  
 
+
+  let encountersCard;
+  if(encounterCount > 0){
+    encountersCard = <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="encountersCardCount"
+        title={encountersTitle} 
+        subheader={encounterUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <EncountersTable
+          id="fetchedEncountersTable"
+          encounters={encounters}
+          rowsPerPage={10}
+          count={totalEncountersDuringDateRange}
+          hideCheckboxes
+          hideTypeCode
+          hideReasonCode
+          hideReason
+          barcodes={false}
+          hideIdentifier
+          hideStatus
+          hideActionIcons
+          hideEndDateTime
+          calculateDuration={false}
+          hideHistory
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearEncountersBtn" color="primary" className={classes.button} onClick={clearEncounters.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  }   
+
+  let conditionsCard;
+  if(conditionCount > 0){
+    conditionsCard= <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="conditionsCardCount"
+        title={conditionsTitle} 
+        subheader={conditionUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ConditionsTable
+          id="fetchedConditionsTable"
+          conditions={conditions}
+          rowsPerPage={10}
+          count={conditionCount}
+          displayPatientName={false}
+          displayAsserterName={false}
+          displayEvidence={false}
+          displayEndDate={false}
+          displayBarcode={false}
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } 
+
+
+  let proceduresCard;
+  if(procedureCount > 0){
+    proceduresCard = <StyledCard id="fetchedProceduresCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="proceduresCardCount"
+        title={proceduresTitle} 
+        subheader={procedureUrl}
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ProceduresTable
+          id="fetchedProceduresTable"                  
+          procedures={procedures}
+          rowsPerPage={10}
+          count={procedureCount}
+          hideActionIcons
+          hideCategory
+          hideCheckboxes
+          hideIdentifier
+          hideSubject
+          hideBodySite
+          hidePerformer
+          hidePerformedDateEnd
+          hideBarcode
+          hideNotes
+          hideActionButton
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearProceduresBtn" color="primary" className={classes.button} onClick={clearProcedures.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } 
+  
+  
+  let devicesCard;
+  if(deviceCount > 0){
+    devicesCard = <StyledCard id="devicesCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="devicesCardCount"
+        title={deviceTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <DevicesTable />
+      </CardContent>
+    </StyledCard> 
+  } 
+
+  let noDataCard;
+  if(!encountersCard && !conditionsCard && !proceduresCard && !devicesCard){
+    noDataCard = <StyledCard style={{minHeight: '200px', marginBottom: '40px'}} disabled>
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px', paddingTop: '50px', textAlign: 'center'}}>
+        <CardHeader 
+          title="No Data"       
+          subheader="Please query the FHIR server for data."
+          style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+            
+      </CardContent>
+    </StyledCard>
+  }
+
+  let patientsCard;
+  if(patientCount > 0){
+    patientsCard = <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
+      <CardHeader 
+        id="patientCardCount"
+        title={patientTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <PatientTable
+          id="fetchedPatientsTable"
+          patients={patients}
+          hideIdentifier
+          hideMaritalStatus
+          rowsPerPage={10}
+          paginationCount={patientCount}
+          hideActionIcons
+          hideLanguage
+          hideCountry
+          showCounts={false}
+          hideActive
+      />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="geocodePatientAddresses" color="primary" variant="contained" className={classes.button} onClick={handleGeocodeAddresses.bind(this)} >Geocode Addresses</Button> 
+        <Button id="clearPatientsBtn" color="primary" className={classes.button} onClick={clearPatients.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } else {
+    patientsCard = noDataCard;
+  }
+  
   return (
     <PageCanvas id='fetchDataFromHospitalPage' headerHeight={158} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
@@ -1478,135 +1631,20 @@ function CovidQueryPage(props){
             </StyledCard>          
           </Grid>
           <Grid item xs={4}>
-            <CardHeader 
-                title="Step 2 - Received Data" 
-                style={{fontSize: '100%'}} />  
-            <StyledCard id="fetchedEncountersCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="encounterCardCount"
-                title={encountersTitle} 
-                subheader={encounterUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <EncountersTable
-                  id="fetchedEncountersTable"
-                  encounters={encounters}
-                  rowsPerPage={10}
-                  count={totalEncountersDuringDateRange}
-                  hideCheckboxes
-                  hideTypeCode
-                  hideReasonCode
-                  hideReason
-                  barcodes={false}
-                  hideIdentifier
-                  hideStatus
-                  hideActionIcons
-                  hideEndDateTime
-                  calculateDuration={false}
-                  hideHistory
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearEncountersBtn" color="primary" className={classes.button} onClick={clearEncounters.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="conditionsCardCount"
-                title={conditionsTitle} 
-                subheader={conditionUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <ConditionsTable
-                  id="fetchedConditionsTable"
-                  conditions={conditions}
-                  rowsPerPage={10}
-                  count={conditionCount}
-                  displayPatientName={false}
-                  displayAsserterName={false}
-                  displayEvidence={false}
-                  displayEndDate={false}
-                  displayBarcode={false}
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="fetchedProceduresCard" style={{minHeight: '200px'}}>
-              <CardHeader 
-                id="proceduresCardCount"
-                title={proceduresTitle} 
-                subheader={procedureUrl}
-                style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <ProceduresTable
-                  id="fetchedProceduresTable"                  
-                  procedures={procedures}
-                  rowsPerPage={10}
-                  count={procedureCount}
-                  hideActionIcons
-                  hideCategory
-                  hideCheckboxes
-                  hideIdentifier
-                  hideSubject
-                  hideBodySite
-                  hidePerformer
-                  hidePerformedDateEnd
-                  hideBarcode
-                  hideNotes
-                  hideActionButton
-                />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearProceduresBtn" color="primary" className={classes.button} onClick={clearProcedures.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-            <DynamicSpacer />
-            <StyledCard id="devicesCard" style={{minHeight: '240px'}}>
-              <CardHeader 
-                id="devicesCardCount"
-                title={deviceTitle}  
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <DevicesTable />
-              </CardContent>
-            </StyledCard>   
-
-
+            <CardHeader title="Step 2 - Received Data" style={{fontSize: '100%'}} />  
+            { encountersCard }
+            { conditionsCard }
+            { proceduresCard }
+            { devicesCard }   
+            { noDataCard }
           </Grid>
           
           <Grid item xs={4}>
             <CardHeader 
                 title="Step 3 - Patient Demographic Lookup" 
                 style={{fontSize: '100%'}} />  
-            <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
-              <CardHeader 
-                id="patientCardCount"
-                title={patientTitle}  
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <PatientTable
-                  id="fetchedPatientsTable"
-                  patients={patients}
-                  hideIdentifier
-                  hideMaritalStatus
-                  rowsPerPage={10}
-                  paginationCount={patientCount}
-                  hideActionIcons
-                  hideLanguage
-                  hideCountry
-                  showCounts={false}
-                  hideActive
-              />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="geocodePatientAddresses" color="primary" variant="contained" className={classes.button} onClick={handleGeocodeAddresses.bind(this)} >Geocode Addresses</Button> 
-                <Button id="clearPatientsBtn" color="primary" className={classes.button} onClick={clearPatients.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
+            { patientsCard }
+
             {/* <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
               <CardHeader                 
                 title="Map Options" 
