@@ -53,6 +53,7 @@
           "HomePage": true,
           "FhirResources": false,
           "DynamicModules": true,
+          "SidebarWorkflows": true,
           "Theme": false,
           "ConstructionZone": false
         },
@@ -67,15 +68,14 @@
           "/communications",
           "/consents",
           "/contracts",
+          "/data-management",
           "/diagnostic-reports",
           "/devices",
           "/encounters",
           "/example-route",
-          "/export-data",
           "/endpoints",
           "/imaging-studies",
           "/immunizations",
-          "/import-data",
           "/goals",
           "/locations",
           "/measures",
@@ -93,7 +93,7 @@
           "/risk-assessments",
           "/subscriptions",
           "/vitals-tracking"
-      ]
+        ]
       }
     },
     "interfaces": {
@@ -115,7 +115,27 @@
     "google": {
       "maps": {
         "apiKey": "",
-        "geodataUrl": "https://data.cityofchicago.org/resource/6zsd-86xi.geojson" 
+        "geodataUrl": "",
+        "mapCenter": "",
+        "searchProximity": 50,
+        "mapOptions": {
+          "radius": 50,
+          "opacity": 0.5,
+          "dissipating": false,
+          "maxIntensity": 50,
+          "gradient": [
+            "rgba(255, 255, 255, 0)",
+            "rgba(251, 251, 213, 1)",
+            "rgba(249, 234, 189, 1)",
+            "rgba(247, 217, 165, 1)",
+            "rgba(243, 184, 118, 1)",
+            "rgba(242, 168, 94, 1)",
+            "rgba(240, 151, 71, 1)",
+            "rgba(238, 135, 47, 1)",
+            "rgba(236, 118, 23, 1)",
+            "rgba(210, 80, 0, 1)"
+          ]
+        }
       }
     },
     "modules": {

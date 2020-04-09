@@ -179,7 +179,13 @@ export function HeaderNavigation(props){
         props.history.replace('/map')
         break;
       case 3:
+        props.history.replace('/hospitals-map')
+        break;
+      case 4:
         props.history.replace('/reporting')
+        break;
+      case 5:
+        props.history.replace('/inventory')
         break;
       }   
 
@@ -199,14 +205,18 @@ export function HeaderNavigation(props){
   // }
   let geocodingTab;
   let mapTab;
+  let hospitalsTab;
+  let inventoryTab;
   if(Package["symptomatic:covid19-geomapping"]){
     geocodingTab = <Tab id="geocodingTab" label="Geocoding" />
-    mapTab = <Tab id="mapTab" label="Map" />
+    mapTab = <Tab id="mapTab" label="Community" />
+    hospitalsTab = <Tab id="hospitalsTab" label="Hospitals" />
   }
 
   let reportingTab;
   if(Package["symptomatic:covid19-reporting"]){
     reportingTab = <Tab id="reportTab" label="Reporting" />
+    inventoryTab = <Tab id="inventoryTab" label="Inventory" />
   }
 
   return (        
@@ -216,7 +226,9 @@ export function HeaderNavigation(props){
           <Tab id="fetchTab" label="Fetch" />
           { geocodingTab }
           { mapTab }
+          { hospitalsTab }
           { reportingTab }
+          { inventoryTab }
         </Tabs>
         <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
           <h3 id="fetchTab">{Session.get('fhirServerEndpoint')}</h3>          

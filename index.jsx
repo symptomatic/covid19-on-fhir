@@ -59,6 +59,7 @@ var SidebarElements = [{
   to: '/terms-and-conditions'
 }];
 
+
 let MainPage = CovidQueryPage;
 
 export { 
