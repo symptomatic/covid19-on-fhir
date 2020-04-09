@@ -118,7 +118,6 @@ function CovidQueryPage(props){
   let [checkedSerumAntibodies,  setCheckedSerumAntibodies]  = useState(false);
   let [checkedVaccinated,  setCheckedVaccinated]  = useState(false);
   
-
   let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'));
 
 
@@ -1225,15 +1224,15 @@ function CovidQueryPage(props){
     Session.set('lastUpdated', new Date())
   }
 
-  function handleFetchConformanceStatement(){
-    logger.trace('handleFetchConformanceStatement')
+  function handleFetchCapabilityStatement(){
+    logger.trace('handleFetchCapabilityStatement')
 
 
     HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
-      let parsedConformanceStatement = JSON5.parse(get(conformanceStatement, "content"))
-      console.log('Conformance Statement', parsedConformanceStatement);
-      Session.set('mainAppDialogJson', parsedConformanceStatement);
-      Session.set('mainAppDialogComponent', "ConformanceCheck");
+      let parsedCapabilityStatement = JSON5.parse(get(conformanceStatement, "content"))
+      console.log('Capability Statement', parsedCapabilityStatement);
+      Session.set('mainAppDialogJson', parsedCapabilityStatement);
+      Session.set('mainAppDialogComponent', "CapabilityCheck");
       Session.set('lastUpdated', new Date())
       Session.set('mainAppDialogOpen', true);
     })
@@ -1466,12 +1465,12 @@ function CovidQueryPage(props){
                 subheader="Fetching data related to COVID19 coronavirus symptoms."
                 style={{fontSize: '100%'}} />
               <Button 
-                id="fetchConformanceStatement" 
+                id="fetchCapabilityStatement" 
                 color="primary" 
                 variant="contained" 
-                className={classes.button} onClick={handleFetchConformanceStatement.bind(this)} 
+                className={classes.button} onClick={handleFetchCapabilityStatement.bind(this)} 
                 style={{float: 'right', right: '0px', marginTop: '-70px'}}
-              >Conformance Statement</Button> 
+              >Capability Statement</Button> 
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>

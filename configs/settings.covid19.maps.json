@@ -25,7 +25,7 @@
         "paperColor": "#ffffff !important",
         "paperTextColor": "rgba(0, 0, 0, 1) !important",
       
-        "backgroundCanvas": "#f5f5f5",
+        "backgroundCanvas": "#F0F0F0",
         "background": "linear-gradient(45deg, rgb(108, 183, 110) 30%, rgb(150, 202, 144) 90%)",
 
         "nivoTheme": "red_grey"
