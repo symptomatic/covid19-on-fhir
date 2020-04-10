@@ -53,10 +53,12 @@ let FooterButtons = [{
 
 var SidebarElements = [{
   primaryText: 'Privacy Policy',
-  to: '/privacy'
+  to: '/privacy',
+  iconName: 'document'
 }, {
   primaryText: 'Terms and Conditions',
-  to: '/terms-and-conditions'
+  to: '/terms-and-conditions',
+  iconName: 'document'
 }];
 
 
