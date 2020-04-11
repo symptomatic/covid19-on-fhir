@@ -1225,14 +1225,15 @@ function CovidQueryPage(props){
   }
 
   function handleFetchCapabilityStatement(){
-    logger.trace('handleFetchCapabilityStatement')
+    logger.trace('Fetching Capablity Statement: ' + fhirServerEndpoint + "/metadata")
 
 
     HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
       let parsedCapabilityStatement = JSON5.parse(get(conformanceStatement, "content"))
       console.log('Capability Statement', parsedCapabilityStatement);
       Session.set('mainAppDialogJson', parsedCapabilityStatement);
-      Session.set('mainAppDialogComponent', "CapabilityCheck");
+      Session.set('mainAppDialogTitle', "Capability Statement");
+      Session.set('mainAppDialogComponent', "CapabilityStatementCheck");
       Session.set('lastUpdated', new Date())
       Session.set('mainAppDialogOpen', true);
     })
