@@ -314,7 +314,7 @@ function CovidQueryPage(props){
     logger.warn('CovidQueryPage.handleToggleTested()');
 
     if(checkedTested){
-      checkedTested(false);
+      setCheckedTested(false);
     } else {
       setCheckedTested(true);
     }

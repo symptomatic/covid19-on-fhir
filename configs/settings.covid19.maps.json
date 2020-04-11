@@ -166,5 +166,7 @@
       }
     }
   },
-  "private": {}
+  "private": {
+    "initializeHospitalIndex": true
+  }
 }
