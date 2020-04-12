@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
-
+import { useLocation, useParams, useHistory } from "react-router-dom";
 
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 
@@ -14,6 +14,12 @@ import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
+
+import {  
+  FormControl,
+  InputLabel,
+  Input
+} from '@material-ui/core';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -38,8 +44,11 @@ import { useTracker } from './Tracker';
 
 import FhirUtilities from '../lib/FhirUtilities';
 
+import FHIR from 'fhirclient';
+const smart = FHIR.oauth2;
 
 import Client from 'fhir-kit-client';
+import simpleOauthModule from 'simple-oauth2';
 
 import {
   MuiPickersUtilsProvider,
@@ -55,9 +64,11 @@ function DynamicSpacer(props){
 }
 
 let fhirClient = new Client({
-  baseUrl: get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4')
+  // baseUrl: get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4')
+  baseUrl: get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4')
 });
-console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'))
+// console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'))
+console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'))
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -93,6 +104,14 @@ function CovidQueryPage(props){
   let totalEncountersDuringDateRange = 0;
 
   const classes = useStyles();
+  let history = useHistory();
+
+
+  let query = new URLSearchParams(useLocation().search);
+  if(query){
+    console.log("WE HAVE QUERY STATE", query.state)
+    console.log("WE HAVE QUERY PARAMS", query)
+  }
 
   const rowsPerPage = get(Meteor, 'settings.public.defaults.rowsPerPage', 25);
 
@@ -101,6 +120,8 @@ function CovidQueryPage(props){
   let [encounters, setEncounters] = useState([]);
   let [conditions, setConditions] = useState([]);
   let [procedures, setProcedures] = useState([]);
+
+  let [checkedDateRangeEnabled, setCheckedDateRangeEnabled] = useState(false);
 
   let [checkedTested,  setCheckedTested]  = useState(false);
   let [checkedFever,  setCheckedFever]  = useState(true);
@@ -118,7 +139,9 @@ function CovidQueryPage(props){
   let [checkedSerumAntibodies,  setCheckedSerumAntibodies]  = useState(false);
   let [checkedVaccinated,  setCheckedVaccinated]  = useState(false);
   
-  let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'));
+  let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'));
+  let [username, setUsername] = useState("");
+  let [password, setPassword] = useState("");
 
 
   //-------------------------------------------------------------------
@@ -128,9 +151,19 @@ function CovidQueryPage(props){
     return Session.get("fhirKitClientStartDate");
   }, []);
 
+  if(!selectedStartDate){
+    selectedStartDate = Session.get("fhirKitClientStartDate");
+  }
+
   selectedEndDate = useTracker(function(){
     return Session.get("fhirKitClientEndDate");
   }, []);  
+
+  if(!selectedEndDate){
+    selectedEndDate = Session.get("fhirKitClientEndDate");
+  }
+
+
 
   totalEncountersDuringDateRange = useTracker(function(){
     return Session.get("totalEncountersDuringDateRange");
@@ -263,6 +296,16 @@ function CovidQueryPage(props){
 
   //-------------------------------------------------------------------
   // Toggle Methods
+
+  function handleToggleDateRange(props){
+    logger.warn('CovidQueryPage.handleToggleDateRange()');
+
+    if(checkedDateRangeEnabled){
+      setCheckedDateRangeEnabled(false);
+    } else {
+      setCheckedDateRangeEnabled(true);
+    }
+  }
 
   function handleToggleFever(props){
     logger.warn('CovidQueryPage.handleToggleFever()');
@@ -761,6 +804,8 @@ function CovidQueryPage(props){
     logger.trace('searchOptions', searchOptions)
 
 
+    smart.authorize(oauthConfig);
+
 
     await fhirClient.search(searchOptions)
     .then((searchResponse) => {
@@ -1228,7 +1273,9 @@ function CovidQueryPage(props){
     logger.trace('Fetching Capablity Statement: ' + fhirServerEndpoint + "/metadata")
 
 
-    HTTP.get(fhirServerEndpoint + "/metadata", function(error, conformanceStatement){
+    HTTP.get(fhirServerEndpoint + "/metadata", {headers: {
+      "Accept": "application/json+fhir"
+    }}, function(error, conformanceStatement){
       let parsedCapabilityStatement = JSON5.parse(get(conformanceStatement, "content"))
       console.log('Capability Statement', parsedCapabilityStatement);
       Session.set('mainAppDialogJson', parsedCapabilityStatement);
@@ -1244,17 +1291,168 @@ function CovidQueryPage(props){
 
   }
   function handleFhirEndpointChange(event){
-    logger.trace('handleFhirEndpointChange', event.target.value)
+    logger.trace('handleFhirEndpointChange', event.currentTarget.value)
 
-    if(event.target.value){
-      // Session.set("fhirServerEndpoint", event.target.value)
-      setFhirServerEndpoint(event.target.value)
+    if(event.currentTarget.value){
+      // Session.set("fhirServerEndpoint", event.currentTarget.value)
+      setFhirServerEndpoint(event.currentTarget.value)
 
       fhirClient = new Client({
-        baseUrl: event.target.value
+        baseUrl: event.currentTarget.value
       });
     }
   }
+  function handleChangeUsername(event){
+    logger.trace('handleChangeUsername', event.currentTarget.value)
+
+    if(event.currentTarget.value){
+      setUsername(event.currentTarget.value)
+    }
+  }
+  function handleChangePassword(event){
+    logger.trace('handleChangePassword', event.currentTarget.value)
+
+    if(event.currentTarget.value){
+      setPassword(event.currentTarget.value)
+    }
+  }
+
+
+  //-----------------------------------------------------------------------------------------------
+  // OAUth Popup Window 
+  // https://dev.to/dinkydani21/how-we-use-a-popup-for-google-and-outlook-oauth-oci
+
+  let windowObjectReference = null;
+  let previousUrl = null;
+
+  function receiveMessage(event){
+    // Do we trust the sender of this message? (might be
+    // different from what we originally opened, for example).
+    // if (event.origin !== Session.get('smartOnFhir_iss')) {
+    //   return;
+    // }
+
+    const { data } = event;
+    // if we trust the sender and the source is our popup
+    //if (data.source === 'lma-login-redirect') {
+      // get the URL params and redirect to our server to use Passport to auth/login
+      const { payload } = data;
+      const redirectUrl = '/launch' + payload;
+
+      window.location.pathname = redirectUrl;
+    //}
+   };
+
+  function openSignInWindow(url, name){
+    // remove any existing event listeners
+    window.removeEventListener('message', receiveMessage);
+
+    // window features
+    const strWindowFeatures = 'toolbar=no, menubar=no, width=600, height=700, top=100, left=100';
+
+    if (windowObjectReference === null || windowObjectReference.closed) {
+      /* if the pointer to the window object in memory does not exist
+        or if such pointer exists but the window was closed */
+      windowObjectReference = window.open(url, name, strWindowFeatures);
+    } else if (previousUrl !== url) {
+      /* if the resource to load is different,
+        then we load it in the already opened secondary window and then
+        we bring such window back on top/in front of its parent window. */
+      windowObjectReference = window.open(url, name, strWindowFeatures);
+      windowObjectReference.focus();
+    } else {
+      /* else the window reference must exist and the window
+        is not closed; therefore, we can bring it back on top of any other
+        window with the focus() method. There would be no need to re-create
+        the window or to reload the referenced resource. */
+      windowObjectReference.focus();
+    }
+
+    // add the listener for receiving a message from the popup
+    window.addEventListener("message", function (event) {
+      receiveMessage(event)
+    }, false);
+
+    // assign the previous URL
+    previousUrl = url;
+  };
+
+
+
+  //-----------------------------------------------------------------------------------------------
+  // OAuth 
+  async function smartAuthenticateWithFhirServer(){
+    console.log('smartAuthenticateWithFhirServer');
+
+    let oauthConfig = {
+      "client_id": get(Meteor, 'settings.public.smartOnFhir[0].client_id'),
+      "scope": get(Meteor, 'settings.public.smartOnFhir[0].scope'),
+      "redirectUri": get(Meteor, 'settings.public.smartOnFhir[0].redirect_uri'),
+      // 'fhirServiceUrl': get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl')
+    }
+
+    console.log('oauthConfig', oauthConfig);
+    FHIR.oauth2.authorize(oauthConfig).catch(function(error){
+      console.log('Authorization error', error)
+    });
+  }
+
+
+
+  async function authenticateWithFhirServer(){
+    console.log('authenticateWithFhirServer', Session.get('smartOnFhir_iss'));
+    fhirClient = new Client({ baseUrl: Session.get('smartOnFhir_iss') });
+    const { authorizeUrl, tokenUrl } = await fhirClient.smartAuthMetadata();
+
+    console.log('authorizeUrl', authorizeUrl)
+    console.log('tokenUrl', tokenUrl)
+
+    if(authorizeUrl && tokenUrl){
+      const oauth2 = simpleOauthModule.create({
+        client: {
+          id: get(Meteor, 'settings.public.smartOnFhir[0].client_id'),
+          secret: get(Meteor, 'settings.public.smartOnFhir[0].secret')
+        },
+        auth: {
+          tokenHost: tokenUrl.protocol + '//' + tokenUrl.host,
+          tokenPath: tokenUrl.pathname,
+          authorizeHost: authorizeUrl.protocol + '//' + authorizeUrl.host,
+          authorizePath: authorizeUrl.pathname
+        },
+        options: {
+          authorizationMethod: 'body',
+        }
+      });
+      console.log('oauth2', oauth2)
+
+      const authorizationUri = oauth2.authorizationCode.authorizeURL({        
+        client_id: get(Meteor, 'settings.public.smartOnFhir[0].client_id'),
+        launch: Session.get('smartOnFhir_launch'),
+        aud: Session.get('smartOnFhir_iss'),
+        scope: get(Meteor, 'settings.public.smartOnFhir[0].scope'),
+        state: Random.secret()
+      });
+
+      console.log('authorizationUri', authorizationUri);
+      Session.set('smartOnFhir_authorizationUri', authorizationUri);
+
+      openSignInWindow(authorizationUri, "authorizationPopup");
+    }
+  }
+  function handleSignIn(event){
+    logger.trace('handleSignIn');
+
+    logger.trace('In theory we could try to sign in.');
+    logger.trace('Username:  ' + username);
+    logger.trace('Password:  ' + password);
+    
+
+
+    // authenticateWithFhirServer();
+  }
+
+
+
 
   let containerStyle = {
     paddingLeft: '100px',
@@ -1452,6 +1650,7 @@ function CovidQueryPage(props){
     patientsCard = noDataCard;
   }
   
+
   return (
     <PageCanvas id='fetchDataFromHospitalPage' headerHeight={158} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
@@ -1460,38 +1659,85 @@ function CovidQueryPage(props){
               <CardHeader 
                 title="Step 1 - Fetch Data From Servers" 
                 style={{fontSize: '100%'}} />            
-            <StyledCard style={{minHeight: '380px'}}>
+            <StyledCard >
               <CardHeader 
-                title="FHIR Server Query" 
-                subheader="Fetching data related to COVID19 coronavirus symptoms."
+                title="FHIR Server Authentication" 
+                subheader="Please authenticate into the server."
                 style={{fontSize: '100%'}} />
               <Button 
                 id="fetchCapabilityStatement" 
                 color="primary" 
-                variant="contained" 
                 className={classes.button} onClick={handleFetchCapabilityStatement.bind(this)} 
                 style={{float: 'right', right: '0px', marginTop: '-70px'}}
               >Capability Statement</Button> 
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    <TextField
-                      id="fhirQueryUrl"
-                      name="fhirQueryUrl"
-                      className={classes.textField}
-                      label="Health Record and Interoperability Resource Query"
-                      value={ fhirServerEndpoint }
-                      placeholder="http://localhost:3100/baseR4/Patient?_count=20"
-                      helperText='Please enter a web address URL.  '
-                      fullWidth
-                      margin="normal"
-                      onChange={handleFhirEndpointChange}
-                      disabled
-                    />
+                    <FormControl style={{width: '100%', marginTop: '20px'}}>
+                      <InputLabel>Health Record and Interoperability Resource Query</InputLabel>
+                      <Input
+                        id="fhirQueryUrl"
+                        name="fhirQueryUrl"
+                        placeholder="http://localhost:3100/baseR4/Patient?_count=20"
+                        // helperText='Please enter a web address URL.'  
+                        defaultValue={ fhirServerEndpoint }
+                        onChange={handleFhirEndpointChange}
+                        fullWidth
+                        disabled
+                      />
+                    </FormControl>
                   </Grid>
                 </Grid>
+                {/* <Grid container spacing={3}>
+                  <Grid item xs={6}>
+                    <FormControl style={{width: '100%', marginTop: '20px', marginBottom: '20px'}}>
+                      <InputLabel>Username</InputLabel>
+                      <Input
+                        id="usernameInput"
+                        name="usernameInput"
+                        placeholder="alicedoe"                      
+                        defaultValue=""
+                        onChange={handleChangeUsername}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl style={{width: '100%', marginTop: '20px', marginBottom: '20px'}}>
+                      <InputLabel>Password</InputLabel>
+                      <Input
+                        id="passwordInput"
+                        name="passwordInput"
+                        placeholder="********"
+                        defaultValue=""
+                        onChange={handleChangePassword}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
+                </Grid> */}
+              </CardContent>
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+                <Button id="signInButton" color="primary" className={classes.button} onClick={authenticateWithFhirServer} >Sign In With {get(Meteor, 'settings.public.smartOnFhir[0].vendor')}</Button> 
+                <Button id="signInButton" color="primary" variant="contained" className={classes.button} onClick={smartAuthenticateWithFhirServer} >Smart Sign In With {get(Meteor, 'settings.public.smartOnFhir[0].vendor')}</Button> 
+              </CardActions> 
+
+            </StyledCard>
+            <DynamicSpacer />
+            <StyledCard>
+              <CardHeader 
+                title="Date Range" 
+                subheader="Fetching data related to COVID19 coronavirus symptoms."
+                style={{fontSize: '100%'}} />
+              <FormControlLabel                
+                control={<Checkbox checked={checkedDateRangeEnabled} onChange={handleToggleDateRange} name="checkedDateRangeEnabled" />}
+                label="Enabled"
+                style={{float: 'right', position: 'relative', right: '0px', top: '-70px' }}
+              />
+
+              <CardContent style={{display: 'flex'}}>
                 <Grid container spacing={3}>
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1502,10 +1748,11 @@ function CovidQueryPage(props){
                         label="Start Date"
                         value={selectedStartDate}
                         onChange={handleStartDateChange}
+                        disabled={checkedDateRangeEnabled ? false : true}
                       />
                     </div>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -1516,13 +1763,20 @@ function CovidQueryPage(props){
                         label="End Date"
                         value={selectedEndDate}
                         onChange={handleEndDateChange}
+                        disabled={checkedDateRangeEnabled ? false : true}
                       />
                     </div>
                   </Grid>
                 </Grid>
-              </CardContent>
+                </CardContent>
+              </StyledCard>
               <DynamicSpacer />
-              <CardContent>
+              <StyledCard style={{minHeight: '380px'}}>
+                <CardHeader 
+                  title="Clinical Parameters" 
+                  subheader="Select the parameters you would like to search for."
+                  style={{fontSize: '100%'}} />
+                <CardContent>
                 <Table size="small">
                   <TableBody>
                     <TableRow>

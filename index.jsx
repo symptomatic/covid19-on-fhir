@@ -5,6 +5,8 @@ import AboutDialog from './client/AboutDialog';
 import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 import ConformanceCheck from './client/ConformanceCheck';
+import LaunchPage from './client/LaunchPage';
+import PopupRedirectPage from './client/PopupRedirectPage';
 
 import { 
   FetchButtons,
@@ -29,7 +31,24 @@ var DynamicRoutes = [{
   'name': 'TermsAndConditionsPage',
   'path': '/terms-and-conditions',
   'component': TermsAndConditionsPage
+}, {
+  'name': 'LaunchPage',
+  'path': '/launch',
+  'component': LaunchPage
+}, {
+  'name': 'LaunchPage',
+  'path': '/_oauth/Cerner',
+  'component': LaunchPage
+}, {
+  'name': 'LaunchPage',
+  'path': '/_oauth/CernerPatient',
+  'component': LaunchPage
+}, {
+  'name': 'PopupRedirectPage',
+  'path': '/_oauth/popup',
+  'component': PopupRedirectPage
 }];
+
 
 let DialogComponents = [{
   name: "SampleDialogComponent",
@@ -74,5 +93,6 @@ export {
   SidebarElements,
   DialogComponents,
 
+  LaunchPage,
   MainPage
 };

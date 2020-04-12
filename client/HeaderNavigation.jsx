@@ -173,12 +173,15 @@ export function HeaderNavigation(props){
         props.history.replace('/query-fhir-provider')
         break;
       case 1:
-        props.history.replace('/geocoding')
+        props.history.replace('/chart-summary')
         break;
       case 2:
-        props.history.replace('/map')
+        props.history.replace('/geocoding')
         break;
       case 3:
+        props.history.replace('/map')
+        break;
+      case 4:
         props.history.replace('/reporting')
         break;
       // case 4:
@@ -206,7 +209,8 @@ export function HeaderNavigation(props){
   let geocodingTab;
   let mapTab;
   let hospitalsTab;
-  let inventoryTab;
+  let inventoryTab; 
+
   if(Package["symptomatic:covid19-geomapping"]){
     geocodingTab = <Tab id="geocodingTab" label="Geocoding" />
     mapTab = <Tab id="mapTab" label="Map" />
@@ -224,6 +228,7 @@ export function HeaderNavigation(props){
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
           <Tab id="fetchTab" label="Fetch" />
+          <Tab id="chartSummaryTab" label="Chart Summary" />
           { geocodingTab }
           { mapTab }
           {/* { hospitalsTab } */}
