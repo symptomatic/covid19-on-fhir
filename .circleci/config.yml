@@ -145,7 +145,7 @@ jobs:
     # take a look around the filesystem (debugging)
     - run: cd ../node-on-fhir && ls -la
     - run: cd ../node-on-fhir/packages && ls -la
-    - run: cd ../node-on-fhir/packages/covid19-on-fhir && ls -la
+    # - run: cd ../node-on-fhir/packages/covid19-on-fhir && ls -la
 
     # create the package directory
     # - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir

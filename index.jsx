@@ -16,6 +16,10 @@ import {
 import { HeaderNavigation } from './client/HeaderNavigation';
 
 var DynamicRoutes = [{
+  'name': 'CovidOnFhirAppPage',
+  'path': '/app',
+  'component': CovidQueryPage
+}, {
   'name': 'CovidQueryPage',
   'path': '/query-fhir-provider',
   'component': CovidQueryPage
