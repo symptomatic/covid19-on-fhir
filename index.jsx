@@ -35,22 +35,6 @@ var DynamicRoutes = [{
   'name': 'TermsAndConditionsPage',
   'path': '/terms-and-conditions',
   'component': TermsAndConditionsPage
-}, {
-  'name': 'LaunchPage',
-  'path': '/launch',
-  'component': LaunchPage
-}, {
-  'name': 'LaunchPage',
-  'path': '/_oauth/Cerner',
-  'component': LaunchPage
-}, {
-  'name': 'LaunchPage',
-  'path': '/_oauth/CernerPatient',
-  'component': LaunchPage
-}, {
-  'name': 'PopupRedirectPage',
-  'path': '/_oauth/popup',
-  'component': PopupRedirectPage
 }];
 
 
