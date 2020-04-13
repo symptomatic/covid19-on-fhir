@@ -148,7 +148,7 @@ jobs:
     # - run: cd ../node-on-fhir/packages/covid19-on-fhir && ls -la
 
     # create the package directory
-    # - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir
+    - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir
 
     # copy repo files into new directory
     - run: cp -R ./* ../node-on-fhir/packages/covid19-on-fhir

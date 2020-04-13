@@ -1717,10 +1717,10 @@ function CovidQueryPage(props){
                   </Grid>
                 </Grid> */}
               </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
+              {/* <CardActions style={{display: 'inline-flex', width: '100%'}} >
                 <Button id="signInButton" color="primary" className={classes.button} onClick={authenticateWithFhirServer} >Sign In With {get(Meteor, 'settings.public.smartOnFhir[0].vendor')}</Button> 
                 <Button id="signInButton" color="primary" variant="contained" className={classes.button} onClick={smartAuthenticateWithFhirServer} >Smart Sign In With {get(Meteor, 'settings.public.smartOnFhir[0].vendor')}</Button> 
-              </CardActions> 
+              </CardActions>  */}
 
             </StyledCard>
             <DynamicSpacer />

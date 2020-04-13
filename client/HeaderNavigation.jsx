@@ -170,10 +170,10 @@ export function HeaderNavigation(props){
 
     switch (newIndex) {
       case 0:
-        props.history.replace('/query-fhir-provider')
+        props.history.replace('/patient-chart')
         break;
       case 1:
-        props.history.replace('/chart-summary')
+        props.history.replace('/query-fhir-provider')
         break;
       case 2:
         props.history.replace('/geocoding')
@@ -210,30 +210,32 @@ export function HeaderNavigation(props){
   let mapTab;
   let hospitalsTab;
   let inventoryTab; 
+  let capacityTab; 
 
   if(Package["symptomatic:covid19-geomapping"]){
     geocodingTab = <Tab id="geocodingTab" label="Geocoding" />
     mapTab = <Tab id="mapTab" label="Map" />
-    hospitalsTab = <Tab id="hospitalsTab" label="Hospitals" />
+    // hospitalsTab = <Tab id="hospitalsTab" label="Hospitals" />
   }
 
   let reportingTab;
   if(Package["symptomatic:covid19-reporting"]){
     reportingTab = <Tab id="reportTab" label="Reporting" />
     inventoryTab = <Tab id="inventoryTab" label="Inventory" />
+    // capacityTab = <Tab id="capacityTab" label="Capacity" />
   }
 
   return (        
     <div style={{display: 'contents'}}>
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
-          <Tab id="fetchTab" label="Fetch" />
-          <Tab id="chartSummaryTab" label="Chart Summary" />
+        <Tab id="chartSummaryTab" label="Chart Summary" />
+          <Tab id="fetchTab" label="Bulk Data" />
           { geocodingTab }
           { mapTab }
-          {/* { hospitalsTab } */}
           { reportingTab }
-          {/* { inventoryTab } */}
+          { inventoryTab }
+          {/* { capacityTab } */}
         </Tabs>
         <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
           <h3 id="fetchTab">{Session.get('fhirServerEndpoint')}</h3>          
