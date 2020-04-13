@@ -162,7 +162,7 @@ jobs:
     - run: cd ../node-on-fhir && meteor npm install
 
     # install test runner
-    - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@4.0.0-alpha.7 chromedriver
+    - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@3.6.0 chromedriver@81.0.0
     - run: cd ../node-on-fhir && meteor add dispatch:mocha practicalmeteor:chai
     - run: cd ../node-on-fhir && mkdir imports 
 
