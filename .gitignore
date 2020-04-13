@@ -1,5 +1,5 @@
-settings.covid19.maps.galaxy.json
+settings.covid19.maps.*.json
 settings.covid19.maps.allscripts.json
 settings.covid19.maps.cerner.json
-settings.covid19.maps.cerner.secure.json
+settings.covid19.maps.cerner.*.json
 settings.covid19.maps.epic.json

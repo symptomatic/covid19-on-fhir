@@ -145,10 +145,10 @@ jobs:
     # take a look around the filesystem (debugging)
     - run: cd ../node-on-fhir && ls -la
     - run: cd ../node-on-fhir/packages && ls -la
-    - run: cd ../node-on-fhir/packages/covid19-on-fhir && ls -la
+    # - run: cd ../node-on-fhir/packages/covid19-on-fhir && ls -la
 
     # create the package directory
-    # - run: cd ../node-on-fhir/packages && mkdir covid19-on-fhir
+    - run: cd ../node-on-fhir/packages && mkdir -p covid19-on-fhir
 
     # copy repo files into new directory
     - run: cp -R ./* ../node-on-fhir/packages/covid19-on-fhir
@@ -162,7 +162,7 @@ jobs:
     - run: cd ../node-on-fhir && meteor npm install
 
     # install test runner
-    - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@3.6.0 chromedriver
+    # - run: cd ../node-on-fhir && npm i --save-dev selenium-webdriver@3.6.0 chromedriver
     - run: cd ../node-on-fhir && meteor add dispatch:mocha practicalmeteor:chai
     - run: cd ../node-on-fhir && mkdir imports 
 

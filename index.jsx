@@ -5,6 +5,8 @@ import AboutDialog from './client/AboutDialog';
 import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 import ConformanceCheck from './client/ConformanceCheck';
+import LaunchPage from './client/LaunchPage';
+import PopupRedirectPage from './client/PopupRedirectPage';
 
 import { 
   FetchButtons,
@@ -14,6 +16,10 @@ import {
 import { HeaderNavigation } from './client/HeaderNavigation';
 
 var DynamicRoutes = [{
+  'name': 'CovidOnFhirAppPage',
+  'path': '/app',
+  'component': CovidQueryPage
+}, {
   'name': 'CovidQueryPage',
   'path': '/query-fhir-provider',
   'component': CovidQueryPage
@@ -30,6 +36,7 @@ var DynamicRoutes = [{
   'path': '/terms-and-conditions',
   'component': TermsAndConditionsPage
 }];
+
 
 let DialogComponents = [{
   name: "SampleDialogComponent",
@@ -53,11 +60,14 @@ let FooterButtons = [{
 
 var SidebarElements = [{
   primaryText: 'Privacy Policy',
-  to: '/privacy'
+  to: '/privacy',
+  iconName: 'document'
 }, {
   primaryText: 'Terms and Conditions',
-  to: '/terms-and-conditions'
+  to: '/terms-and-conditions',
+  iconName: 'document'
 }];
+
 
 let MainPage = CovidQueryPage;
 
@@ -71,5 +81,6 @@ export {
   SidebarElements,
   DialogComponents,
 
+  LaunchPage,
   MainPage
 };
