@@ -234,7 +234,7 @@ export function HeaderNavigation(props){
           { geocodingTab }
           { mapTab }
           { reportingTab }
-          { inventoryTab }
+          {/* { inventoryTab } */}
           {/* { capacityTab } */}
         </Tabs>
         <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
