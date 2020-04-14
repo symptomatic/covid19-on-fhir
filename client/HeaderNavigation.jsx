@@ -1,4 +1,6 @@
 import React, { Component, useState, useEffect } from 'react';
+import { useLocation, useParams } from "react-router-dom";
+
 
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
@@ -160,12 +162,39 @@ export function HeaderNavigation(props){
   console.log('HeaderNavigation.props', props)
   let value = 0;
 
+  let location = useLocation();
+  console.log('HeaderNavigation.location', location)
+
+  function parseIndexFromLocation(pathname){
+    switch (pathname) {
+      case '/patient-chart':
+        return 0;
+        break;
+      case '/query-fhir-provider':
+        return 1;
+        break;
+      case '/geocoding':
+        return 2;
+        break;
+      case '/map':
+        return 3;
+        break;
+      case '/reporting':
+        return 4;
+        break;
+      default:
+        return 1;
+        break;
+    }
+  }
+  let startingIndex = parseIndexFromLocation(location.pathname)
+
   const classes = useStyles();
   const tabClasses = useTabStyles();
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState(1);
 
   function selectSlide(event, newIndex){
-    logger.info('HeaderNavigation.selectSlide', newIndex);
+    logger.info('HeaderNavigation.selectSlide', startingIndex);
     setTabIndex(newIndex);    
 
     switch (newIndex) {

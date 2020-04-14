@@ -5,7 +5,7 @@ import AboutDialog from './client/AboutDialog';
 import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 import ConformanceCheck from './client/ConformanceCheck';
-import LaunchPage from './client/LaunchPage';
+import CovidLaunchPage from './client/CovidLaunchPage';
 import PopupRedirectPage from './client/PopupRedirectPage';
 
 import { 
@@ -70,6 +70,7 @@ var SidebarElements = [{
 
 
 let MainPage = CovidQueryPage;
+let LaunchPage = CovidLaunchPage;
 
 export { 
   DynamicRoutes, 

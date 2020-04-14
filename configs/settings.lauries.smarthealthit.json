@@ -1,0 +1,170 @@
+{
+  "public": {
+    "title": "Laurie's Family Friendly Pediatric Gastroenterology Chart",
+    "fhirVersion": "R4",
+    "smartOnFhir": [{
+      "vendor": "SmartHealth IT",
+      "client_id": "my-client-id",
+      "scope": "launch launch/patient patient/read encounter/read procedure/read condition/read observation/read offline_access",
+      "fhirServiceUrl": "https://launch.smarthealthit.org/v/r3/sim/",
+      "redirect_uri": "./patient-chart",
+      "iss": "https://launch.smarthealthit.org/v/r3/sim/eyJoIjoiMSIsImIiOiJmMDQ2MjkzNi1lYjRiLTRkYTEtYjQ1YS1mYmQ5NmViZjhjY2IiLCJlIjoic21hcnQtUHJhY3RpdGlvbmVyLTcxNjE0NTAyIn0/fhir"
+    }],
+    "theme": {
+      "showVideoBackground": false,
+      "defaultVideo": "/VideoBackgrounds/GrayWaves.mp4",
+      "backgroundImagePath": "/backgrounds/medical/Gradient.jpg",
+      "palette": {
+        "primaryColor": "#71c5ee",
+        "primaryText": "rgba(255, 255, 255, 1) !important",
+      
+        "secondaryColor": "#fdb813",
+        "secondaryText": "rgba(255, 255, 255, 1) !important",
+      
+        "cardColor": "#ffffff !important",
+        "cardTextColor": "rgba(0, 0, 0, 1) !important",
+      
+        "errorColor": "rgb(128,20,60) !important",
+        "errorText": "#ffffff !important",
+      
+        "appBarColor": "#2c78c8 !important",
+        "appBarTextColor": "#ffffff !important",
+      
+        "paperColor": "#ffffff !important",
+        "paperTextColor": "rgba(0, 0, 0, 1) !important",
+      
+        "backgroundCanvas": "#F0F0F0",
+        "background": "linear-gradient(45deg, rgb(108, 183, 110) 30%, rgb(150, 202, 144) 90%)",
+
+        "nivoTheme": "red_grey"
+      }
+    },
+    "loggingThreshold": "trace",
+    "defaults": {
+      "route": "/example-route",
+      "landingPage": "/example-route",
+      "landingModal": {
+        "open": false,
+        "title": "Welcome to Pediatric Gastroenterology Chart"
+      },
+      "dateFormat": "YYYY-MM-DD",
+      "prominantHeader": true,
+      "displayNavbars": true,
+      "disableHeader": false,
+      "disableFooter": false,
+      "paginationLimit": 100,
+      "subscriptionLimit": 1000,
+      "sidebar": {
+        "menuItems": {
+          "HomePage": true,
+          "FhirResources": false,
+          "DynamicModules": true,
+          "SidebarWorkflows": true,
+          "Theme": false,
+          "ConstructionZone": false
+        },
+        "hidden": [
+          "/allergies",
+          "/audit-events",
+          "/bundles",
+          "/care-plans",
+          "/careplans",
+          "/careplan",
+          "/communications",
+          "/consents",
+          "/contracts",
+          "/data-management",
+          "/diagnostic-reports",
+          "/example-route",
+          "/endpoints",
+          "/imaging-studies",
+          "/immunizations",
+          "/goals",
+          "/measures",
+          "/measure-reports",
+          "/medications",
+          "/medication-orders",
+          "/medication-statements",
+          "/practitioners",
+          "/persons",
+          "/risk-assessments",
+          "/subscriptions",
+          "/vitals-tracking"
+        ],
+        "hiddenWorkflow": [
+          "/data-management"
+        ]
+      }
+    },
+    "interfaces": {
+      "default": {
+        "status": "inactive",
+        "channel": {
+          "endpoint": ""
+        },
+        "auth": {
+          "username": "foo",
+          "password": "bar"
+        }
+      }
+    },
+    "meshNetwork": {
+      "upstreamSync": "http://meteor-on-fhir.meteorapp.com/fhir-3.0.0", 
+      "autosync": false
+    },
+    "google": {
+      "maps": {
+        "apiKey": "AIzaSyCC3PHFkh1UvzuK9yykLa847jx2NeAU4LI",
+        "geodataUrl": "",
+        "mapCenter": "",
+        "searchProximity": 50,
+        "mapOptions": {
+          "radius": 50,
+          "opacity": 0.5,
+          "dissipating": false,
+          "maxIntensity": 50,
+          "gradient": [
+            "rgba(255, 255, 255, 0)",
+            "rgba(251, 251, 213, 1)",
+            "rgba(249, 234, 189, 1)",
+            "rgba(247, 217, 165, 1)",
+            "rgba(243, 184, 118, 1)",
+            "rgba(242, 168, 94, 1)",
+            "rgba(240, 151, 71, 1)",
+            "rgba(238, 135, 47, 1)",
+            "rgba(236, 118, 23, 1)",
+            "rgba(210, 80, 0, 1)"
+          ]
+        }
+      }
+    },
+    "modules": {
+      "apps": {},
+      "fhir": {
+        "AllergyIntolerances": true,
+        "AuditEvents": true,
+        "BodySites": true,
+        "CarePlans": true,
+        "Conditions": true,
+        "Devices": true,
+        "DiagnosticReports": true,
+        "Goals": true,
+        "ImagingStudies": true,
+        "Immunizations": true,
+        "Locations": true,
+        "Lists": true,
+        "Medications": true,
+        "MedicationOrders": true,
+        "MedicationStatements": true,
+        "Organizations": true,
+        "Observations": true,
+        "Patients": true,
+        "Practitioners": true,
+        "Procedures": true,
+        "Questionnaires": true,
+        "RiskAssessments": true
+      }
+    }
+  },
+  "private": {}
+}
