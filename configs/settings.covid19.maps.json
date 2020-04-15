@@ -1,6 +1,7 @@
 {
   "public": {
     "title": "Covid19 Geomapping",
+    "version": "v0.2.2",
     "fhirVersion": "R4",
     "theme": {
       "showVideoBackground": false,
