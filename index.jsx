@@ -5,7 +5,7 @@ import AboutDialog from './client/AboutDialog';
 import PrivacyPage from './client/PrivacyPage';
 import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 import ConformanceCheck from './client/ConformanceCheck';
-import LaunchPage from './client/LaunchPage';
+import CovidLaunchPage from './client/CovidLaunchPage';
 import PopupRedirectPage from './client/PopupRedirectPage';
 
 import { 
@@ -14,6 +14,8 @@ import {
 } from './client/FooterButtons';
 
 import { HeaderNavigation } from './client/HeaderNavigation';
+import { PatientChardHeaderNavigation } from './client/PatientChardHeaderNavigation';
+
 
 var DynamicRoutes = [{
   'name': 'CovidOnFhirAppPage',
@@ -70,12 +72,14 @@ var SidebarElements = [{
 
 
 let MainPage = CovidQueryPage;
+let LaunchPage = CovidLaunchPage;
 
 export { 
   DynamicRoutes, 
 
   CovidQueryPage,
   HeaderNavigation,
+  PatientChardHeaderNavigation,
 
   FooterButtons,
   SidebarElements,
