@@ -158,26 +158,17 @@ const useTabStyles = makeStyles(theme => ({
 
 
 
-export function HeaderNavigation(props){
-  console.log('HeaderNavigation.props', props)
+export function PatientChardHeaderNavigation(props){
+  console.log('PatientChardHeaderNavigation.props', props)
   let value = 0;
 
   let location = useLocation();
-  console.log('HeaderNavigation.location', location)
+  console.log('PatientChardHeaderNavigation.location', location)
 
   function parseIndexFromLocation(pathname){
     switch (pathname) {
-      case '/query-fhir-provider':
+      case '/patient-chart':
         return 0;
-        break;
-      case '/geocoding':
-        return 1;
-        break;
-      case '/map':
-        return 2;
-        break;
-      case '/reporting':
-        return 3;
         break;
       default:
         return 0;
@@ -191,52 +182,25 @@ export function HeaderNavigation(props){
   const [tabIndex, setTabIndex] = useState(1);
 
   function selectSlide(event, newIndex){
-    logger.info('HeaderNavigation.selectSlide', startingIndex);
+    logger.info('PatientChardHeaderNavigation.selectSlide', startingIndex);
     setTabIndex(newIndex);    
 
     switch (newIndex) {
       case 0:
-        props.history.replace('/query-fhir-provider')
-        break;
-      case 1:
-        props.history.replace('/geocoding')
-        break;
-      case 2:
-        props.history.replace('/map')
-        break;
-      case 3:
-        props.history.replace('/reporting')
+        props.history.replace('/patient-chart')
         break;
       }   
- }
+  }
 
   let geocodingTab;
   let mapTab;
-  let hospitalsTab;
-  let inventoryTab; 
-  let capacityTab; 
 
-  if(Package["symptomatic:covid19-geomapping"]){
-    geocodingTab = <Tab id="geocodingTab" label="Geocoding" />
-    mapTab = <Tab id="mapTab" label="Map" />
-  }
-
-  let reportingTab;
-  if(Package["symptomatic:covid19-reporting"]){
-    reportingTab = <Tab id="reportTab" label="Reporting" />
-    inventoryTab = <Tab id="inventoryTab" label="Inventory" />
-  }
 
   return (        
     <div style={{display: 'contents'}}>
       <div >
         <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
-          <Tab id="fetchTab" label="Bulk Data" />
-          { geocodingTab }
-          { mapTab }
-          { reportingTab }
-          {/* { inventoryTab } */}
-          {/* { capacityTab } */}
+          <Tab id="chartSummaryTab" label="Chart Summary" />
         </Tabs>
         <div id="headerUrl" aria-label="sitename" className={ tabClasses.menu_items_right }>        
           <h3 id="fetchTab">{Session.get('fhirServerEndpoint')}</h3>          
@@ -246,7 +210,7 @@ export function HeaderNavigation(props){
   );
 }
 
-export default HeaderNavigation;
+export default PatientChardHeaderNavigation;
 
 
 

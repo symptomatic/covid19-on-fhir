@@ -14,6 +14,8 @@ import {
 } from './client/FooterButtons';
 
 import { HeaderNavigation } from './client/HeaderNavigation';
+import { PatientChardHeaderNavigation } from './client/PatientChardHeaderNavigation';
+
 
 var DynamicRoutes = [{
   'name': 'CovidOnFhirAppPage',
@@ -77,6 +79,7 @@ export {
 
   CovidQueryPage,
   HeaderNavigation,
+  PatientChardHeaderNavigation,
 
   FooterButtons,
   SidebarElements,
