@@ -63,12 +63,14 @@ function DynamicSpacer(props){
   return <br className="dynamicSpacer" style={{height: '40px'}}/>;
 }
 
+// Bulk Data Transfer happens in a different location than from the Patient Charting servers.
+// So, we've decided to use an interface default channel endpoint, rather than the SMART on FHIR fhirServiceUrl
 let fhirClient = new Client({
-  // baseUrl: get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4')
-  baseUrl: get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4')
+  baseUrl: get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4')
+  // baseUrl: get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4')
 });
-// console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'))
-console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'))
+console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'))
+// console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'))
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -800,11 +802,6 @@ function CovidQueryPage(props){
 
     searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
     searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
-
-    logger.trace('searchOptions', searchOptions)
-
-
-    smart.authorize(oauthConfig);
 
 
     await fhirClient.search(searchOptions)

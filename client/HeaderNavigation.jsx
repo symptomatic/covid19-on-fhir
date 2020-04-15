@@ -188,7 +188,7 @@ export function HeaderNavigation(props){
 
   const classes = useStyles();
   const tabClasses = useTabStyles();
-  const [tabIndex, setTabIndex] = useState(1);
+  const [tabIndex, setTabIndex] = useState(0);
 
   function selectSlide(event, newIndex){
     logger.info('HeaderNavigation.selectSlide', startingIndex);
