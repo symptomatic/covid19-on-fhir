@@ -143,10 +143,10 @@ function CovidQueryPage(props){
   let history = useHistory();
 
   let query = new URLSearchParams(useLocation().search);
-  if(query){
-    console.log("WE HAVE QUERY STATE", query.state)
-    console.log("WE HAVE QUERY PARAMS", query)
-  }
+  // if(query){
+  //   console.log("WE HAVE QUERY STATE", query.state)
+  //   console.log("WE HAVE QUERY PARAMS", query)
+  // }
 
   const rowsPerPage = get(Meteor, 'settings.public.defaults.rowsPerPage', 25);
 
@@ -161,7 +161,7 @@ function CovidQueryPage(props){
   let [procedures, setProcedures] = useState([]);
   let [observations, setObservations] = useState([]);
 
-  let [checkedDateRangeEnabled, setCheckedDateRangeEnabled] = useState(false);
+  let [checkedDateRangeEnabled, setCheckedDateRangeEnabled] = useState(get(Meteor, 'settings.public.defaults.useDateRangeInQueries', false));
 
   let [checkedTested,  setCheckedTested]  = useState(false);
   let [checkedFever,  setCheckedFever]  = useState(true);
@@ -369,8 +369,10 @@ function CovidQueryPage(props){
 
     if(checkedDateRangeEnabled){
       setCheckedDateRangeEnabled(false);
+      Session.set('useDateRangeInQueries', false)
     } else {
       setCheckedDateRangeEnabled(true);
+      Session.set('useDateRangeInQueries', true)
     }
   }
 
@@ -1374,6 +1376,17 @@ function CovidQueryPage(props){
     }
   }
 
+  function handlePatientRowClick(id){
+    console.log('CovidQueryPage.handlePatientRowClick()', id)
+    // Session.set('currentPatientId', id);
+    Session.set('selectedPatientId', id);
+
+    if(typeof Patients === "object"){
+      console.log('CovidQueryPage.handlePatientRowClick()', Patients.findOne({id: id}))
+      // Session.set('currentPatient', Patients.findOne({id: id}));  
+      Session.set('selectedPatient', Patients.findOne({id: id}));  
+    }
+  }
 
   //-----------------------------------------------------------------------------------------------
   // OAUth Popup Window 
@@ -1804,6 +1817,7 @@ function CovidQueryPage(props){
           hideCountry
           showCounts={false}
           hideActive
+          onRowClick={handlePatientRowClick}
       />
       </CardContent>
       <CardActions style={{display: 'inline-flex', width: '100%'}} >
