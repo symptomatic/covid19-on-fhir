@@ -17,13 +17,17 @@ import { HeaderNavigation } from './client/HeaderNavigation';
 import { PatientChardHeaderNavigation } from './client/PatientChardHeaderNavigation';
 
 
-var DynamicRoutes = [{
+let DynamicRoutes = [{
   'name': 'CovidOnFhirAppPage',
-  'path': '/app',
+  'path': '/bulk-data-query',
   'component': CovidQueryPage
 }, {
   'name': 'CovidQueryPage',
   'path': '/query-fhir-provider',
+  'component': CovidQueryPage
+}, {
+  'name': 'BulkDataFetch',
+  'path': '/bulk-data-fetch',
   'component': CovidQueryPage
 }, {
   'name': 'AboutDialog',
@@ -60,14 +64,18 @@ let FooterButtons = [{
 }];
 
 
-var SidebarElements = [{
-  primaryText: 'Privacy Policy',
-  to: '/privacy',
-  iconName: 'document'
+let SidebarWorkflows = [{
+  primaryText: 'Bulk Data Fetch',
+  to: '/bulk-data-fetch',
+  iconName: 'fir'
 }, {
-  primaryText: 'Terms and Conditions',
-  to: '/terms-and-conditions',
-  iconName: 'document'
+  primaryText: 'Patient Chart',
+  to: '/patient-chart',
+  iconName: 'user'
+}, {
+  primaryText: 'Quick Chart',
+  to: '/patient-quickchart',
+  iconName: 'user'
 }];
 
 
@@ -84,6 +92,7 @@ export {
   FooterButtons,
   SidebarElements,
   DialogComponents,
+  SidebarWorkflows,
 
   LaunchPage,
   MainPage
