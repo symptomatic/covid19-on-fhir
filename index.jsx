@@ -67,11 +67,13 @@ let FooterButtons = [{
 let SidebarWorkflows = [{
   primaryText: 'Bulk Data Fetch',
   to: '/bulk-data-fetch',
-  iconName: 'fir'
+  iconName: 'fire',
+  workflowTabs: "default"
 }, {
   primaryText: 'Patient Chart',
   to: '/patient-chart',
-  iconName: 'user'
+  iconName: 'user',
+  workflowTabs: "patientchart"
 }, {
   primaryText: 'Quick Chart',
   to: '/patient-quickchart',
