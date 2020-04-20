@@ -37,7 +37,31 @@ import JSON5 from 'json5';
 
 import moment from 'moment';
 
-import { Patients, Encounters, Conditions, Procedures, Devices, EncountersTable, ConditionsTable, ProceduresTable, DevicesTable } from 'meteor/clinical:hl7-fhir-data-infrastructure';
+import { 
+  Conditions,
+  Devices,
+  Encounters, 
+  Locations,
+  Immunizations,
+  Medications,
+  MedicationOrders,
+  MedicationRequests,
+  MedicationStatements, 
+  Observations,
+  Procedures,
+
+  ConditionsTable,
+  DevicesTable,
+  EncountersTable,
+  LocationsTable,
+  ImmunizationsTable,
+  MedicationsTable,
+  MedicationOrdersTable,
+  MedicationRequestsTable,
+  MedicationStatementsTable, 
+  ObservationsTable,
+  ProceduresTable
+} from 'meteor/clinical:hl7-fhir-data-infrastructure';
 
 import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
 import { useTracker } from './Tracker';
@@ -69,6 +93,11 @@ let fhirClient = new Client({
   baseUrl: get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4')
   // baseUrl: get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4')
 });
+if(!fhirClient){
+  console.error('=======================================================================================');
+  console.error('ERROR!!!  Bulk data channel endpoint not configured.   Unable to initialize FhirClient.');
+  console.error('Please set a value for Meter.settings.public.interfaces.default.channel.endpoint');
+}
 console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'))
 // console.log('Intitializing fhir-kit-client for ' + get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'))
 
@@ -96,8 +125,15 @@ Session.setDefault('encounterUrl', "https://");
 Session.setDefault('conditionUrl', "https://");
 Session.setDefault('procedureUrl', "https://");
 Session.setDefault('deviceUrl', "https://");
+Session.setDefault('observationUrl', "https://");
+Session.setDefault('immunizationUrl', "https://");
+Session.setDefault('medicationUrl', "https://");
+Session.setDefault('medicationOrderUrl', "https://");
+Session.setDefault('medicationRequestUrl', "https://");
+Session.setDefault('medicationStatementUrl', "https://");
 
 Session.setDefault('geoJsonLayer', "");
+Session.setDefault('viewPreference_rowsPerPage', 5)
 
 function CovidQueryPage(props){
   let selectedStartDate = Session.get("fhirKitClientStartDate");
@@ -108,22 +144,26 @@ function CovidQueryPage(props){
   const classes = useStyles();
   let history = useHistory();
 
-
   let query = new URLSearchParams(useLocation().search);
-  if(query){
-    console.log("WE HAVE QUERY STATE", query.state)
-    console.log("WE HAVE QUERY PARAMS", query)
-  }
+  // if(query){
+  //   console.log("WE HAVE QUERY STATE", query.state)
+  //   console.log("WE HAVE QUERY PARAMS", query)
+  // }
 
   const rowsPerPage = get(Meteor, 'settings.public.defaults.rowsPerPage', 25);
 
-
-  let [patients,   setPatients]   = useState([]);
-  let [encounters, setEncounters] = useState([]);
   let [conditions, setConditions] = useState([]);
+  let [encounters, setEncounters] = useState([]);
+  let [immunizations, setImmunizations] = useState([]);
+  let [medications, setMedications] = useState([]);
+  let [medicationOrders, setMedicationOrders] = useState([]);
+  let [medicationRequests, setMedicationRequests] = useState([]);
+  let [medicationStatements, setMedicationStatements] = useState([]);
+  let [patients,   setPatients]   = useState([]);
   let [procedures, setProcedures] = useState([]);
+  let [observations, setObservations] = useState([]);
 
-  let [checkedDateRangeEnabled, setCheckedDateRangeEnabled] = useState(false);
+  let [checkedDateRangeEnabled, setCheckedDateRangeEnabled] = useState(get(Meteor, 'settings.public.defaults.useDateRangeInQueries', false));
 
   let [checkedTested,  setCheckedTested]  = useState(false);
   let [checkedFever,  setCheckedFever]  = useState(true);
@@ -131,6 +171,8 @@ function CovidQueryPage(props){
   let [checkedDyspnea,  setCheckedDyspnea]  = useState(false);
   let [checkedVentilator,  setCheckedVentilator]  = useState(true);
   let [checkedOxygenAdministration,  setCheckedOxygenAdministration]  = useState(true);
+  let [checkedIntubated,  setCheckedIntubated]  = useState(true);
+  let [checkedPronated,  setCheckedPronated]  = useState(true);
   let [checkedCovid19,  setCheckedCovid19]  = useState(true);
   let [checkedSuspectedCovid19,  setCheckedSuspectedCovid19]  = useState(true);
   let [checkedHydroxychloroquine,  setCheckedHydroxychloroquine]  = useState(false);
@@ -140,18 +182,25 @@ function CovidQueryPage(props){
   let [checkedTamiflu,  setCheckedTamiflu]  = useState(false);
   let [checkedSerumAntibodies,  setCheckedSerumAntibodies]  = useState(false);
   let [checkedVaccinated,  setCheckedVaccinated]  = useState(false);
+  let [checkedPlasmaTransfer,  setCheckedPlasmaTransfer]  = useState(false);
+
+  let [checkedVitalSigns, setCheckedVitalSigns] = useState(false);
+  let [checkedLabResults, setCheckedLabResults] = useState(false);
   
-  let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'));
+  let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.interfaces.default.channel.endpoint', 'http://localhost:3100/baseR4'));
+  // let [fhirServerEndpoint, setFhirServerEndpoint] = useState(get(Meteor, 'settings.public.smartOnFhir[0].fhirServiceUrl', 'http://localhost:3100/baseR4'));
+
+  
   let [username, setUsername] = useState("");
   let [password, setPassword] = useState("");
 
 
   //-------------------------------------------------------------------
-  // Tracking
+  // Tracking - Session Variables
 
   selectedStartDate = useTracker(function(){
     return Session.get("fhirKitClientStartDate");
-  }, []);
+  }, [props.lastUpdated]);
 
   if(!selectedStartDate){
     selectedStartDate = Session.get("fhirKitClientStartDate");
@@ -159,141 +208,159 @@ function CovidQueryPage(props){
 
   selectedEndDate = useTracker(function(){
     return Session.get("fhirKitClientEndDate");
-  }, []);  
+  }, [props.lastUpdated]);
 
   if(!selectedEndDate){
     selectedEndDate = Session.get("fhirKitClientEndDate");
   }
 
-
-
   totalEncountersDuringDateRange = useTracker(function(){
     return Session.get("totalEncountersDuringDateRange");
-  }, []);  
+  }, [props.lastUpdated]);
 
 
+  //-------------------------------------------------------------------
+  // Tracking - Cursors
 
   let encounterCursor;
-  encounterCursor = useTracker(function(){    
-    // logger.trace('CovidQueryPage.Encounters.find()', Encounters.find().fetch());
-    return Encounters.find();
-  }, [props.lastUpdated]);  
-
+  encounterCursor = useTracker(function(){ return Encounters.find(); }, [props.lastUpdated]);  
   if(encounterCursor){
     encounters = encounterCursor.fetch();
   }
 
-  let patientsCursor;
-  patientsCursor = useTracker(function(){
-    // this console logging statement may be creating a side effect
-    // that triggers the re-render
-    //logger.debug('CovidQueryPage.Patients.find()', Patients.find().fetch());
-    return Patients.find();
-  }, [props.lastUpdated]);  
-  if(patientsCursor){
-    patients = patientsCursor.fetch();
-  }
-
   let conditionsCursor;
-  conditionsCursor = useTracker(function(){
-    // this console logging statement may be creating a side effect
-    // that triggers the re-render
-    //logger.trace('CovidQueryPage.Conditions.find()', Conditions.find().fetch());
-    return Conditions.find();
-  }, [props.lastUpdated]); 
+  conditionsCursor = useTracker(function(){ return Conditions.find(); }, [props.lastUpdated]); 
   if(conditionsCursor){
     conditions = conditionsCursor.fetch();
   }
 
+  let devicesCursor;
+  devicesCursor = useTracker(function(){ return Devices.find(); }, [props.lastUpdated]); 
+  if(devicesCursor){
+    devices = devicesCursor.fetch();
+  }
+
+  let immunizationsCursor;
+  immunizationsCursor = useTracker(function(){ return Immunizations.find(); }, [props.lastUpdated]); 
+  if(immunizationsCursor){
+    immunizations = immunizationsCursor.fetch();
+  }
+
+  let locationsCursor;
+  locationsCursor = useTracker(function(){ return Locations.find(); }, [props.lastUpdated]); 
+  if(locationsCursor){
+    locations = locationsCursor.fetch();
+  }
+
+  let medicationsCursor;
+  medicationsCursor = useTracker(function(){ return Medications.find(); }, [props.lastUpdated]); 
+  if(medicationsCursor){
+    medications = medicationsCursor.fetch();
+  }
+
+  let medicationOrdersCursor;
+  medicationOrdersCursor = useTracker(function(){ return MedicationOrders.find(); }, [props.lastUpdated]); 
+  if(medicationOrdersCursor){
+    medicationOrders = medicationOrdersCursor.fetch();
+  }
+
+  let medicationRequestsCursor;
+  medicationRequestsCursor = useTracker(function(){ return MedicationRequests.find(); }, [props.lastUpdated]); 
+  if(medicationRequestsCursor){
+    medicationRequests = medicationRequestsCursor.fetch();
+  }
+
+  let medicationStatementsCursor;
+  medicationStatementsCursor = useTracker(function(){ return MedicationStatements.find(); }, [props.lastUpdated]); 
+  if(medicationStatementsCursor){
+    medicationStatements = medicationStatementsCursor.fetch();
+  }
+
+  let observationsCursor;
+  observationsCursor = useTracker(function(){ return Observations.find(); }, [props.lastUpdated]);  
+  if(observationsCursor){
+    observations = observationsCursor.fetch();
+  }
+
+  let patientsCursor;
+  patientsCursor = useTracker(function(){ return Patients.find(); }, [props.lastUpdated]);  
+  if(patientsCursor){
+    patients = patientsCursor.fetch();
+  }
+
   let proceduresCursor;
-  proceduresCursor = useTracker(function(){
-    // this console logging statement may be creating a side effect
-    // that triggers the re-render
-    //logger.debug('CovidQueryPage.Procedures.find()', Procedures.find().fetch());
-    return Procedures.find();
-  }, [props.lastUpdated]); 
+  proceduresCursor = useTracker(function(){ return Procedures.find(); }, [props.lastUpdated]); 
   if(proceduresCursor){
     procedures = proceduresCursor.fetch();
   }
 
 
-  let locationsCursor;
-  locationsCursor = useTracker(function(){
-    // this console logging statement may be creating a side effect
-    // that triggers the re-render
-    //logger.debug('CovidQueryPage.Procedures.find()', Procedures.find().fetch());
-    return Locations.find();
-  }, [props.lastUpdated]); 
-  if(locationsCursor){
-    locations = locationsCursor.fetch();
-  }
 
-  let devicesCursor;
-  devicesCursor = useTracker(function(){
-    // this console logging statement may be creating a side effect
-    // that triggers the re-render
-    //logger.debug('CovidQueryPage.Procedures.find()', Procedures.find().fetch());
-    return Devices.find();
-  }, [props.lastUpdated]); 
-  if(devicesCursor){
-    devices = devicesCursor.fetch();
-  }
+  //-------------------------------------------------------------------
+  // Tracking - Counters
+  
+  let deviceCount = 0;
+  let conditionCount = 0;
+  let encounterCount = 0;
+  let locationCount = 0;
+  let immunizationCount = 0;
+  let medicationCount = 0;
+  let medicationOrderCount = 0;
+  let medicationRequestCount = 0;
+  let medicationStatementCount = 0;
+  let observationCount = 0;
+  let patientCount = 0;
+  let procedureCount = 0;
+
+  conditionCount = useTracker(function(){ return Conditions.find().count() }, []);  
+  deviceCount = useTracker(function(){ return Devices.find().count() }, []);  
+  encounterCount = useTracker(function(){ return Encounters.find().count() }, []);  
+  locationCount = useTracker(function(){ return Locations.find().count() }, []);  
+  immunizationCount = useTracker(function(){ return Immunizations.find().count() }, []);  
+  medicationCount = useTracker(function(){ return Medications.find().count() }, []);  
+  medicationOrderCount = useTracker(function(){ return MedicationOrders.find().count() }, []);  
+  medicationRequestCount = useTracker(function(){ return MedicationRequests.find().count() }, []);  
+  medicationStatementCount = useTracker(function(){ return MedicationStatements.find().count() }, []);  
+  observationCount = useTracker(function(){ return Observations.find().count() }, []);  
+  patientCount = useTracker(function(){ return Patients.find().count() }, []);  
+  procedureCount = useTracker(function(){ return Procedures.find().count() }, []);  
+
 
 
   //-------------------------------------------------------------------
-  // Counters
-  
-  let encounterCount = 0;
-  encounterCount = useTracker(function(){    
-    return Encounters.find().count()
-  }, []);  
+  // Tracking - Urls
 
-  let patientCount = 0;
-  patientCount = useTracker(function(){    
-    return Patients.find().count()
-  }, []);  
+  let conditionUrl = "";
+  let deviceUrl = "";
+  let encounterUrl = "";
+  let locationUrl = "";
+  let immunizationUrl = "";
+  let medicationUrl = "";
+  let medicationOrderUrl = "";
+  let medicationRequestUrl = "";
+  let medicationStatementUrl = "";
+  let observationUrl = "";
+  let procedureUrl = "";
+  let patientUrl = "";
 
-  let conditionCount = 0;
-  conditionCount = useTracker(function(){    
-    return Conditions.find().count()
-  }, []);  
-
-  let procedureCount = 0;
-  procedureCount = useTracker(function(){    
-    return Procedures.find().count()
-  }, []);  
-
-  let locationCount = 0;
-  locationCount = useTracker(function(){    
-    return Locations.find().count()
-  }, []);  
-
-  let deviceCount = 0;
-  deviceCount = useTracker(function(){    
-    return Devices.find().count()
-  }, []);  
+  conditionUrl = useTracker(function(){ return Session.get('conditionUrl') }, [props.lastUpdated]);  
+  encounterUrl = useTracker(function(){ return Session.get('encounterUrl') }, [props.lastUpdated]);  
+  deviceUrl = useTracker(function(){ return Session.get('deviceUrl')}, [props.lastUpdated]);  
+  locationUrl = useTracker(function(){ return Session.get('locationUrl')}, [props.lastUpdated]);  
+  immunizationUrl = useTracker(function(){ return Session.get('immunizationUrl')}, [props.lastUpdated]);  
+  medicationUrl = useTracker(function(){ return Session.get('medicationUrl')}, [props.lastUpdated]);  
+  medicationOrderUrl = useTracker(function(){ return Session.get('medicationOrderUrl')}, [props.lastUpdated]);  
+  medicationRequestUrl = useTracker(function(){ return Session.get('medicationRequestUrl')}, [props.lastUpdated]);  
+  medicationStatementUrl = useTracker(function(){ return Session.get('medicationStatementUrl')}, [props.lastUpdated]);  
+  observationUrl = useTracker(function(){ return Session.get('observationUrl')}, [props.lastUpdated]);  
+  procedureUrl = useTracker(function(){ return Session.get('procedureUrl') }, [props.lastUpdated]);  
+  patientUrl = useTracker(function(){ return Session.get('patientUrl') }, [props.lastUpdated]);  
 
 
-  let encounterUrl = 0;
-  encounterUrl = useTracker(function(){    
-    return Session.get('encounterUrl')
-  }, [props.lastUpdated]);  
-
-  let conditionUrl = 0;
-  conditionUrl = useTracker(function(){    
-    return Session.get('conditionUrl')
-  }, [props.lastUpdated]);  
-
-  let procedureUrl = 0;
-  procedureUrl = useTracker(function(){    
-    return Session.get('procedureUrl')
-  }, [props.lastUpdated]);  
-
-  let deviceUrl = 0;
-  deviceUrl = useTracker(function(){    
-    return Session.get('deviceUrl')
-  }, [props.lastUpdated]);  
-
+  //-------------------------------------------------------------------
+  // Tracking - Preferences 
+  let viewPreference_rowsPerPage = 5;
+  viewPreference_rowsPerPage = useTracker(function(){ return Session.get('viewPreference_rowsPerPage') }, [props.lastUpdated]);  
 
 
   //-------------------------------------------------------------------
@@ -304,8 +371,10 @@ function CovidQueryPage(props){
 
     if(checkedDateRangeEnabled){
       setCheckedDateRangeEnabled(false);
+      Session.set('useDateRangeInQueries', false)
     } else {
       setCheckedDateRangeEnabled(true);
+      Session.set('useDateRangeInQueries', true)
     }
   }
 
@@ -352,6 +421,24 @@ function CovidQueryPage(props){
       setCheckedOxygenAdministration(false);
     } else {
       setCheckedOxygenAdministration(true);
+    }
+  }
+  function handleToggleIntubated(props){
+    logger.warn('CovidQueryPage.handleToggleIntubated()');
+
+    if(checkedIntubated){
+      setCheckedIntubated(false);
+    } else {
+      setCheckedIntubated(true);
+    }
+  }
+  function handleTogglePronated(props){
+    logger.warn('CovidQueryPage.handleTogglePronated()');
+
+    if(checkedPronated){
+      setCheckedPronated(false);
+    } else {
+      setCheckedPronated(true);
     }
   }
   
@@ -447,430 +534,40 @@ function CovidQueryPage(props){
     }
   }
 
-  
+  function handleToggleVitalSigns(props){
+    logger.warn('CovidQueryPage.handleToggleVitalSigns()');
+
+    if(checkedVitalSigns){
+      setCheckedVitalSigns(false);
+    } else {
+      setCheckedVitalSigns(true);
+    }
+  }
+  function handleToggleLabResults(props){
+    logger.warn('CovidQueryPage.handleToggleLabResults()');
+
+    if(checkedLabResults){
+      setCheckedLabResults(false);
+    } else {
+      setCheckedLabResults(true);
+    }
+  }
+  function handleTogglePlasmaTransfer(props){
+    logger.warn('CovidQueryPage.handleTogglePlasmaTransfer()');
+
+    if(checkedPlasmaTransfer){
+      setCheckedPlasmaTransfer(false);
+    } else {
+      setCheckedPlasmaTransfer(true);
+    }
+  }
 
   
-  
-
   //-------------------------------------------------------------------
   // Button Methods
 
-
-
-  function handleFetchEncounters(props){
-    logger.warn('CovidQueryPage.handleFetchEncounters()');
-
-    fetchEncounterData(props, function(){
-      fetchPatientsFromFhirArray(props, Encounters.find().fetch());
-    });
-  }
   function handleFetchConditions(props){
     logger.warn('CovidQueryPage.handleFetchConditions()');
-
-    fetchConditionData(props, function(){
-      fetchPatientsFromFhirArray(props, Conditions.find().fetch());
-    });
-  }
-  function handleFetchProcedures(props){
-    logger.warn('CovidQueryPage.handleFetchProcedures()');
-
-    fetchProcedureData(props, function(){
-      fetchPatientsFromFhirArray(props, Procedures.find().fetch());
-    });
-  }
-  function handleFetchDevices(props){
-    logger.warn('CovidQueryPage.handleFetchDevices()');
-
-    fetchDeviceData(props, function(){
-      fetchPatientsFromFhirArray(props, Devices.find().fetch());
-    });
-  }
-
-  
-
-
-  function handleGeocodeAddresses(props){
-    logger.warn('CovidQueryPage.handleGeocodeAddresses()');
-    logger.debug('CovidQueryPage.handleGeocodeAddresses().patients?', patients);
-
-    patients.forEach(function(patient){
-      Meteor.call('geocodePatientAddress', patient, function(error, result){
-        if(error){
-          console.log('geocodeAddress.error', error)
-        }
-        if(result){
-          console.log('geocodeAddress.result', result)
- 
-          if(get(result, 'resourceType') === "Location"){
-            Locations.insert(result, {filter: false, validate: false});
-          }
-        }
-      })
-    });
-  }
-
-  function clearProcedures(){
-    logger.warn('CovidQueryPage.clearProcedures()');
-    Procedures.remove({});
-  }
-  function clearEncounters(){
-    logger.warn('CovidQueryPage.clearEncounters()');
-    Encounters.remove({});
-  }
-  function clearConditions(){
-    logger.warn('CovidQueryPage.clearConditions()');
-    Conditions.remove({});
-  }
-  function clearPatients(){
-    logger.warn('CovidQueryPage.clearPatients()');
-    Patients.remove({});
-  }
-  function clearLocations(){
-    logger.warn('CovidQueryPage.clearLocations()');
-    Locations.remove({});
-  }
-  function clearGeoJson(){
-    logger.warn('CovidQueryPage.clearGeoJson()');
-    Session.set('geoJsonLayer', "")
-  }
-
-  function generateGeoJson(){
-    logger.warn('CovidQueryPage.generateGeoJson()');
-
-    let newGeoJson = {
-      "type": "FeatureCollection",
-      "features": []
-    }
-
-    let proximityCount = Locations.find({_location: {$near: {
-      $geometry: {
-        type: 'Point',
-        coordinates: [-88.0020589, 42.01136169999999]
-      },
-      // Convert [mi] to [km] to [m]
-      $maxDistance: 50 * 1.60934 * 1000
-    }}}).count();
-
-    console.log('Found ' + proximityCount + ' locations within 50 miles of the search origin.')
-
-    let count = 0;
-    Locations.find({_location: {$near: {
-      $geometry: {
-        type: 'Point',
-        coordinates: [-88.0020589, 42.01136169999999]
-      },
-      // Convert [mi] to [km] to [m]
-      $maxDistance: 50 * 1.60934 * 1000
-    }}}).forEach(function(location){
-      count++;
-
-      if(get(location, 'position.longitude') && get(location, 'position.latitude')){
-        let newFeature = { 
-          "type": "Feature", 
-          "properties": { 
-            "id": (count).toString(),                 
-            "primary_type": "POSITIVE",                           
-            "location_zip": get(location, 'address.postalCode'),      
-            "location_address": get(location, 'address.line[0]'),    
-            "location_city": get(location, 'address.city'),                    
-            "location_state": get(location, 'address.state'),
-            "longitude": (get(location, 'position.longitude')).toFixed(9).toString(),
-            "latitude": (get(location, 'position.latitude')).toFixed(9).toString()        
-          }, 
-          "geometry": { 
-            "type": "Point", 
-            "coordinates": [ Number((get(location, 'position.longitude')).toFixed(9)), Number((get(location, 'position.latitude')).toFixed(9)) ] 
-          }
-        }
-  
-        newGeoJson.features.push(newFeature);
-      }      
-    })
-
-    console.log('newGeoJson', newGeoJson)
-    Session.set('geoJsonLayer', newGeoJson)
-  }
-
-  //-------------------------------------------------------------------
-  // Recursive Methods
-
-  async function recursiveEncounterQuery(fhirClient, searchResponse, encountersArray, callback){
-    logger.debug('recursiveEncounterQuery', fhirClient, searchResponse);
-  
-    let self = this;
-
-    function hasNext(searchResponse){
-      let result = false;
-      if(get(searchResponse, 'link')){
-        searchResponse.link.forEach(function(link){
-          if(get(link, 'relation') === "next"){
-            result = true;
-          }
-        })
-      }
-      return result;
-    }
-
-    let recursiveResult = null;
-    if(hasNext(searchResponse)){
-      logger.debug('Found a next link in the bundle.  Fetching...')
-      recursiveResult = await fhirClient.nextPage(searchResponse)
-      .then((newResponse) => {
-        logger.trace('recursiveEncounterQuery().fhirClient.nextPage().newResponse', newResponse);
-
-        if(get(newResponse, 'resourceType') === "Bundle"){
-          logger.debug('Parsing a Bundle.')
-          let entries = get(newResponse, 'entry', []);
-
-          entries.forEach(function(entry){
-            if(get(entry, 'resource.resourceType') === "Encounter"){
-              logger.trace('Found an encounter', get(entry, 'resource'));
-
-              if(!Encounters.findOne({id: get(entry, 'resource.id')})){
-                let encounterId = Encounters.insert(get(entry, 'resource'), {validate: false, filter: false});
-                logger.trace('Just received new encounter: ' + encounterId);
-    
-                if(!get(entry, 'resource.id')){
-                  entry.resource.id = encounterId;
-                } 
-                if(!get(entry, 'resource._id')){
-                  entry.resource._id = encounterId;
-                }
-    
-                encountersArray.push(get(entry, 'resource'))  
-              }
-            }
-          })        
-
-          // setEncounters(encountersArray);  // this is mostly just to update the progress so people see things are loading
-          encountersArray = recursiveEncounterQuery(fhirClient, newResponse, encountersArray, callback)
-        } 
-
-        // setEncounters(encountersArray);
-        return encountersArray;
-      })
-    } else {
-      callback();
-    }
-
-    return recursiveResult;
-  }
-
-
-
-  async function recursiveConditionQuery(fhirClient, searchResponse, conditionsArray, callback){
-    logger.debug('recursiveConditionQuery', fhirClient, searchResponse);
-  
-    let self = this;
-
-    function hasNext(searchResponse){
-      let result = false;
-      if(get(searchResponse, 'link')){
-        searchResponse.link.forEach(function(link){
-          if(get(link, 'relation') === "next"){
-            result = true;
-          }
-        })
-      }
-      return result;
-    }
-
-    let recursiveResult = null;
-    if(hasNext(searchResponse)){
-      logger.debug('Found a next link in the bundle.  Fetching...')
-      recursiveResult = await fhirClient.nextPage(searchResponse)
-      .then((newResponse) => {
-        logger.trace('recursiveConditionQuery().fhirClient.nextPage().newResponse', newResponse);
-
-        if(get(newResponse, 'resourceType') === "Bundle"){
-          logger.debug('Parsing a Bundle.')
-          let entries = get(newResponse, 'entry', []);
-
-          entries.forEach(function(entry){
-            if(get(entry, 'resource.resourceType') === "Condition"){
-              logger.trace('Found an condition', get(entry, 'resource'));
-
-              if(!Conditions.findOne({id: get(entry, 'resource.id')})){
-                let conditionId = Conditions.insert(get(entry, 'resource'), {validate: false, filter: false});
-                logger.trace('Just received new condition: ' + conditionId);
-    
-                if(!get(entry, 'resource.id')){
-                  entry.resource.id = conditionId;
-                } 
-                if(!get(entry, 'resource._id')){
-                  entry.resource._id = conditionId;
-                }
-    
-                conditionsArray.push(get(entry, 'resource'))  
-              }
-            }
-          })        
-
-          // setConditions(conditionsArray);  // this is mostly just to update the progress so people see things are loading
-          conditionsArray = recursiveConditionQuery(fhirClient, newResponse, conditionsArray, callback)
-        } 
-
-        // setEncounters(conditionsArray);
-        return conditionsArray;
-      })
-    } else {
-      callback();
-    }
-
-    return recursiveResult;
-  }
-
-
-
-
-  async function recursiveProcedureQuery(fhirClient, searchResponse, proceduresArray, callback){
-    logger.debug('recursiveProcedureQuery', fhirClient, searchResponse);
-  
-    let self = this;
-
-    function hasNext(searchResponse){
-      let result = false;
-      if(get(searchResponse, 'link')){
-        searchResponse.link.forEach(function(link){
-          if(get(link, 'relation') === "next"){
-            result = true;
-          }
-        })
-      }
-      return result;
-    }
-
-    let recursiveResult = null;
-    if(hasNext(searchResponse)){
-      logger.debug('Found a next link in the bundle.  Fetching...')
-      recursiveResult = await fhirClient.nextPage(searchResponse)
-      .then((newResponse) => {
-        logger.trace('recursiveProcedureQuery().fhirClient.nextPage().newResponse', newResponse);
-
-        if(get(newResponse, 'resourceType') === "Bundle"){
-          logger.debug('Parsing a Bundle.')
-          let entries = get(newResponse, 'entry', []);
-
-          entries.forEach(function(entry){
-            if(get(entry, 'resource.resourceType') === "Procedure"){
-              logger.trace('Found an procedure', get(entry, 'resource'));
-
-              if(!Procedures.findOne({id: get(entry, 'resource.id')})){
-                let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
-                logger.trace('Just received new procedure: ' + procedureId);
-    
-                if(!get(entry, 'resource.id')){
-                  entry.resource.id = procedureId;
-                } 
-                if(!get(entry, 'resource._id')){
-                  entry.resource._id = procedureId;
-                }
-    
-                proceduresArray.push(get(entry, 'resource'))  
-              }
-            }
-          })        
-
-          // setProcedures(proceduresArray);  // this is mostly just to update the progress so people see things are loading
-          proceduresArray = recursiveProcedureQuery(fhirClient, newResponse, proceduresArray, callback)
-        } 
-
-        // setEncounters(proceduresArray);
-        return proceduresArray;
-      })
-    } else {
-      callback();
-    }
-
-    return recursiveResult;
-  }
-
-  //-------------------------------------------------------------------
-  // Methods
-
-  async function fetchEncounterData(props, callback){
-    logger.debug('Fetch encounter data from the following endpoint: ' + fhirServerEndpoint);
-
-
-    let encountersArray = [];
-    let searchOptions = { 
-      resourceType: 'Encounter', 
-      searchParams: { 
-        date: []
-      }
-    };
-
-    searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
-    searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
-
-
-    await fhirClient.search(searchOptions)
-    .then((searchResponse) => {
-      logger.debug('fetchEncounterData.searchResponse', searchResponse);
-
-      if(searchResponse){
-        let encountersArray = [];
-
-        if(searchResponse.total){
-          Session.set('totalEncountersDuringDateRange', searchResponse.total);
-          Session.set('currentEncounterSearchset', searchResponse);
-        }
-      }
-
-      if(get(searchResponse, 'resourceType') === "Bundle"){
-        logger.debug('Parsing a Bundle.')
-        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
-        Session.set('encounterUrl', get(searchResponse, "link[0].url"));
-
-        let entries = get(searchResponse, 'entry', []);
-        
-        entries.forEach(function(entry){
-          if(get(entry, 'resource.resourceType') === "Encounter"){
-
-             // checking for duplicates along the way
-            if(!Encounters.findOne({id: get(entry, 'resource.id')})){
-              logger.trace('doesnt exist, upserting');
-
-              let encounterId = Encounters.insert(get(entry, 'resource'), {validate: false, filter: false});
-              logger.trace('Just received new encounter: ' + encounterId);
-  
-              if(!get(entry, 'resource.id')){
-                entry.resource.id = encounterId;
-              } 
-              if(!get(entry, 'resource._id')){
-                entry.resource._id = encounterId;
-              }
-  
-              encountersArray.push(get(entry, 'resource'))
-            }     
-          }
-        })        
-      }
-
-      encountersArray = recursiveEncounterQuery(fhirClient, searchResponse, encountersArray, function(error, result){
-        logger.info("We just finished the recursive query and received the following result: " + result)
-      });
-
-      return encountersArray;
-    })
-    .then((encountersArray) => {
-      // console.log('encountersArray', encountersArray);
-      setEncounters(encountersArray);
-      if(typeof callback === "function"){
-        callback();
-      }
-      return encountersArray;
-    })
-    .catch((error) => {
-      console.log(error)
-    });
-  }
-
-  async function fetchConditionData(props, callback){
-    logger.debug('Fetch condition data from the following endpoint: ' + fhirServerEndpoint);
-
-
-    let conditionsArray = [];
 
     let searchOptions = { 
       resourceType: 'Condition',
@@ -920,75 +617,31 @@ function CovidQueryPage(props){
     searchOptions.searchParams["onset-date"][0] = "ge" + selectedStartDate;
     searchOptions.searchParams["onset-date"][1] = "le" +  selectedEndDate;
 
-    logger.debug('searchOptions', searchOptions)
-
-    await fhirClient.search(searchOptions)
-    .then((searchResponse) => {
-      logger.debug('fetchConditionData.searchResponse', searchResponse);
-
-      if(searchResponse){
-        let conditionsArray = [];
-
-        if(searchResponse.total){
-          Session.set('totalConditionsDuringDateRange', searchResponse.total);
-          Session.set('currentConditionSearchset', searchResponse);
-        }
-      }
-
-      if(get(searchResponse, 'resourceType') === "Bundle"){
-        logger.debug('Parsing a Bundle.')
-        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
-        Session.set('conditionUrl', get(searchResponse, "link[0].url"));
-
-        let entries = get(searchResponse, 'entry', []);
-        
-        entries.forEach(function(entry){
-          if(get(entry, 'resource.resourceType') === "Condition"){
-
-             // checking for duplicates along the way
-            if(!Conditions.findOne({id: get(entry, 'resource.id')})){
-              logger.trace('doesnt exist, upserting');
-
-              let conditionId = Conditions.insert(get(entry, 'resource'), {validate: false, filter: false});
-              logger.trace('Just received new condition: ' + conditionId);
-  
-              if(!get(entry, 'resource.id')){
-                entry.resource.id = conditionId;
-              } 
-              if(!get(entry, 'resource._id')){
-                entry.resource._id = conditionId;
-              }
-  
-              conditionsArray.push(get(entry, 'resource'))
-            }     
-          }
-        })        
-      }
-
-      conditionsArray = recursiveConditionQuery(fhirClient, searchResponse, conditionsArray, function(error, result){
-        logger.info("We just finished the recursive query and received the following result: " + result)
-      });
-
-      return conditionsArray;
-    })
-    .then((conditionsArray) => {
-      // console.log('conditionsArray', conditionsArray);
-      setConditions(conditionsArray);
-      if(typeof callback === "function"){
-        callback();
-      }
-      return conditionsArray;
-    })
-    .catch((error) => {
-      console.log(error)
+    fetchResourceData(props, searchOptions, Conditions, function(){
+      fetchPatientsFromFhirArray(props, Conditions.find().fetch());
     });
   }
+  function handleFetchEncounters(props){
+    logger.warn('CovidQueryPage.handleFetchEncounters()');
 
+    let searchOptions = { 
+      resourceType: 'Encounter', 
+      searchParams: { 
+        date: []
+      }
+    };
 
+    searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
+    searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
 
-  async function fetchDeviceData(props, callback){
-    logger.debug('Fetch device data from the following endpoint: ' + fhirServerEndpoint);
-
+    fetchResourceData(props, searchOptions, Encounters, function(){
+      fetchPatientsFromFhirArray(props, Encounters.find().fetch());
+    }, function(total){
+      Session.set('totalEncountersDuringDateRange', total);
+    });
+  }
+  function handleFetchDevices(props){
+    logger.warn('CovidQueryPage.handleFetchDevices()');
 
     let devicesArray = [];
     let searchOptions = { 
@@ -998,92 +651,143 @@ function CovidQueryPage(props){
       }
     };
 
-    let proceduresToSearchFor = [];
-    let proceduresToSearchForString = "";
+    let devicesToSearchFor = [];
+    let devicesToSearchForString = "";
     
     // these are our toggles
     // http://www.snomed.org/news-and-events/articles/jan-2020-sct-intl-edition-release
     if(checkedVentilator){
-      proceduresToSearchFor.push("706172005")
+      devicesToSearchFor.push("706172005")
     }
     // if(checkedOxygenAdministration){
-    //   proceduresToSearchFor.push("371908008")
+    //   devicesToSearchFor.push("371908008")
     // }
 
     // we're being a bit sloppy with this algorithm because it needs to get out the door
-    proceduresToSearchFor.forEach(function(snomedCode){
+    devicesToSearchFor.forEach(function(snomedCode){
       // adding a comma after each snomed code
-      proceduresToSearchForString = proceduresToSearchForString + snomedCode + ",";
+      devicesToSearchForString = devicesToSearchForString + snomedCode + ",";
     })
-    if(proceduresToSearchFor.length > 0){
+    if(devicesToSearchFor.length > 0){
       // and then dropping the last comma;
       // blah, but it works
-      searchOptions.searchParams.type = proceduresToSearchForString.substring(0, proceduresToSearchForString.length - 1);
+      searchOptions.searchParams.type = devicesToSearchForString.substring(0, devicesToSearchForString.length - 1);
     }
 
 
     logger.trace('searchOptions', searchOptions)
 
-    await fhirClient.search(searchOptions)
-    .then((searchResponse) => {
-      logger.debug('fetchDeviceData.searchResponse', searchResponse);
-      let devicesArray = [];
-
-      if(get(searchResponse, 'resourceType') === "Bundle"){
-        logger.debug('Parsing a Bundle.')
-        logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
-        Session.set('deviceUrl', get(searchResponse, "link[0].url"));
-
-        let entries = get(searchResponse, 'entry', []);
-        
-        entries.forEach(function(entry){
-          if(get(entry, 'resource.resourceType') === "Device"){
-
-             // checking for duplicates along the way
-            if(!Procedures.findOne({id: get(entry, 'resource.id')})){
-              logger.trace('doesnt exist, upserting');
-
-              let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
-              logger.trace('Just received new procedure: ' + procedureId);
-  
-              if(!get(entry, 'resource.id')){
-                entry.resource.id = procedureId;
-              } 
-              if(!get(entry, 'resource._id')){
-                entry.resource._id = procedureId;
-              }
-  
-              devicesArray.push(get(entry, 'resource'))
-            }     
-          }
-        })        
-      }
-
-      devicesArray = recursiveProcedureQuery(fhirClient, searchResponse, devicesArray, function(error, result){
-        logger.info("We just finished the recursive query and received the following result: " + result)
-      });
-
-      return devicesArray;
-    })
-    .then((devicesArray) => {
-      // console.log('devicesArray', devicesArray);
-      setProcedures(devicesArray);
-      if(typeof callback === "function"){
-        callback();
-      }
-      return devicesArray;
-    })
-    .catch((error) => {
-      console.log(error)
+    fetchResourceData(props, searchOptions, Devices, function(){
+      fetchPatientsFromFhirArray(props, Devices.find().fetch());
     });
   }
+  function handleFetchImmunizations(props){
+    logger.warn('CovidQueryPage.handleFetchImmunizations()');
+
+    let searchOptions = { 
+      resourceType: 'Immunization', 
+      searchParams: {
+        date: []
+      }
+    };
+
+    searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
+    searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
+
+    fetchResourceData(props, searchOptions, Immunizations, function(){
+      fetchPatientsFromFhirArray(props, Immunizations.find().fetch());
+    }, function(total){
+      console.log('Apparently there are ' + total + ' immunizations.')
+    });
+  }
+  function handleFetchMedications(props){
+    logger.warn('CovidQueryPage.handleFetchMedications()');
+
+    let medicationOrderSearchOptions = { 
+      resourceType: 'MedicationOrder', 
+      searchParams: { 
+        date: []
+      }
+    };
+    medicationOrderSearchOptions.searchParams.date[0] = "ge" + selectedStartDate;
+    medicationOrderSearchOptions.searchParams.date[1] = "le" +  selectedEndDate;
+
+    fetchResourceData(props, medicationOrderSearchOptions, MedicationOrders, function(){
+      fetchPatientsFromFhirArray(props, MedicationOrders.find().fetch());
+      fetchMedicationsFromFhirArray(props, MedicationOrders.find().fetch());
+    });
 
 
+    let medicationRequestSearchOptions = { 
+      resourceType: 'MedicationRequest', 
+      searchParams: { 
+        date: []
+      }
+    };
+    medicationRequestSearchOptions.searchParams.date[0] = "ge" + selectedStartDate;
+    medicationRequestSearchOptions.searchParams.date[1] = "le" +  selectedEndDate;
+
+    fetchResourceData(props, medicationRequestSearchOptions, MedicationRequests, function(){
+      fetchPatientsFromFhirArray(props, MedicationRequests.find().fetch());
+      fetchMedicationsFromFhirArray(props, MedicationRequests.find().fetch());
+    });
 
 
-  async function fetchProcedureData(props, callback){
-    logger.debug('Fetch procedure data from the following endpoint: ' + fhirServerEndpoint);
+    let medicationStatementSearchOptions = { 
+      resourceType: 'MedicationStatement', 
+      searchParams: { 
+        effective: []
+      }
+    };
+    medicationStatementSearchOptions.searchParams.effective[0] = "ge" + selectedStartDate;
+    medicationStatementSearchOptions.searchParams.effective[1] = "le" +  selectedEndDate;
 
+    fetchResourceData(props, medicationStatementSearchOptions, MedicationStatements, function(){
+      fetchPatientsFromFhirArray(props, MedicationStatements.find().fetch());
+      fetchMedicationsFromFhirArray(props, MedicationStatements.find().fetch());
+    });
+  }
+  function handleFetchObservations(props){
+    logger.warn('CovidQueryPage.handleFetchObservations()');
+
+    let observationSearchOptions = { 
+      resourceType: 'Observation', 
+      searchParams: { 
+        date: []
+      }
+    };
+
+    observationSearchOptions.searchParams.date[0] = "ge" + selectedStartDate;
+    observationSearchOptions.searchParams.date[1] = "le" +  selectedEndDate;
+
+    let observationsToSearchFor = [];
+    let observationsToSearchForString = "";
+    
+    if(checkedVitalSigns){
+      observationsToSearchFor.push("vital-signs")
+    }
+    if(checkedLabResults){
+      observationsToSearchFor.push("laboratory")
+    }
+
+    // we're being a bit sloppy with this algorithm because it needs to get out the door
+    observationsToSearchFor.forEach(function(category){
+      // adding a comma after each snomed code
+      observationsToSearchForString = observationsToSearchForString + category + ",";
+    })
+    if(observationsToSearchFor.length > 0){
+      // and then dropping the last comma;
+      // blah, but it works
+      observationSearchOptions.searchParams.category = observationsToSearchForString.substring(0, observationsToSearchForString.length - 1);
+    }
+
+
+    fetchResourceData(props, observationSearchOptions, Observations, function(){
+      fetchPatientsFromFhirArray(props, Observations.find().fetch());
+    });
+  }
+  function handleFetchProcedures(props){
+    logger.warn('CovidQueryPage.handleFetchProcedures()');
 
     let proceduresArray = [];
     let searchOptions = { 
@@ -1110,7 +814,6 @@ function CovidQueryPage(props){
       proceduresToSearchFor.push("371908008")
     }
 
-
     // we're being a bit sloppy with this algorithm because it needs to get out the door
     proceduresToSearchFor.forEach(function(snomedCode){
       // adding a comma after each snomed code
@@ -1122,68 +825,419 @@ function CovidQueryPage(props){
       searchOptions.searchParams.code = proceduresToSearchForString.substring(0, proceduresToSearchForString.length - 1);
     }
 
-
     searchOptions.searchParams.date[0] = "ge" + selectedStartDate;
     searchOptions.searchParams.date[1] = "le" +  selectedEndDate;
 
     logger.trace('searchOptions', searchOptions)
 
+    fetchResourceData(props, searchOptions, Procedures, function(){
+      fetchPatientsFromFhirArray(props, Procedures.find().fetch());
+    });
+  }
+
+
+
+
+  function handleGeocodeAddresses(props){
+    logger.warn('CovidQueryPage.handleGeocodeAddresses()');
+    logger.debug('CovidQueryPage.handleGeocodeAddresses().patients?', patients);
+
+    patients.forEach(function(patient){
+      Meteor.call('geocodePatientAddress', patient, function(error, result){
+        if(error){
+          console.log('geocodeAddress.error', error)
+        }
+        if(result){
+          console.log('geocodeAddress.result', result)
+ 
+          if(get(result, 'resourceType') === "Location"){
+            Locations.insert(result, {filter: false, validate: false});
+          }
+        }
+      })
+    });
+  }
+
+  function clearConditions(){
+    logger.warn('CovidQueryPage.clearConditions()');
+    Conditions.remove({});
+  }
+  function clearEncounters(){
+    logger.warn('CovidQueryPage.clearEncounters()');
+    Encounters.remove({});
+  }
+  function clearImmunizations(){
+    logger.warn('CovidQueryPage.clearImmunizations()');
+    Immunizations.remove({});
+  }
+  function clearLocations(){
+    logger.warn('CovidQueryPage.clearLocations()');
+    Locations.remove({});
+  }
+  function clearMedications(){
+    logger.warn('CovidQueryPage.clearMedications()');
+    Medications.remove({});
+  }
+  function clearMedicationOrders(){
+    logger.warn('CovidQueryPage.clearMedicationOrders()');
+    MedicationOrders.remove({});
+  }
+  function clearMedicationRequests(){
+    logger.warn('CovidQueryPage.clearMedicationRequests()');
+    MedicationRequests.remove({});
+  }
+  function clearMedicationStatements(){
+    logger.warn('CovidQueryPage.clearMedicationStatements()');
+    MedicationStatements.remove({});
+  }
+  function clearObservations(){
+    logger.warn('CovidQueryPage.clearObservations()');
+    Observations.remove({});
+  }
+  function clearProcedures(){
+    logger.warn('CovidQueryPage.clearProcedures()');
+    Procedures.remove({});
+  }
+  function clearPatients(){
+    logger.warn('CovidQueryPage.clearPatients()');
+    Patients.remove({});
+  }
+  function clearGeoJson(){
+    logger.warn('CovidQueryPage.clearGeoJson()');
+    Session.set('geoJsonLayer', "")
+  }
+
+  //-------------------------------------------------------------------
+  // Recursive Methods
+
+
+  function hasNext(searchResponse){
+    let result = false;
+    if(get(searchResponse, 'link')){
+      searchResponse.link.forEach(function(link){
+        if(get(link, 'relation') === "next"){
+          result = true;
+        }
+      })
+    }
+    return result;
+  }
+
+  // This is where the magic happens
+  async function recursiveResourceQuery(fhirClient, resourceType, searchResponse, resourceArray, cursor, callback){
+    logger.debug("RecursiveResourceQuery.  Welcome to the rabbit hole.  Don't be late to the tea party.")
+    let self = this;
+
+    logger.trace('searchResponse', searchResponse);
+    logger.trace('hasNext', hasNext(searchResponse));
+  
+    let recursiveResult = null;
+    if(hasNext(searchResponse)){      
+      recursiveResult = await fhirClient.nextPage(searchResponse).then((newResponse) => {
+  
+        if(get(newResponse, 'resourceType') === "Bundle"){
+          logger.trace('Received next bundle.', newResponse)
+          let entries = get(newResponse, 'entry', []);
+  
+          entries.forEach(function(entry){
+            if(get(entry, 'resource.resourceType') === resourceType){
+
+              if(cursor){
+                if(!cursor.findOne({id: get(entry, 'resource.id')})){
+                  let newResourceId = cursor.upsert({id: get(entry, 'resource.id')}, {$set: get(entry, 'resource')}, {validate: false, filter: false});
+                  logger.trace('Just received new ' + resourceType + ":  " + newResourceId);
+
+                  if(!get(entry, 'resource.id')){
+                    entry.resource.id = newResourceId;
+                  } 
+                  if(!get(entry, 'resource._id')){
+                    entry.resource._id = newResourceId;
+                  }
+
+                  resourceArray.push(get(entry, 'resource'))                    
+                }
+              } else {
+                resourceArray.push(get(entry, 'resource'))                    
+              }
+            }
+          })        
+  
+          resourceArray = recursiveResourceQuery(fhirClient, resourceType, newResponse, resourceArray, cursor, callback)
+        } 
+  
+        return resourceArray;
+      })
+    } else {
+      if(typeof callback === "function"){
+        callback();
+      }
+    }
+  
+    return recursiveResult;
+  }
+
+
+
+  // // may be able to remove the following
+  // async function recursiveEncounterQuery(fhirClient, searchResponse, encountersArray, callback){
+  //   logger.debug('recursiveEncounterQuery', fhirClient, searchResponse);
+  
+  //   let self = this;
+
+  //   function hasNext(searchResponse){
+  //     let result = false;
+  //     if(get(searchResponse, 'link')){
+  //       searchResponse.link.forEach(function(link){
+  //         if(get(link, 'relation') === "next"){
+  //           result = true;
+  //         }
+  //       })
+  //     }
+  //     return result;
+  //   }
+
+  //   let recursiveResult = null;
+  //   if(hasNext(searchResponse)){
+  //     logger.debug('Found a next link in the bundle.  Fetching...')
+  //     recursiveResult = await fhirClient.nextPage(searchResponse)
+  //     .then((newResponse) => {
+  //       logger.trace('recursiveEncounterQuery().fhirClient.nextPage().newResponse', newResponse);
+
+  //       if(get(newResponse, 'resourceType') === "Bundle"){
+  //         logger.debug('Parsing a Bundle.')
+  //         let entries = get(newResponse, 'entry', []);
+
+  //         entries.forEach(function(entry){
+  //           if(get(entry, 'resource.resourceType') === "Encounter"){
+  //             logger.trace('Found an encounter', get(entry, 'resource'));
+
+  //             if(!Encounters.findOne({id: get(entry, 'resource.id')})){
+  //               let encounterId = Encounters.insert(get(entry, 'resource'), {validate: false, filter: false});
+  //               logger.trace('Just received new encounter: ' + encounterId);
+    
+  //               if(!get(entry, 'resource.id')){
+  //                 entry.resource.id = encounterId;
+  //               } 
+  //               if(!get(entry, 'resource._id')){
+  //                 entry.resource._id = encounterId;
+  //               }
+    
+  //               encountersArray.push(get(entry, 'resource'))  
+  //             }
+  //           }
+  //         })        
+
+  //         // setEncounters(encountersArray);  // this is mostly just to update the progress so people see things are loading
+  //         encountersArray = recursiveEncounterQuery(fhirClient, newResponse, encountersArray, callback)
+  //       } 
+
+  //       // setEncounters(encountersArray);
+  //       return encountersArray;
+  //     })
+  //   } else {
+  //     callback();
+  //   }
+
+  //   return recursiveResult;
+  // }
+
+  // async function recursiveConditionQuery(fhirClient, searchResponse, conditionsArray, callback){
+  //   logger.debug('recursiveConditionQuery', fhirClient, searchResponse);
+  
+  //   let self = this;
+
+  //   function hasNext(searchResponse){
+  //     let result = false;
+  //     if(get(searchResponse, 'link')){
+  //       searchResponse.link.forEach(function(link){
+  //         if(get(link, 'relation') === "next"){
+  //           result = true;
+  //         }
+  //       })
+  //     }
+  //     return result;
+  //   }
+
+  //   let recursiveResult = null;
+  //   if(hasNext(searchResponse)){
+  //     logger.debug('Found a next link in the bundle.  Fetching...')
+  //     recursiveResult = await fhirClient.nextPage(searchResponse)
+  //     .then((newResponse) => {
+  //       logger.trace('recursiveConditionQuery().fhirClient.nextPage().newResponse', newResponse);
+
+  //       if(get(newResponse, 'resourceType') === "Bundle"){
+  //         logger.debug('Parsing a Bundle.')
+  //         let entries = get(newResponse, 'entry', []);
+
+  //         entries.forEach(function(entry){
+  //           if(get(entry, 'resource.resourceType') === "Condition"){
+  //             logger.trace('Found an condition', get(entry, 'resource'));
+
+  //             if(!Conditions.findOne({id: get(entry, 'resource.id')})){
+  //               let conditionId = Conditions.insert(get(entry, 'resource'), {validate: false, filter: false});
+  //               logger.trace('Just received new condition: ' + conditionId);
+    
+  //               if(!get(entry, 'resource.id')){
+  //                 entry.resource.id = conditionId;
+  //               } 
+  //               if(!get(entry, 'resource._id')){
+  //                 entry.resource._id = conditionId;
+  //               }
+    
+  //               conditionsArray.push(get(entry, 'resource'))  
+  //             }
+  //           }
+  //         })        
+
+  //         // setConditions(conditionsArray);  // this is mostly just to update the progress so people see things are loading
+  //         conditionsArray = recursiveConditionQuery(fhirClient, newResponse, conditionsArray, callback)
+  //       } 
+
+  //       // setEncounters(conditionsArray);
+  //       return conditionsArray;
+  //     })
+  //   } else {
+  //     callback();
+  //   }
+
+  //   return recursiveResult;
+  // }
+
+  // async function recursiveProcedureQuery(fhirClient, searchResponse, proceduresArray, callback){
+  //   logger.debug('recursiveProcedureQuery', fhirClient, searchResponse);
+  
+  //   let self = this;
+
+  //   function hasNext(searchResponse){
+  //     let result = false;
+  //     if(get(searchResponse, 'link')){
+  //       searchResponse.link.forEach(function(link){
+  //         if(get(link, 'relation') === "next"){
+  //           result = true;
+  //         }
+  //       })
+  //     }
+  //     return result;
+  //   }
+
+  //   let recursiveResult = null;
+  //   if(hasNext(searchResponse)){
+  //     logger.debug('Found a next link in the bundle.  Fetching...')
+  //     recursiveResult = await fhirClient.nextPage(searchResponse)
+  //     .then((newResponse) => {
+  //       logger.trace('recursiveProcedureQuery().fhirClient.nextPage().newResponse', newResponse);
+
+  //       if(get(newResponse, 'resourceType') === "Bundle"){
+  //         logger.debug('Parsing a Bundle.')
+  //         let entries = get(newResponse, 'entry', []);
+
+  //         entries.forEach(function(entry){
+  //           if(get(entry, 'resource.resourceType') === "Procedure"){
+  //             logger.trace('Found an procedure', get(entry, 'resource'));
+
+  //             if(!Procedures.findOne({id: get(entry, 'resource.id')})){
+  //               let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
+  //               logger.trace('Just received new procedure: ' + procedureId);
+    
+  //               if(!get(entry, 'resource.id')){
+  //                 entry.resource.id = procedureId;
+  //               } 
+  //               if(!get(entry, 'resource._id')){
+  //                 entry.resource._id = procedureId;
+  //               }
+    
+  //               proceduresArray.push(get(entry, 'resource'))  
+  //             }
+  //           }
+  //         })        
+
+  //         // setProcedures(proceduresArray);  // this is mostly just to update the progress so people see things are loading
+  //         proceduresArray = recursiveProcedureQuery(fhirClient, newResponse, proceduresArray, callback)
+  //       } 
+
+  //       // setEncounters(proceduresArray);
+  //       return proceduresArray;
+  //     })
+  //   } else {
+  //     callback();
+  //   }
+
+  //   return recursiveResult;
+  // }
+
+  //-------------------------------------------------------------------
+  // Fetch Methods
+
+  async function fetchResourceData(props, searchOptions, cursor, callback, totalsCallback){
+    logger.debug('Fetch data from the following endpoint: ' + fhirServerEndpoint + '/' + get(searchOptions, "resourceType"));
+    logger.debug('Search Options: ', searchOptions);
+
+    let resultsArray = [];
+    let resourceType = get(searchOptions, 'resourceType');
+
     await fhirClient.search(searchOptions)
     .then((searchResponse) => {
-      logger.debug('fetchProcedureData.searchResponse', searchResponse);
+      logger.debug('Received a searchResponse.', searchResponse);
 
-      if(searchResponse){
-        let proceduresArray = [];
+      let resultsArray = [];
 
-        if(searchResponse.total){
-          Session.set('totalProceduresDuringDateRange', searchResponse.total);
-          Session.set('currentProcedureSearchset', searchResponse);
+      if(typeof totalsCallback === "function"){
+        if(get(searchResponse, "total")){
+          console.log('Iniital payload reports that there are a total of ' + get(searchResponse, 'total') + ' records matching the search.')
+          totalsCallback(get(searchResponse, "total"))
         }
       }
 
       if(get(searchResponse, 'resourceType') === "Bundle"){
         logger.debug('Parsing a Bundle.')
         logger.debug('Bundle linkUrl was: ' + get(searchResponse, "link[0].url"));
-        Session.set('procedureUrl', get(searchResponse, "link[0].url"));
+        // Session.set('encounterUrl', get(searchResponse, "link[0].url"));
 
         let entries = get(searchResponse, 'entry', []);
+        logger.debug('Number of entries found: ' + entries.length);
         
         entries.forEach(function(entry){
-          if(get(entry, 'resource.resourceType') === "Procedure"){
+          if(get(entry, 'resource.resourceType') === get(searchOptions, 'resourceType')){
 
-             // checking for duplicates along the way
-            if(!Procedures.findOne({id: get(entry, 'resource.id')})){
-              logger.trace('doesnt exist, upserting');
+            if(cursor){
+              // checking for duplicates along the way
+              if(!cursor.findOne({id: get(entry, 'resource.id')})){
+                logger.trace('doesnt exist, upserting');
 
-              let procedureId = Procedures.insert(get(entry, 'resource'), {validate: false, filter: false});
-              logger.trace('Just received new procedure: ' + procedureId);
-  
-              if(!get(entry, 'resource.id')){
-                entry.resource.id = procedureId;
-              } 
-              if(!get(entry, 'resource._id')){
-                entry.resource._id = procedureId;
-              }
-  
-              proceduresArray.push(get(entry, 'resource'))
-            }     
+                let newResourceId = cursor.upsert({id: get(entry, 'resource.id')}, {$set: get(entry, 'resource')}, {validate: false, filter: false});
+                logger.trace('Just received new ' + get(searchOptions, 'resourceType') + ": " + newResourceId);
+    
+                if(!get(entry, 'resource.id')){
+                  entry.resource.id = newResourceId;
+                } 
+                if(!get(entry, 'resource._id')){
+                  entry.resource._id = newResourceId;
+                }
+    
+                resultsArray.push(get(entry, 'resource'))
+              }  
+            } else {
+              resultsArray.push(get(entry, 'resource'))              
+            }   
           }
-        })        
+        })   
+        
+        console.log('Upserted ' + cursor.find().count() + ' new records.' )
       }
 
-      proceduresArray = recursiveProcedureQuery(fhirClient, searchResponse, proceduresArray, function(error, result){
+      resultsArray = recursiveResourceQuery(fhirClient, resourceType, searchResponse, resultsArray, cursor, function(error, result){
         logger.info("We just finished the recursive query and received the following result: " + result)
       });
 
-      return proceduresArray;
+      return resultsArray;
     })
-    .then((proceduresArray) => {
-      // console.log('proceduresArray', proceduresArray);
-      setProcedures(proceduresArray);
+    .then((resultsArray) => {
+      // console.log('resultsArray', resultsArray);
+      setEncounters(resultsArray);
       if(typeof callback === "function"){
         callback();
       }
-      return proceduresArray;
+      return resultsArray;
     })
     .catch((error) => {
       console.log(error)
@@ -1192,13 +1246,65 @@ function CovidQueryPage(props){
 
 
 
+  function fetchMedicationsFromFhirArray(props, arrayOfMedicationResources){
+    logger.debug('CovidQueryPage.fetchMedicationsFromFhirArray()', arrayOfMedicationResources);
 
+    let medicationReference = "";
+    let medicationId = "";
+    let fetchedMedicationResponse;
+
+    logger.trace('fetchMedicationsFromFhirArray.arrayOfResources' + arrayOfMedicationResources);
+    
+    if(Array.isArray(arrayOfMedicationResources)){
+      arrayOfMedicationResources.forEach(async function(resource){
+        newMedicationId = "";
+  
+        if(get(resource, 'medication.reference')){
+          medicationReference = get(resource, 'medication.reference');
+          medicationId = FhirUtilities.pluckReferenceId(medicationReference);
+        } else if (get(resource, 'medicationReference.reference')){
+          medicationReference = get(resource, 'medicationReference.reference');
+          medicationId = FhirUtilities.pluckReferenceId(medicationReference);
+        }
+  
+        logger.debug('fetchMedicationsFromFhirArray.encounters[i].medicationId', medicationId);
+  
+        fetchedMedicationResponse = await fhirClient.read({ resourceType: 'Medication', id: medicationId });
+        logger.trace('fetchedMedicationResponse', fetchedMedicationResponse);
+  
+        if(fetchedMedicationResponse){
+          if(fetchedMedicationResponse.resourceType === "Medication"){
+            if(!Medications.findOne({id: fetchedMedicationResponse.id})){
+              newMedicationId = Medications.insert(fetchedMedicationResponse, {validate: false, filter: false});
+              logger.verbose('Just received new medication: ' + newMedicationId);
+            }    
+          } else if(fetchedMedicationResponse.resourceType === "Bundle"){
+            if(Array.isArray(fetchedMedicationResponse.entry)){
+              fetchedMedicationResponse.entry.forEach(function(entry){
+                if(get(entry, 'resource.resourceType') === "Medication"){
+                  console.log('Searching for medication id: ' + get(entry, 'resource.id'));                
+                  if(!Medications.findOne({id: get(entry, 'resource.id')})){
+                    newMedicationId = Medications.insert(get(entry, 'resource'), {validate: false, filter: false});
+                    logger.verbose('Just added a new medication: ' + newMedicationId);
+                  } else {
+                    console.log("Already found the medication?")
+                  }
+                }
+              })
+            }
+          }
+        }
+      })   
+    }
+    if(typeof callback === "function"){
+      callback();
+    }
+  }
 
   function fetchPatientsFromFhirArray(props, arrayOfResources){
     logger.info('CovidQueryPage.fetchPatientsFromFhirArray()');
 
     let patientReference = "";
-    let patientReferenceArray = [];
     let patientId = "";
     let newPatientId = "";
     let fetchedPatientResponse;
@@ -1254,7 +1360,8 @@ function CovidQueryPage(props){
 
 
 
-
+  //-------------------------------------------------------------------
+  // UI Component Methods
 
   function handleStartDateChange(event, newDate){
     Session.set('fhirKitClientStartDate', moment(newDate).format("YYYY-MM-DD"));
@@ -1314,6 +1421,17 @@ function CovidQueryPage(props){
     }
   }
 
+  function handlePatientRowClick(id){
+    console.log('CovidQueryPage.handlePatientRowClick()', id)
+    // Session.set('currentPatientId', id);
+    Session.set('selectedPatientId', id);
+
+    if(typeof Patients === "object"){
+      console.log('CovidQueryPage.handlePatientRowClick()', Patients.findOne({id: id}))
+      // Session.set('currentPatient', Patients.findOne({id: id}));  
+      Session.set('selectedPatient', Patients.findOne({id: id}));  
+    }
+  }
 
   //-----------------------------------------------------------------------------------------------
   // OAUth Popup Window 
@@ -1443,13 +1561,12 @@ function CovidQueryPage(props){
     logger.trace('Username:  ' + username);
     logger.trace('Password:  ' + password);
     
-
-
     // authenticateWithFhirServer();
   }
 
 
-
+  //-------------------------------------------------------------------
+  // Render Titles and Headers
 
   let containerStyle = {
     paddingLeft: '100px',
@@ -1457,43 +1574,103 @@ function CovidQueryPage(props){
     marginBottom: '100px'
   };
 
-  let patientTitle = 'Patients';
-  let encountersTitle = 'Encounters';
-  let conditionsTitle = 'Conditions';
-  let proceduresTitle = 'Procedures';
-  let locationsTitle = 'Locations';
   let deviceTitle = 'Devices';
+  let conditionsTitle = 'Conditions';
+  let encountersTitle = 'Encounters';
+  let locationsTitle = 'Locations';
+  let immunizationsTitle = 'Immunizations';
+  let medicationsTitle = 'Immunizations';
+  let medicationOrdersTitle = 'Medication Orders';
+  let medicationRequestsTitle = 'Medication Requests';
+  let medicationStatementsTitle = 'Medication Statements';
+  let observationsTitle = 'Observations';
+  let patientTitle = 'Patients';
+  let proceduresTitle = 'Procedures';
 
-  
-
-
-  if(typeof Patients === "object"){
-    patientTitle = patientCount + ' Patients';
-  }
-
-  if(typeof Encounters === "object"){
-    encountersTitle = encounterCount + ' Encounters';
-  }
-
-  if(typeof Encounters === "object"){
+  if(typeof Conditions === "object"){
     conditionsTitle = conditionCount + ' Conditions';
-  }
-
-  if(typeof Procedures === "object"){
-    proceduresTitle = procedureCount + ' Procedures';
-  }
-  if(typeof Locations === "object"){
-    locationsTitle = locationCount + ' Locations';
   }
   if(typeof Devices === "object"){
     deviceTitle = deviceCount + ' Devices';
   }
-
+  if(typeof Encounters === "object"){
+    encountersTitle = encounterCount + ' Encounters';
+  }
+  if(typeof Immunizations === "object"){
+    immunizationsTitle = immunizationCount + ' Immunizations';
+  }
+  if(typeof Locations === "object"){
+    locationsTitle = locationCount + ' Locations';
+  }
+  if(typeof Medications === "object"){
+    medicationsTitle = medicationCount + ' Medications';
+  }
+  if(typeof MedicationOrders === "object"){
+    medicationOrdersTitle = medicationOrderCount + ' Medication Orders';
+  }
+  if(typeof MedicationRequests === "object"){
+    medicationRequestsTitle = medicationRequestCount + ' Medication Requests';
+  }
+  if(typeof MedicationStatements === "object"){
+    medicationStatementsTitle = medicationStatementCount + ' Medication Statements';
+  }
+  if(typeof Observations === "object"){
+    observationsTitle = observationCount + ' Observations';
+  }
+  if(typeof Patients === "object"){
+    patientTitle = patientCount + ' Patients';
+  }
+  if(typeof Procedures === "object"){
+    proceduresTitle = procedureCount + ' Procedures';
+  }
   
   selectedStartDate = moment(selectedStartDate).format("YYYY-MM-DD");
   selectedEndDate = moment(selectedEndDate).format("YYYY-MM-DD");
-  
 
+
+  //-------------------------------------------------------------------
+  // Render Cards
+
+  let conditionsCard;
+  if(conditionCount > 0){
+    conditionsCard= <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="conditionsCardCount"
+        title={conditionsTitle} 
+        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ConditionsTable
+          id="fetchedConditionsTable"
+          conditions={conditions}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={conditionCount}
+          displayPatientName={false}
+          displayAsserterName={false}
+          displayEvidence={false}
+          displayEndDate={false}
+          displayBarcode={false}
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard>
+  } 
+
+  let devicesCard;
+  if(deviceCount > 0){
+    devicesCard = <StyledCard id="devicesCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="devicesCardCount"
+        title={deviceTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <DevicesTable 
+          rowsPerPage={viewPreference_rowsPerPage}
+        />
+      </CardContent>
+    </StyledCard> 
+  } 
 
   let encountersCard;
   if(encounterCount > 0){
@@ -1501,13 +1678,12 @@ function CovidQueryPage(props){
       <CardHeader 
         id="encountersCardCount"
         title={encountersTitle} 
-        subheader={encounterUrl}
         style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
       <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
         <EncountersTable
           id="fetchedEncountersTable"
           encounters={encounters}
-          rowsPerPage={10}
+          rowsPerPage={viewPreference_rowsPerPage}
           count={totalEncountersDuringDateRange}
           hideCheckboxes
           hideTypeCode
@@ -1528,47 +1704,166 @@ function CovidQueryPage(props){
     </StyledCard>
   }   
 
-  let conditionsCard;
-  if(conditionCount > 0){
-    conditionsCard= <StyledCard id="fetchedConditionssCard" style={{minHeight: '200px', marginBottom: '40px'}}>
+  let immunizationsCard;
+  if(immunizationCount > 0){
+    immunizationsCard = <StyledCard id="immunizationsCard" style={{minHeight: '240px', marginBottom: '40px'}}>
       <CardHeader 
-        id="conditionsCardCount"
-        title={conditionsTitle} 
-        subheader={conditionUrl}
-        style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
+        id="immunizationsCardCount"
+        title={immunizationsTitle}  
+        style={{fontSize: '100%'}} />
       <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-        <ConditionsTable
-          id="fetchedConditionsTable"
-          conditions={conditions}
-          rowsPerPage={10}
-          count={conditionCount}
-          displayPatientName={false}
-          displayAsserterName={false}
-          displayEvidence={false}
-          displayEndDate={false}
-          displayBarcode={false}
+        <ImmunizationsTable 
+          immunizations={immunizations}
+          rowsPerPage={viewPreference_rowsPerPage}
+          hideCheckboxes={true}
+          hideIdentifier={true}
+          hideActionIcons={true}
+          hidePerformer={true}
+          hidePatient={false}
+          count={immunizationCount}
         />
       </CardContent>
       <CardActions style={{display: 'inline-flex', width: '100%'}} >
-        <Button id="clearConditionsBtn" color="primary" className={classes.button} onClick={clearConditions.bind(this)} >Clear</Button> 
+        <Button id="clearImmunizationsBtn" color="primary" className={classes.button} onClick={clearImmunizations.bind(this)} >Clear</Button> 
       </CardActions> 
-    </StyledCard>
+    </StyledCard> 
+  } 
+
+  let medicationsCard;
+  if(medicationCount > 0){
+    medicationsCard = <StyledCard id="medicationsCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="medicationsCardCount"
+        title={medicationsTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <MedicationsTable 
+          medications={medications}
+          hideCheckbox={true}
+          hideActionIcons={true}
+          hideIdentifier={true}
+          hideActiveIngredient={true}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={medicationCount}
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearMedicationsBtn" color="primary" className={classes.button} onClick={clearMedications.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard> 
+  } 
+
+  let medicationOrdersCard;
+  if(medicationOrderCount > 0){
+    medicationOrdersCard = <StyledCard id="medicationOrdersCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="medicationOrdersCardCount"
+        title={medicationOrdersTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <MedicationOrdersTable 
+          medicationOrders={medicationOrders}
+          hideCheckboxes={true}
+          hideIdentifier={true}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={medicationOrderCount}        
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearMedicationOrdersBtn" color="primary" className={classes.button} onClick={clearMedicationOrders.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard> 
+  } 
+
+  let medicationRequestsCard;
+  if(medicationRequestCount > 0){
+    medicationRequestsCard = <StyledCard id="medicationRequestsCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="medicationRequestsCardCount"
+        title={medicationRequestsTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <MedicationRequestsTable
+          medicationRequests={medicationRequests}
+          hideCheckboxes={true}
+          hideIdentifier={true}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={medicationRequestCount}     
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearMedicationRequestsBtn" color="primary" className={classes.button} onClick={clearMedicationRequests.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard> 
+  } 
+
+  let medicationStatementsCard;
+  if(medicationStatementCount > 0){
+    medicationStatementsCard = <StyledCard id="medicationStatementsCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="medicationStatementsCardCount"
+        title={medicationStatementsTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <MedicationStatementsTable
+          medicationStatements={medicationStatements}
+          displayCheckboxes={false}
+          displayIdentifier={false}
+          displayMedicationReference={true}
+          displayReasonReference={true}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={medicationStatementCount}   
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearMedicationStatementsBtn" color="primary" className={classes.button} onClick={clearMedicationStatements.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard> 
+  } 
+
+  let observationsCard;
+  if(observationCount > 0){
+    observationsCard = <StyledCard id="observationsCard" style={{minHeight: '240px', marginBottom: '40px'}}>
+      <CardHeader 
+        id="observationsCardCount"
+        title={observationsTitle}  
+        style={{fontSize: '100%'}} />
+      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
+        <ObservationsTable        
+          observations={observations}
+          hideCheckboxes={true}
+          hideActionIcons={true}
+          hideSubject={true}
+          hideDevices={true}
+          hideValue={false}
+          hideBarcodes={true}
+          hideDenominator={true}
+          hideNumerator={true}
+          multiComponentValues={true}
+          rowsPerPage={viewPreference_rowsPerPage}
+          count={observationCount}  
+        />
+      </CardContent>
+      <CardActions style={{display: 'inline-flex', width: '100%'}} >
+        <Button id="clearObservationssBtn" color="primary" className={classes.button} onClick={clearObservations.bind(this)} >Clear</Button> 
+      </CardActions> 
+    </StyledCard> 
   } 
 
 
+  
   let proceduresCard;
   if(procedureCount > 0){
     proceduresCard = <StyledCard id="fetchedProceduresCard" style={{minHeight: '200px', marginBottom: '40px'}}>
       <CardHeader 
         id="proceduresCardCount"
-        title={proceduresTitle} 
-        subheader={procedureUrl}
+        title={proceduresTitle}         
         style={{fontSize: '100%', whiteSpace: 'nowrap'}} />
       <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
         <ProceduresTable
           id="fetchedProceduresTable"                  
           procedures={procedures}
-          rowsPerPage={10}
+          rowsPerPage={viewPreference_rowsPerPage}
           count={procedureCount}
           hideActionIcons
           hideCategory
@@ -1589,22 +1884,12 @@ function CovidQueryPage(props){
     </StyledCard>
   } 
   
-  
-  let devicesCard;
-  if(deviceCount > 0){
-    devicesCard = <StyledCard id="devicesCard" style={{minHeight: '240px', marginBottom: '40px'}}>
-      <CardHeader 
-        id="devicesCardCount"
-        title={deviceTitle}  
-        style={{fontSize: '100%'}} />
-      <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-        <DevicesTable />
-      </CardContent>
-    </StyledCard> 
-  } 
+  //-------------------------------------------------------------------
+  // Render No Data Card and PatientLookup Card
+  // These are a little different than the others, because they're a secondary lookup
 
   let noDataCard;
-  if(!encountersCard && !conditionsCard && !proceduresCard && !devicesCard){
+  if(!conditionsCard && !devicesCard && !encountersCard && !immunizationsCard && !medicationsCard && !medicationOrdersCard && !medicationRequestsCard && !medicationStatementsCard && !observationsCard && !proceduresCard){
     noDataCard = <StyledCard style={{minHeight: '200px', marginBottom: '40px'}} disabled>
       <CardContent style={{fontSize: '100%', paddingBottom: '28px', paddingTop: '50px', textAlign: 'center'}}>
         <CardHeader 
@@ -1615,7 +1900,6 @@ function CovidQueryPage(props){
       </CardContent>
     </StyledCard>
   }
-
   let patientsCard;
   if(patientCount > 0){
     patientsCard = <StyledCard id="fetchedPatientsCard" style={{minHeight: '240px'}}>
@@ -1629,13 +1913,14 @@ function CovidQueryPage(props){
           patients={patients}
           hideIdentifier
           hideMaritalStatus
-          rowsPerPage={10}
+          rowsPerPage={viewPreference_rowsPerPage}
           paginationCount={patientCount}
           hideActionIcons
           hideLanguage
           hideCountry
           showCounts={false}
           hideActive
+          onRowClick={handlePatientRowClick}
       />
       </CardContent>
       <CardActions style={{display: 'inline-flex', width: '100%'}} >
@@ -1646,10 +1931,16 @@ function CovidQueryPage(props){
   } else {
     patientsCard = noDataCard;
   }
+
+
   
+  let headerHeight = 84;
+  if(get(Meteor, 'settings.public.defaults.prominantHeader')){
+    headerHeight = 148;
+  }  
 
   return (
-    <PageCanvas id='fetchDataFromHospitalPage' headerHeight={158} >
+    <PageCanvas id='fetchDataFromHospitalPage' headerHeight={headerHeight} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
         <Grid container spacing={3} >
           <Grid item xs={4}>
@@ -1771,17 +2062,33 @@ function CovidQueryPage(props){
               <StyledCard style={{minHeight: '380px'}}>
                 <CardHeader 
                   title="Clinical Parameters" 
-                  subheader="Select the parameters you would like to search for."
+                  subheader="Select the clinical parameters related to Covid19 you would like to search for."
                   style={{fontSize: '100%'}} />
                 <CardContent>
                 <Table size="small">
                   <TableBody>
                     <TableRow>
                       <TableCell>
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedCovid19" />}
+                          label="Covid19"
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedSuspectedCovid19" />}
+                          label="Suspected Covid19"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox disabled checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedSerumAntibodies" />}
+                          label="Serum Antibodies"
+                        />
+                      </TableCell>
+                      <TableCell>
                         <Typography >
-                          Symptoms
+                          <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} fullWidth>Fetch Conditions</Button>                 
                         </Typography>
                       </TableCell>
+                    </TableRow>
+                    <TableRow>
                       <TableCell>
                         <FormControlLabel                
                           control={<Checkbox checked={checkedFever} onChange={handleToggleFever.bind(this)} name="checkedFever" />}
@@ -1796,109 +2103,141 @@ function CovidQueryPage(props){
                           label="Dyspnea (Shortness of Breath)"
                         />
                       </TableCell>
+                      <TableCell>
+                        <Typography >
+                          <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} fullWidth>Fetch Symptoms</Button>                 
+                        </Typography>
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>
-                        <Typography >
-                          Risk Factors
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
                         <FormControlLabel                
-                          control={<Checkbox checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedSmoker" />}
+                          control={<Checkbox disabled checked={checkedSmoker} onChange={handleToggleSmoker.bind(this)} name="checkedSmoker" />}
                           label="Smoker"
                         />
                         <FormControlLabel                
-                          control={<Checkbox checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedHypertension" />}
+                          control={<Checkbox disabled checked={checkedHypertension} onChange={handleToggleHypertension.bind(this)} name="checkedHypertension" />}
                           label="Hypertension"
                         />
                         <FormControlLabel                
-                          control={<Checkbox checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedBloodTypeA" />}
+                          control={<Checkbox disabled checked={checkedBloodTypeA} onChange={handleToggleBloodTypeA.bind(this)} name="checkedBloodTypeA" />}
                           label="Blood Type A"
                         />
                       </TableCell>
+                      <TableCell>
+                        <Typography >
+                          <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} fullWidth >Fetch Pre-Existing Conditions</Button>                 
+                        </Typography>
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>
-                        <Typography >
-                        Medications
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
                         <FormControlLabel                
-                          control={<Checkbox checked={checkedVaccinated} onChange={handleToggleVaccinated.bind(this)} name="checkedVacinated" />}
+                          control={<Checkbox disabled checked={checkedVaccinated} onChange={handleToggleVaccinated.bind(this)} name="checkedVaccinated" />}
                           label="Vaccinated"
                         />
                         <FormControlLabel                
-                          control={<Checkbox checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedTamiflu" />}
-                          label="Tamiflu"
+                          control={<Checkbox disabled checked={checkedPlasmaTransfer} onChange={handleTogglePlasmaTransfer.bind(this)} name="checkedPlasmaTransfer" />}
+                          label="Plasma Transfer"
                         />
-                        <FormControlLabel                
-                          control={<Checkbox checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedHydroxychloroquine" />}
-                          label="Hydroxychloroquine"
-                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography >
+                          <Button id="fetchImmunizationsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchImmunizations.bind(this)} fullWidth>Fetch Immunizations</Button> 
+                        </Typography>
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox disabled checked={checkedTamiflu} onChange={handleToggleTamiflu.bind(this)} name="checkedTamiflu" />}
+                          label="Tamiflu"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox disabled checked={checkedHydroxychloroquine} onChange={setCheckedHydroxychloroquine.bind(this)} name="checkedHydroxychloroquine" />}
+                          label="Hydroxychloroquine"
+                        />
+                      </TableCell>
+                      <TableCell>
                         <Typography >
-                          Procedures
+                          <Button id="fetchMedicationsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchMedications.bind(this)} fullWidth>Fetch Medications</Button> 
                         </Typography>
                       </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <FormControlLabel                
+                          control={<Checkbox checked={checkedOxygenAdministration} onChange={handleToggleOxygenAdministration.bind(this)} name="checkedOxygenAdministration" />}
+                          label="Oxygen Administration"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox disabled checked={checkedIntubated} onChange={handleToggleIntubated.bind(this)} name="checkedIntubated" />}
+                          label="Intubated"
+                        />
+                        <FormControlLabel                
+                          control={<Checkbox disabled checked={checkedPronated} onChange={handleTogglePronated.bind(this)} name="checkedPronated" />}
+                          label="Pronated"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography >
+                          <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} fullWidth>Fetch Procedures</Button> 
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
                       <TableCell>
                         <FormControlLabel                
                           control={<Checkbox checked={checkedVentilator} onChange={handleToggleVentilator.bind(this)} name="checkedVentilator" />}
                           label="Ventilators"
                         />
-                        <FormControlLabel                
-                          control={<Checkbox checked={checkedOxygenAdministration} onChange={handleToggleOxygenAdministration.bind(this)} name="checkedOxygenAdministration" />}
-                          label="Oxygen Administration"
-                        />
-                        <FormControlLabel
-                          control={<Checkbox checked={checkedTested} onChange={handleToggleTested.bind(this)} name="checkedTested" />}
-                          label="Testing Encounter"
-                        />
+
                       </TableCell>
-                    </TableRow>
-                    <TableRow>
                       <TableCell>
                         <Typography >
-                        Conditions
+                          <Button id="fetchDevicesButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchDevices.bind(this)} fullWidth>Fetch Devices</Button> 
                         </Typography>
                       </TableCell>
+                    </TableRow>
+
+                    <TableRow>
                       <TableCell>
                         <FormControlLabel
-                          control={<Checkbox checked={checkedSuspectedCovid19} onChange={handleToggleSuspectedCovid19.bind(this)} name="checkedSuspectedCovid19" />}
-                          label="Suspected Covid19"
+                          control={<Checkbox checked={checkedVitalSigns} onChange={handleToggleVitalSigns.bind(this)} name="checkedVitalSigns" />}
+                          label="Vital Signs"
                         />
                         <FormControlLabel
-                          control={<Checkbox checked={checkedCovid19} onChange={handleToggleCovid19.bind(this)} name="checkedCovid19" />}
-                          label="Covid19"
+                          control={<Checkbox checked={checkedLabResults} onChange={handleToggleLabResults.bind(this)} name="checkedLabResults" />}
+                          label="Lab Results"
                         />
-                        <FormControlLabel                
-                          control={<Checkbox checked={checkedSerumAntibodies} onChange={handleToggleSerumAntibodies.bind(this)} name="checkedSerumAntibodies" />}
-                          label="Serum Antibodies"
-                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography >
+                          <Button id="fetchObservationsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchObservations.bind(this)} fullWidth>Fetch Observations</Button> 
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
               </CardContent>
               <DynamicSpacer />
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} >Fetch Encounters</Button> 
-                <Button id="fetchConditionsButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchConditions.bind(this)} >Fetch Conditions</Button> 
-                <Button id="fetchProceduresButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchProcedures.bind(this)} >Fetch Procedures</Button> 
-                <Button id="fetchDevicesButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchDevices.bind(this)} >Fetch Devices</Button> 
+              <CardActions style={{display: 'inline-flex', width: '100%'}} >                
+                <Button id="fetchEncountersButton" color="primary" variant="contained" className={classes.button} onClick={handleFetchEncounters.bind(this)} fullWidth>Fetch Encounters</Button> 
               </CardActions>              
             </StyledCard>          
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{paddingBottom: '80px'}}>
             <CardHeader title="Step 2 - Received Data" style={{fontSize: '100%'}} />  
-            { encountersCard }
             { conditionsCard }
-            { proceduresCard }
             { devicesCard }   
+            { encountersCard }
+            { immunizationsCard }
+            { medicationsCard }
+            { medicationOrdersCard }
+            { medicationRequestsCard }
+            { medicationStatementsCard }
+            { observationsCard }
+            { proceduresCard }
             { noDataCard }
           </Grid>
           
@@ -1907,110 +2246,8 @@ function CovidQueryPage(props){
                 title="Step 3 - Patient Demographic Lookup" 
                 style={{fontSize: '100%'}} />  
             { patientsCard }
-
-            {/* <StyledCard id="optionsCard" style={{minHeight: '280px'}}>
-              <CardHeader                 
-                title="Map Options" 
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}} >
-                <Grid container style={{paddingBottom: '20px'}}>
-                  <Grid item xs={6} style={{paddingRight: '10px'}}>
-                    <TextField 
-                      id="mapCenterAddress" 
-                      label="Map Centrer" 
-                      helperText="This should be an address.  We will geocode it." 
-                      defaultValue="Chicago, IL"
-                      disabled
-                      fullWidth />
-                  </Grid>
-                  <Grid item xs={6} style={{paddingLeft: '10px'}}>
-                    <TextField 
-                      id="searchProximity" 
-                      label="Search Proximity" 
-                      helperText="This should be a number (in miles)." 
-                      defaultValue={50}
-                      disabled
-                      fullWidth />
-                  </Grid>
-                </Grid>
-
-                <Typography gutterBottom>
-                  Opacity
-                </Typography>
-                <Slider
-                  defaultValue={50}
-                  //getAriaValueText={valuetext}
-                  aria-labelledby="discrete-slider"
-                  valueLabelDisplay="auto"
-                  step={10}
-                  marks
-                  min={0}
-                  max={100}
-                />
-
-                <Typography gutterBottom>
-                  Radius
-                </Typography>
-                <Slider
-                  defaultValue={10}
-                  //getAriaValueText={valuetext}
-                  aria-labelledby="discrete-slider"
-                  valueLabelDisplay="auto"
-                  step={10}
-                  marks
-                  min={0}
-                  max={100}
-                />
-
-              </CardContent>
-                <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                  <Button id="geocodeCentroidButton" color="primary" className={classes.button} onClick={geocodeCentroid.bind(this)} >Geocode</Button> 
-                </CardActions> 
-            </StyledCard> */}
           </Grid>
-        </Grid>        
-        <Grid container spacing={3} style={{paddingBottom: '80px'}}>          
-          {/* <Grid item xs={4}>
-            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px' }}>
-              <CardHeader 
-                id="geocodedLocationsCount"
-                title={locationsTitle}  
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px'}}>
-                <LocationsTable
-                  id="geocodedLocationsTable"
-                  locations={locations}
-                  rowsPerPage={10}
-                  count={locationCount}
-              />
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearLocationsBtn" color="primary" className={classes.button} onClick={clearLocations.bind(this)} >Clear</Button> 
-                <Button id="generateGeoJsonBtn" color="primary" variant="contained" className={classes.button} onClick={generateGeoJson.bind(this)} >Generate GeoJson</Button> 
-              </CardActions> 
-            </StyledCard>
-          </Grid> */}
-          {/* <Grid item xs={4}>
-            <StyledCard id="geocodedLocationsCard" style={{minHeight: '240px',  maxHeight: '660px'}}>
-              <CardHeader 
-                id="geoJsonPreview"
-                title="GeoJson"
-                subheader={geoJsonLayerFeaturesCount ? geoJsonLayerFeaturesCount + ' Features' : ''}
-                style={{fontSize: '100%'}} />
-              <CardContent style={{fontSize: '100%', paddingBottom: '28px', overflowY: 'scroll', maxHeight: '500px'}}>
-                
-                <div style={{position: 'absolute', overflowY: 'scroll', maxHeight: '630px', width: '100%'}}>
-                  <pre style={{overflow: 'scroll', maxHeight: '450px', width: '100%'}}>
-                    { JSON.stringify(geoJsonLayer, null, 2) }
-                  </pre>
-                </div>
-              </CardContent>
-              <CardActions style={{display: 'inline-flex', width: '100%'}} >
-                <Button id="clearGeoJson" color="primary" className={classes.button} onClick={clearGeoJson.bind(this)} >Clear</Button> 
-              </CardActions> 
-            </StyledCard>
-          </Grid> */}
-        </Grid>   
+        </Grid>          
       </MuiPickersUtilsProvider>            
     </PageCanvas>
   );

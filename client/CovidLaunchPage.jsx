@@ -110,8 +110,13 @@ function CovidLaunchPage(props){
     }
   }
 
+  let headerHeight = 84;
+  if(get(Meteor, 'settings.public.defaults.prominantHeader')){
+    headerHeight = 148;
+  }  
+
   return (
-    <PageCanvas id='CovidLaunchPage' headerHeight={148} >
+    <PageCanvas id='CovidLaunchPage' headerHeight={headerHeight} >
       <Grid container spacing={3} justify="center" >
         <Grid item xs={4}>
           <StyledCard>

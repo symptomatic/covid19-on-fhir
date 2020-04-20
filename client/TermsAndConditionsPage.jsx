@@ -56,10 +56,13 @@ function TermsAndConditionsPage(props){
     marginBottom: '100px'
   };
 
-    
+  let headerHeight = 84;
+  if(get(Meteor, 'settings.public.defaults.prominantHeader')){
+    headerHeight = 148;
+  }  
 
   return (
-    <PageCanvas id='infoPage' headerHeight={148} >
+    <PageCanvas id='infoPage' headerHeight={headerHeight} >
       <Grid container spacing={3} justify="center" >
         <Grid item xs={4}>
           <StyledCard height="auto">
