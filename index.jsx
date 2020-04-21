@@ -59,7 +59,7 @@ let FooterButtons = [{
   pathname: '/query-fhir-provider',
   component: <FetchButtons />
 }, {
-  pathname: '/',
+  pathname: '/bulk-data-fetch',
   component: <FetchButtons />
 }];
 
@@ -81,7 +81,7 @@ let SidebarWorkflows = [{
 }];
 
 
-let MainPage = CovidQueryPage;
+// let MainPage = CovidQueryPage;
 let LaunchPage = CovidLaunchPage;
 
 export { 
@@ -96,6 +96,5 @@ export {
   DialogComponents,
   SidebarWorkflows,
 
-  LaunchPage,
-  MainPage
+  LaunchPage
 };

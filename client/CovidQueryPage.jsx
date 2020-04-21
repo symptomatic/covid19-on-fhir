@@ -1942,8 +1942,8 @@ function CovidQueryPage(props){
   return (
     <PageCanvas id='fetchDataFromHospitalPage' headerHeight={headerHeight} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
-        <Grid container spacing={3} >
-          <Grid item xs={4}>
+        <Grid container spacing={3} style={{paddingBottom: '80px'}}>
+          <Grid item md={4} >
               <CardHeader 
                 title="Step 1 - Fetch Data From Servers" 
                 style={{fontSize: '100%'}} />            
@@ -1960,7 +1960,7 @@ function CovidQueryPage(props){
               >Capability Statement</Button> 
               <CardContent>
                 <Grid container spacing={3}>
-                  <Grid item xs={12}>
+                  <Grid item md={12}>
                     <FormControl style={{width: '100%', marginTop: '20px'}}>
                       <InputLabel>Health Record and Interoperability Resource Query</InputLabel>
                       <Input
@@ -1977,7 +1977,7 @@ function CovidQueryPage(props){
                   </Grid>
                 </Grid>
                 {/* <Grid container spacing={3}>
-                  <Grid item xs={6}>
+                  <Grid item md={6}>
                     <FormControl style={{width: '100%', marginTop: '20px', marginBottom: '20px'}}>
                       <InputLabel>Username</InputLabel>
                       <Input
@@ -1990,7 +1990,7 @@ function CovidQueryPage(props){
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item md={6}>
                     <FormControl style={{width: '100%', marginTop: '20px', marginBottom: '20px'}}>
                       <InputLabel>Password</InputLabel>
                       <Input
@@ -2025,7 +2025,7 @@ function CovidQueryPage(props){
 
               <CardContent style={{display: 'flex'}}>
                 <Grid container spacing={3}>
-                  <Grid item xs={6}>
+                  <Grid item md={6}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -2040,7 +2040,7 @@ function CovidQueryPage(props){
                       />
                     </div>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item md={6}>
                     <div>
                       <KeyboardDatePicker
                         fullWidth
@@ -2226,7 +2226,7 @@ function CovidQueryPage(props){
               </CardActions>              
             </StyledCard>          
           </Grid>
-          <Grid item xs={4} style={{paddingBottom: '80px'}}>
+          <Grid item md={4} style={{paddingBottom: '80px'}}>
             <CardHeader title="Step 2 - Received Data" style={{fontSize: '100%'}} />  
             { conditionsCard }
             { devicesCard }   
@@ -2241,7 +2241,7 @@ function CovidQueryPage(props){
             { noDataCard }
           </Grid>
           
-          <Grid item xs={4}>
+          <Grid item md={4}>
             <CardHeader 
                 title="Step 3 - Patient Demographic Lookup" 
                 style={{fontSize: '100%'}} />  

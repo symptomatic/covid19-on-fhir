@@ -9,6 +9,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
 
 import { get, has } from 'lodash';
 import { Meteor } from 'meteor/meteor';
@@ -64,18 +65,24 @@ function PrivacyPage(props){
 
   return (
     <PageCanvas id='infoPage' headerHeight={headerHeight} >
-      <Grid container spacing={3} justify="center" >
-        <Grid item xs={4}>
+        <Container maxWidth="lg" style={{paddingBottom: '80px'}}>
           <StyledCard height="auto">
             <CardHeader 
               title="Privacy Page" 
               style={{fontSize: '100%'}} />
-            <CardContent>
-              This application does not store data on servers.  It fetches data directly from a FHIR compliant server to the user's browser.  All data is flushed when the application is shut down.  
+            <CardContent style={{fontSize: '120%'}}>
+              This application is designed to work in both single-user 21st Century Cures mode and in multi-user HIPAA mode.  This demo:
+              <ul>
+                <li>does not store patient data on servers.  </li>
+                <li>is currently configured to use synthetic test patient data.</li>
+                <li>fetches data directly from a FHIR compliant server to the user's browser.  </li>
+                <li>wipes all data when the application is shut down or the page is closed.  </li>
+                <li>does not aggregate or resell patient data.</li>                
+                <li>is funded by volunteers and open-source donations.</li>                
+              </ul>
             </CardContent>
           </StyledCard>          
-        </Grid>
-      </Grid>                 
+      </Container>                 
     </PageCanvas>
   );
 }

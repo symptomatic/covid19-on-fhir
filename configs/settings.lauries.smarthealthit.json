@@ -1,13 +1,13 @@
 {
   "public": {
-    "title": "Laurie's Family Friendly Pediatric Gastroenterology Chart",
+    "title": "Laurie's Family Friendly (Pediatric) Gastroenterology Chart",
     "fhirVersion": "R4",
     "smartOnFhir": [{
       "vendor": "SmartHealth IT",
       "client_id": "my-client-id",
       "scope": "launch launch/patient patient/read encounter/read procedure/read condition/read observation/read offline_access",
       "fhirServiceUrl": "https://launch.smarthealthit.org/v/r3/sim/",
-      "redirect_uri": "./patient-chart",
+      "redirect_uri": "./patient-quickchart",
       "iss": "https://launch.smarthealthit.org/v/r3/sim/eyJoIjoiMSIsImIiOiJmMDQ2MjkzNi1lYjRiLTRkYTEtYjQ1YS1mYmQ5NmViZjhjY2IiLCJlIjoic21hcnQtUHJhY3RpdGlvbmVyLTcxNjE0NTAyIn0/fhir"
     }],
     "theme": {
