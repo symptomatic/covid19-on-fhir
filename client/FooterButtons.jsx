@@ -52,14 +52,14 @@ import {
     west_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-      color: theme.appBarTextColor,
+      color: theme.palette.appBar.contrastText,
       marginLeft: '20px',
       marginTop: '10px'
     },
     east_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-      color: theme.appBarTextColor,
+      color: theme.palette.appBar.contrastText,
       right: '20px',
       marginTop: '15px',
       position: 'absolute'
@@ -113,71 +113,71 @@ export function FetchButtons(props){
     Session.set('lastUpdated', new Date())
     Session.toggle('mainAppDialogOpen');
   }
-  async function smartFhirTest(){
+  // async function smartFhirTest(){
 
-    FHIR.oauth2.ready(function(ready){
-      console.log('Success! Do a thing.  :)')
-    }, function(error){
-      console.log('Error! :(')
-    });
-  }
-  async function fhirKitTest(){
-    console.log('fhirKitTest');
+  //   FHIR.oauth2.ready(function(ready){
+  //     console.log('Success! Do a thing.  :)')
+  //   }, function(error){
+  //     console.log('Error! :(')
+  //   });
+  // }
+  // async function fhirKitTest(){
+  //   console.log('fhirKitTest');
 
-    console.log('authenticateWithFhirServer', Session.get('smartOnFhir_iss'));
-    fhirClient = new Client({ baseUrl: Session.get('smartOnFhir_iss') });
-    const { authorizeUrl, tokenUrl } = await fhirClient.smartAuthMetadata();
+  //   console.log('authenticateWithFhirServer', Session.get('smartOnFhir_iss'));
+  //   fhirClient = new Client({ baseUrl: Session.get('smartOnFhir_iss') });
+  //   const { authorizeUrl, tokenUrl } = await fhirClient.smartAuthMetadata();
 
-    if(authorizeUrl && tokenUrl){
-      const oauth2 = simpleOauthModule.create({
-        client: {
-          id: get(Meteor, 'settings.public.smartOnFhir[0].client_id'),
-          secret: get(Meteor, 'settings.public.smartOnFhir[0].secret')
-        },
-        auth: {
-          tokenHost: tokenUrl.protocol + '//' + tokenUrl.host,
-          tokenPath: tokenUrl.pathname,
-          authorizeHost: authorizeUrl.protocol + '//' + authorizeUrl.host,
-          authorizePath: authorizeUrl.pathname
-        },
-        options: {
-          authorizationMethod: 'body',
-        }
-      });
+  //   if(authorizeUrl && tokenUrl){
+  //     const oauth2 = simpleOauthModule.create({
+  //       client: {
+  //         id: get(Meteor, 'settings.public.smartOnFhir[0].client_id'),
+  //         secret: get(Meteor, 'settings.public.smartOnFhir[0].secret')
+  //       },
+  //       auth: {
+  //         tokenHost: tokenUrl.protocol + '//' + tokenUrl.host,
+  //         tokenPath: tokenUrl.pathname,
+  //         authorizeHost: authorizeUrl.protocol + '//' + authorizeUrl.host,
+  //         authorizePath: authorizeUrl.pathname
+  //       },
+  //       options: {
+  //         authorizationMethod: 'body',
+  //       }
+  //     });
 
-      const options = {
-        code: Session.get('smartOnFhir_code'),
-        redirect_uri: get(Meteor, 'settings.public.smartOnFhir[0].redirect_uri')
-      };
+  //     const options = {
+  //       code: Session.get('smartOnFhir_code'),
+  //       redirect_uri: get(Meteor, 'settings.public.smartOnFhir[0].redirect_uri')
+  //     };
 
-      try {
-        const result = await oauth2.authorizationCode.getToken(options);
+  //     try {
+  //       const result = await oauth2.authorizationCode.getToken(options);
     
-        const { token } = oauth2.accessToken.create(result);
+  //       const { token } = oauth2.accessToken.create(result);
     
-        console.log('The token is : ', token);
+  //       console.log('The token is : ', token);
     
-        fhirClient.bearerToken = token.access_token;
+  //       fhirClient.bearerToken = token.access_token;
     
-        const patient = await fhirClient.read({ resourceType: 'Patient', id: token.patient });
+  //       const patient = await fhirClient.read({ resourceType: 'Patient', id: token.patient });
     
-        console.log('patient', patient);
-      } catch (error) {
-        console.error('Access Token Error', error.message);        
-      }
-    }
-  }
+  //       console.log('patient', patient);
+  //     } catch (error) {
+  //       console.error('Access Token Error', error.message);        
+  //     }
+  //   }
+  // }
   return (
     <MuiThemeProvider theme={muiTheme} >
       <Button onClick={ clearAllData } className={ buttonClasses.west_button }>
         Clear All Data
       </Button>
-      <Button onClick={ smartFhirTest } className={ buttonClasses.west_button }>
+      {/* <Button onClick={ smartFhirTest } className={ buttonClasses.west_button }>
         SMART on FHIR Test
       </Button>
       <Button onClick={ fhirKitTest } className={ buttonClasses.west_button }>
         FHIR Kit Test
-      </Button>
+      </Button> */}
       <Button onClick={ toggleDialog } className={ buttonClasses.east_button }>
         Info Dialog
       </Button>
