@@ -13,8 +13,8 @@ import {
   SampleDialogComponent
 } from './client/FooterButtons';
 
-import { HeaderNavigation } from './client/HeaderNavigation';
-import { PatientChardHeaderNavigation } from './client/PatientChardHeaderNavigation';
+import PatientChartWorkflowTabs from './client/PatientChartWorkflowTabs';
+import CovidWorkflowTabs from './client/CovidWorkflowTabs';
 
 
 let DynamicRoutes = [{
@@ -81,6 +81,18 @@ let SidebarWorkflows = [{
 }];
 
 
+let WorkflowTabs = [{
+  name: "CovidWorkflowTabs",
+  component: <CovidWorkflowTabs />,
+  matchingPaths: [
+    "/bulk-data-fetch",
+    "/geocoding",
+    "/map",
+    "/reporting"
+  ]
+}]
+
+
 // let MainPage = CovidQueryPage;
 let LaunchPage = CovidLaunchPage;
 
@@ -88,13 +100,14 @@ export {
   DynamicRoutes, 
 
   CovidQueryPage,
-  HeaderNavigation,
-  PatientChardHeaderNavigation,
+  PatientChartWorkflowTabs,
+  CovidWorkflowTabs,
 
   FooterButtons,
   SidebarElements,
   DialogComponents,
   SidebarWorkflows,
+  WorkflowTabs,
 
   LaunchPage
 };
