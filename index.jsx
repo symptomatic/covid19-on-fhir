@@ -13,6 +13,8 @@ import {
   SampleDialogComponent
 } from './client/FooterButtons';
 
+
+
 import PatientChartWorkflowTabs from './client/PatientChartWorkflowTabs';
 import CovidWorkflowTabs from './client/CovidWorkflowTabs';
 

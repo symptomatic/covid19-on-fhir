@@ -37,6 +37,7 @@ import JSON5 from 'json5';
 
 import moment from 'moment';
 
+
 import { 
   Conditions,
   Devices,
@@ -1398,7 +1399,6 @@ function CovidQueryPage(props){
     logger.trace('handleFhirEndpointChange', event.currentTarget.value)
 
     if(event.currentTarget.value){
-      // Session.set("fhirServerEndpoint", event.currentTarget.value)
       setFhirServerEndpoint(event.currentTarget.value)
 
       fhirClient = new Client({

@@ -23,14 +23,11 @@ import {
 
   // Global Theming 
   // This is necessary for the Material UI component render layer
-  let theme = {
-    appBarColor: "#f5f5f5 !important",
-    appBarTextColor: "rgba(0, 0, 0, 1) !important",
-  }
+  let palette = {}
 
   // if we have a globally defined theme from a settings file
   if(get(Meteor, 'settings.public.theme.palette')){
-    theme = Object.assign(theme, get(Meteor, 'settings.public.theme.palette'));
+    palette = get(Meteor, 'settings.public.theme.palette');
   }
 
   const muiTheme = createMuiTheme({
@@ -39,8 +36,8 @@ import {
     },
     palette: {
       appBar: {
-        main: theme.appBarColor,
-        contrastText: theme.appBarTextColor
+        main: palette.appBarColor,
+        contrastText: palette.appBarTextColor
       },
       contrastThreshold: 3,
       tonalOffset: 0.2
@@ -52,14 +49,14 @@ import {
     west_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-      color: theme.appBarTextColor,
+      color: palette.appBarTextColor,
       marginLeft: '20px',
       marginTop: '10px'
     },
     east_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-      color: theme.appBarTextColor,
+      color: palette.appBarTextColor,
       right: '20px',
       marginTop: '15px',
       position: 'absolute'
