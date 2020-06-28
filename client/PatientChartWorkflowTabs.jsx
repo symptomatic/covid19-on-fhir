@@ -158,12 +158,12 @@ const useTabStyles = makeStyles(theme => ({
 
 
 
-export function PatientChardHeaderNavigation(props){
-  console.log('PatientChardHeaderNavigation.props', props)
+export function PatientChartWorkflowTabs(props){
+  console.log('PatientChartWorkflowTabs.props', props)
   let value = 0;
 
   let location = useLocation();
-  console.log('PatientChardHeaderNavigation.location', location)
+  console.log('PatientChartWorkflowTabs.location', location)
 
   function parseIndexFromLocation(pathname){
     switch (pathname) {
@@ -182,7 +182,7 @@ export function PatientChardHeaderNavigation(props){
   const [tabIndex, setTabIndex] = useState(1);
 
   function selectSlide(event, newIndex){
-    logger.info('PatientChardHeaderNavigation.selectSlide', startingIndex);
+    logger.info('PatientChartWorkflowTabs.selectSlide', startingIndex);
     setTabIndex(newIndex);    
 
     switch (newIndex) {
@@ -210,7 +210,7 @@ export function PatientChardHeaderNavigation(props){
   );
 }
 
-export default PatientChardHeaderNavigation;
+export default PatientChartWorkflowTabs;
 
 
 

@@ -20,10 +20,9 @@ Package.onUse(function(api) {
     api.use('random');
     api.use('fourseven:scss');
 
-    api.use('clinical:hl7-fhir-data-infrastructure@6.4.11');
+    api.use('clinical:hl7-fhir-data-infrastructure@6.4.15');
 
     api.addFiles('lib/TestingMethods.js');    
-    api.addFiles('server/ProxyMethods.js', 'server');
     
     api.mainModule('index.jsx', 'client');
 });

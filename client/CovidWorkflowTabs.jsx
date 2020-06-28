@@ -158,12 +158,12 @@ const useTabStyles = makeStyles(theme => ({
 
 
 
-export function HeaderNavigation(props){
-  console.log('HeaderNavigation.props', props)
+export function CovidWorkflowTabs(props){
+  console.log('CovidWorkflowTabs.props', props)
   let value = 0;
 
   let location = useLocation();
-  console.log('HeaderNavigation.location', location)
+  console.log('CovidWorkflowTabs.location', location)
 
   function parseIndexFromLocation(pathname){
     switch (pathname) {
@@ -191,7 +191,7 @@ export function HeaderNavigation(props){
   const [tabIndex, setTabIndex] = useState(0);
 
   function selectSlide(event, newIndex){
-    logger.info('HeaderNavigation.selectSlide', startingIndex);
+    logger.info('CovidWorkflowTabs.selectSlide', startingIndex);
     setTabIndex(newIndex);    
 
     switch (newIndex) {
@@ -230,7 +230,7 @@ export function HeaderNavigation(props){
   return (        
     <div style={{display: 'contents'}}>
       <div >
-        <Tabs id="headerNavigationTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
+        <Tabs id="CovidWorkflowTabsTabs" value={tabIndex} onChange={selectSlide} aria-label="simple tabs example" className={ tabClasses.menu_items }>        
           <Tab id="fetchTab" label="Bulk Data" />
           { geocodingTab }
           { mapTab }
@@ -246,7 +246,7 @@ export function HeaderNavigation(props){
   );
 }
 
-export default HeaderNavigation;
+export default CovidWorkflowTabs;
 
 
 
