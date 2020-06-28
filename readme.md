@@ -147,6 +147,13 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 - [COVID-19: Adult Respiratory Failure and Cardiac Arrest](https://hdsi.uchicago.edu/wp-content/uploads/2020/03/2020-03-24-AgileMD-_-COVID-19_-Adult-Respiratory-Failure-and-Cardiac-Arrest.pdf)  
 - [COVID-19 Patient Impact & Hospital Capacity Module](https://www.cdc.gov/nhsn/acute-care-hospital/covid19/index.html)  
 
+
+- [Alterations in Smell or Taste in Mildly Symptomatic Outpatients With SARS-CoV-2 Infection](https://jamanetwork.com/journals/jama/fullarticle/2765183)  
+- [Clinical Characteristics of Coronavirus Disease 2019 in China](https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)   
+- [CDC - Symptoms of Coronavirus](https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html)  
+
+
+
 #### Team Acknowledgements  
 - Jason Walonoski, _Bioinformatics_ (Synthea)
 - James Agnew, _FHIR Hosting_ (Smile CDR)
@@ -154,7 +161,6 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 - Andrei Rusu, _Quality Control_, (Nightwatch.js)     
 - Jae Brodsky, _Statistician_  
 - Sarah Sims, _Business Administration_   
-- David Donohue, _Medical Advisory Board_  
 
 #### Acknowledgements (Product Development, Review, & Early Testing)    
 - Ken Salyards (SAMSHA, Health and Human Services)  
