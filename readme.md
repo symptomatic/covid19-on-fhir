@@ -152,6 +152,21 @@ For example, Walgreens is contracted with LabCorp, so it  could be sent to NC or
 - [Clinical Characteristics of Coronavirus Disease 2019 in China](https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)   
 - [CDC - Symptoms of Coronavirus](https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html)  
 
+- [Coronavirus: Dexamethasone proves first life-saving drug](https://www.bbc.com/news/health-53061281)  
+- [Dexamethasone cuts covid-19 deaths](https://www.economist.com/britain/2020/06/20/dexamethasone-cuts-covid-19-deaths)  
+- [RECOVERY Trial](https://www.recoverytrial.net/)  
+- [Effect of Dexamethasone in Hospitalized Patients with COVID-19: Preliminary Report](https://www.medrxiv.org/content/10.1101/2020.06.22.20137273v1)    
+- [RxNorm 3264 - Dexamethasone](http://bioportal.bioontology.org/ontologies/RXNORM?p=classes&conceptid=3264)   
+- [Low-cost dexamethasone reduces death by up to one third in hospitalised patients with severe respiratory complications of COVID-19](https://www.recoverytrial.net/files/recovery_dexamethasone_statement_160620_final.pdf)    
+- [CDC - Recovery Trial - Dexamethasone Statement](https://emergency.cdc.gov/agent/riotcontrol/factsheet.asp)  
+- [Vitamin D deficiency may raise risk of getting COVID-19](https://www.uchicagomedicine.org/forefront/coronavirus-disease-covid-19/vitamin-d-deficiency-may-raise-risk-of-getting-covid19)    
+- [Disturbing Photo Shows What Coronavirus Can Do To Your Lungs](https://blockclubchicago.org/2020/06/11/disturbing-photo-shows-what-coronavirus-can-do-to-your-lungs/?fbclid=IwAR2iMjq_gJAP_NxSW5-AG2T7aYDWMRUgsEZxrsEj2XGtBUR6LMjrOQdaQQ4)  
+- [How the Coronavirus Short-Circuits the Immune System](https://www.nytimes.com/2020/06/26/health/coronavirus-immune-system.html?action=click&module=Spotlight&pgtype=Homepage&fbclid=IwAR0aiWeioyYo32_KPXLx3ARYNKNUgNGvcCK2uiTq9XnwPlIsn_rXLnY2FZQ)  
+- [Immunologic perturbations in severe COVID-19/SARS-CoV-2 infection](https://www.biorxiv.org/content/10.1101/2020.05.18.101717v1)  
+- [Decreased T cell populations contribute to the increased severity of COVID-19](https://www.unboundmedicine.com/medline/citation/32405080/Decreased_T_cell_populations_contribute_to_the_increased_severity_of_COVID_19_)  
+- [A consensus Covid-19 immune signature combines immuno-protection with discrete sepsis-like traits associated with poor prognosis](https://www.medrxiv.org/content/10.1101/2020.06.08.20125112v1)  
+
+- []()  
 
 
 #### Team Acknowledgements  
