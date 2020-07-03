@@ -1,0 +1,1139 @@
+{
+  "name": "symptoms",
+  "remarks": [
+    "This submodule sets symptoms of COVID19 according to the rates documented in Table 1 of https://www.nejm.org/doi/full/10.1056/NEJMoa2002032"
+  ],
+  "states": {
+    "Initial": {
+      "type": "Initial",
+      "direct_transition": "Determine Conjunctival Congestion",
+      "name": "Initial"
+    },
+    "Terminal": {
+      "type": "Terminal",
+      "name": "Terminal"
+    },
+    "Determine Headache": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Headache",
+              "distribution": 0.15
+            },
+            {
+              "transition": "Determine Cough",
+              "distribution": 0.8500000000000001
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Headache",
+              "distribution": 0.134
+            },
+            {
+              "transition": "Determine Cough",
+              "distribution": 0.866
+            }
+          ]
+        }
+      ],
+      "name": "Determine Headache"
+    },
+    "Determine Cough": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Cough",
+              "distribution": 0.705
+            },
+            {
+              "transition": "Determine Sore Throat",
+              "distribution": 0.29500000000000004
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Cough",
+              "distribution": 0.673
+            },
+            {
+              "transition": "Determine Sore Throat",
+              "distribution": 0.32699999999999996
+            }
+          ]
+        }
+      ],
+      "name": "Determine Cough"
+    },
+    "Determine Sore Throat": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Sore Throat",
+              "distribution": 0.133
+            },
+            {
+              "transition": "Determine Sputum Production",
+              "distribution": 0.867
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Sore Throat",
+              "distribution": 0.14
+            },
+            {
+              "transition": "Determine Sputum Production",
+              "distribution": 0.86
+            }
+          ]
+        }
+      ],
+      "name": "Determine Sore Throat"
+    },
+    "Determine Sputum Production": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Sputum Production",
+              "distribution": 0.353
+            },
+            {
+              "transition": "Determine Fatigue",
+              "distribution": 0.647
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Sputum Production",
+              "distribution": 0.334
+            },
+            {
+              "transition": "Determine Fatigue",
+              "distribution": 0.6659999999999999
+            }
+          ]
+        }
+      ],
+      "name": "Determine Sputum Production"
+    },
+    "Determine Fatigue": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Fatigue",
+              "distribution": 0.399
+            },
+            {
+              "transition": "Determine Hemoptysis",
+              "distribution": 0.601
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Fatigue",
+              "distribution": 0.378
+            },
+            {
+              "transition": "Determine Hemoptysis",
+              "distribution": 0.6219999999999999
+            }
+          ]
+        }
+      ],
+      "name": "Determine Fatigue"
+    },
+    "Determine Hemoptysis": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Hemoptysis",
+              "distribution": 0.023
+            },
+            {
+              "transition": "Determine Shortness of Breath",
+              "distribution": 0.9770000000000001
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Hemoptysis",
+              "distribution": 0.006
+            },
+            {
+              "transition": "Determine Shortness of Breath",
+              "distribution": 0.994
+            }
+          ]
+        }
+      ],
+      "name": "Determine Hemoptysis"
+    },
+    "Determine Shortness of Breath": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Shortness of Breath",
+              "distribution": 0.376
+            },
+            {
+              "transition": "Determine Nausea or Vomiting",
+              "distribution": 0.6240000000000001
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Shortness of Breath",
+              "distribution": 0.151
+            },
+            {
+              "transition": "Determine Nausea or Vomiting",
+              "distribution": 0.849
+            }
+          ]
+        }
+      ],
+      "name": "Determine Shortness of Breath"
+    },
+    "Determine Nausea or Vomiting": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Nausea",
+              "distribution": 0.069
+            },
+            {
+              "transition": "Determine Diarrhea",
+              "distribution": 0.931
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Nausea",
+              "distribution": 0.046
+            },
+            {
+              "transition": "Determine Diarrhea",
+              "distribution": 0.954
+            }
+          ]
+        }
+      ],
+      "name": "Determine Nausea or Vomiting"
+    },
+    "Determine Diarrhea": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Diarrhea",
+              "distribution": 0.058
+            },
+            {
+              "transition": "Determine Myalgia or Arthralgia",
+              "distribution": 0.942
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Diarrhea",
+              "distribution": 0.035
+            },
+            {
+              "transition": "Determine Myalgia or Arthralgia",
+              "distribution": 0.9650000000000001
+            }
+          ]
+        }
+      ],
+      "name": "Determine Diarrhea"
+    },
+    "Determine Myalgia or Arthralgia": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Muscle Pain",
+              "distribution": 0.173
+            },
+            {
+              "transition": "Determine Chills",
+              "distribution": 0.827
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Muscle Pain",
+              "distribution": 0.145
+            },
+            {
+              "transition": "Determine Chills",
+              "distribution": 0.855
+            }
+          ]
+        }
+      ],
+      "name": "Determine Myalgia or Arthralgia"
+    },
+    "Determine Chills": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Chills",
+              "distribution": 0.15
+            },
+            {
+              "transition": "Determine Fever",
+              "distribution": 0.8500000000000001
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Chills",
+              "distribution": 0.108
+            },
+            {
+              "transition": "Determine Fever",
+              "distribution": 0.8919999999999999
+            }
+          ]
+        }
+      ],
+      "name": "Determine Chills"
+    },
+    "Determine Conjunctival Congestion": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Conjunctival Congestion",
+              "distribution": 0.023
+            },
+            {
+              "transition": "Determine Nasal Congestion",
+              "distribution": 0.977
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Conjunctival Congestion",
+              "distribution": 0.005
+            },
+            {
+              "transition": "Determine Nasal Congestion",
+              "distribution": 0.995
+            }
+          ]
+        }
+      ],
+      "name": "Determine Conjunctival Congestion"
+    },
+    "Conjunctival Congestion": {
+      "type": "Symptom",
+      "symptom": "conjunctival congestion",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Conjunctival Congestion Onset",
+      "name": "Conjunctival Congestion"
+    },
+    "Conjunctival Congestion Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 246677007,
+          "display": "Passive conjunctival congestion (finding)"
+        }
+      ],
+      "direct_transition": "Determine Nasal Congestion",
+      "name": "Conjunctival Congestion Onset"
+    },
+    "Determine Nasal Congestion": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Nasal Congestion",
+              "distribution": 0.035
+            },
+            {
+              "transition": "Determine Headache",
+              "distribution": 0.965
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Nasal Congestion",
+              "distribution": 0.051
+            },
+            {
+              "transition": "Determine Headache",
+              "distribution": 0.9490000000000001
+            }
+          ]
+        }
+      ],
+      "name": "Determine Nasal Congestion"
+    },
+    "Nasal Congestion": {
+      "type": "Symptom",
+      "symptom": "nasal congestion",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "name": "Nasal Congestion",
+      "distributed_transition": [
+        {
+          "transition": "Nasal Discharge Onset",
+          "distribution": 0.25
+        },
+        {
+          "transition": "Nasal Congestion Onset",
+          "distribution": 0.5
+        },
+        {
+          "transition": "Runny Nose Onset",
+          "distribution": 0.25
+        }
+      ]
+    },
+    "Nasal Congestion Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 68235000,
+          "display": "Nasal congestion (finding)"
+        }
+      ],
+      "direct_transition": "Determine Headache",
+      "name": "Nasal Congestion Onset"
+    },
+    "Headache": {
+      "type": "Symptom",
+      "symptom": "headache",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Headache Onset",
+      "name": "Headache"
+    },
+    "Headache Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 25064002,
+          "display": "Headache (finding)"
+        }
+      ],
+      "direct_transition": "Determine Cough",
+      "name": "Headache Onset"
+    },
+    "Cough": {
+      "type": "Symptom",
+      "symptom": "cough",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Cough Onset",
+      "name": "Cough"
+    },
+    "Cough Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 49727002,
+          "display": "Cough (finding)"
+        }
+      ],
+      "direct_transition": "Determine Sore Throat",
+      "name": "Cough Onset"
+    },
+    "Sore Throat": {
+      "type": "Symptom",
+      "symptom": "sore throat",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Sore Throat Onset",
+      "name": "Sore Throat"
+    },
+    "Sore Throat Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 267102003,
+          "display": "Sore throat symptom (finding)"
+        }
+      ],
+      "direct_transition": "Determine Sputum Production",
+      "name": "Sore Throat Onset"
+    },
+    "Sputum Production": {
+      "type": "Symptom",
+      "symptom": "sputum production",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Sputum Production Onset",
+      "name": "Sputum Production"
+    },
+    "Sputum Production Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 248595008,
+          "display": "Sputum finding (finding)"
+        }
+      ],
+      "direct_transition": "Determine Fatigue",
+      "name": "Sputum Production Onset"
+    },
+    "Fatigue": {
+      "type": "Symptom",
+      "symptom": "fatigue",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Fatigue Onset",
+      "name": "Fatigue"
+    },
+    "Fatigue Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 84229001,
+          "display": "Fatigue (finding)"
+        }
+      ],
+      "direct_transition": "Determine Hemoptysis",
+      "name": "Fatigue Onset"
+    },
+    "Hemoptysis": {
+      "type": "Symptom",
+      "symptom": "hemoptysis",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Hemoptysis Onset",
+      "name": "Hemoptysis"
+    },
+    "Hemoptysis Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 66857006,
+          "display": "Hemoptysis (finding)"
+        }
+      ],
+      "direct_transition": "Determine Shortness of Breath",
+      "name": "Hemoptysis Onset"
+    },
+    "Shortness of Breath": {
+      "type": "Symptom",
+      "symptom": "dyspnea",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Shortness of Breath Onset",
+      "name": "Shortness of Breath"
+    },
+    "Shortness of Breath Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 267036007,
+          "display": "Dyspnea (finding)"
+        }
+      ],
+      "direct_transition": "Wheezing",
+      "name": "Shortness of Breath Onset"
+    },
+    "Nausea": {
+      "type": "Symptom",
+      "symptom": "nausea",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Nausea Onset",
+      "name": "Nausea"
+    },
+    "Nausea Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 422587007,
+          "display": "Nausea (finding)"
+        }
+      ],
+      "direct_transition": "Vomiting",
+      "name": "Nausea Onset"
+    },
+    "Vomiting": {
+      "type": "Symptom",
+      "symptom": "vomiting",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Vomiting Onset",
+      "name": "Vomiting"
+    },
+    "Vomiting Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 249497008,
+          "display": "Vomiting symptom (finding)"
+        }
+      ],
+      "direct_transition": "Determine Diarrhea",
+      "name": "Vomiting Onset"
+    },
+    "Diarrhea": {
+      "type": "Symptom",
+      "symptom": "diarrhea",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Diarrhea Onset",
+      "name": "Diarrhea"
+    },
+    "Diarrhea Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 267060006,
+          "display": "Diarrhea symptom (finding)"
+        }
+      ],
+      "direct_transition": "Determine Myalgia or Arthralgia",
+      "name": "Diarrhea Onset"
+    },
+    "Muscle Pain": {
+      "type": "Symptom",
+      "symptom": "myalgia",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Muscle Pain Onset",
+      "name": "Muscle Pain"
+    },
+    "Muscle Pain Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 68962001,
+          "display": "Muscle pain (finding)"
+        }
+      ],
+      "direct_transition": "Joint Pain",
+      "name": "Muscle Pain Onset"
+    },
+    "Joint Pain": {
+      "type": "Symptom",
+      "symptom": "arthralgia",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Joint Pain Onset",
+      "name": "Joint Pain"
+    },
+    "Joint Pain Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 57676002,
+          "display": "Joint pain (finding)"
+        }
+      ],
+      "direct_transition": "Determine Chills",
+      "name": "Joint Pain Onset"
+    },
+    "Chills": {
+      "type": "Symptom",
+      "symptom": "chills",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Chills Onset",
+      "name": "Chills"
+    },
+    "Chills Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 43724002,
+          "display": "Chill (finding)"
+        }
+      ],
+      "direct_transition": "Determine Fever",
+      "name": "Chills Onset"
+    },
+    "Determine Fever": {
+      "type": "Simple",
+      "complex_transition": [
+        {
+          "condition": {
+            "condition_type": "Or",
+            "conditions": [
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "severe"
+              },
+              {
+                "condition_type": "Attribute",
+                "attribute": "covid19_severity",
+                "operator": "==",
+                "value": "critical"
+              }
+            ]
+          },
+          "distributions": [
+            {
+              "transition": "Fever",
+              "distribution": 0.919
+            },
+            {
+              "transition": "Determine Loss of Taste",
+              "distribution": 0.08099999999999996
+            }
+          ]
+        },
+        {
+          "distributions": [
+            {
+              "transition": "Fever",
+              "distribution": 0.881
+            },
+            {
+              "transition": "Determine Loss of Taste",
+              "distribution": 0.119
+            }
+          ]
+        }
+      ],
+      "name": "Determine Fever"
+    },
+    "Fever": {
+      "type": "Symptom",
+      "symptom": "fever",
+      "cause": "covid19",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Fever Onset",
+      "name": "Fever"
+    },
+    "Fever Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 386661006,
+          "display": "Fever (finding)"
+        }
+      ],
+      "direct_transition": "Determine Loss of Taste",
+      "name": "Fever Onset"
+    },
+    "Determine Loss of Taste": {
+      "type": "Simple",
+      "distributed_transition": [
+        {
+          "transition": "Loss of Taste",
+          "distribution": 0.506
+        },
+        {
+          "transition": "Terminal",
+          "distribution": 0.494
+        }
+      ],
+      "remarks": [
+        "In a survey, 50.6% of patients reported loss of taste as moderate, severe, or As bad as it can be, from Table 2 in Spinato G, Fabbris C, Polesel J, et al. Alterations in Smell or Taste in Mildly Symptomatic Outpatients With SARS-CoV-2 Infection. JAMA. Published online April 22, 2020. doi:10.1001/jama.2020.6771"
+      ],
+      "name": "Determine Loss of Taste"
+    },
+    "Loss of Taste": {
+      "type": "Symptom",
+      "symptom": "loss_of_taste",
+      "cause": "",
+      "probability": 1,
+      "exact": {
+        "quantity": 1
+      },
+      "direct_transition": "Loss of Taste Onset",
+      "remarks": [
+        "In a survey, 50.6% of patients reported loss of taste as moderate, severe, or As bad as it can be, from Table 2 in Spinato G, Fabbris C, Polesel J, et al. Alterations in Smell or Taste in Mildly Symptomatic Outpatients With SARS-CoV-2 Infection. JAMA. Published online April 22, 2020. doi:10.1001/jama.2020.6771"
+      ],
+      "name": "Loss of Taste"
+    },
+    "Loss of Taste Onset": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 36955009,
+          "display": "Loss of taste (finding)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "remarks": [
+        "In a survey, 50.6% of patients reported loss of taste as moderate, severe, or As bad as it can be, from Table 2 in Spinato G, Fabbris C, Polesel J, et al. Alterations in Smell or Taste in Mildly Symptomatic Outpatients With SARS-CoV-2 Infection. JAMA. Published online April 22, 2020. doi:10.1001/jama.2020.6771"
+      ],
+      "name": "Loss of Taste Onset"
+    },
+    "Wheezing": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 56018004,
+          "display": "Wheezing (finding)"
+        }
+      ],
+      "direct_transition": "Determine Nausea or Vomiting",
+      "name": "Wheezing"
+    },
+    "Nasal Discharge Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 64531003,
+          "display": "Nasal discharge"
+        }
+      ],
+      "name": "Nasal Discharge Onset",
+      "direct_transition": "Determine Headache"
+    },
+    "Runny Nose Onset": {
+      "type": "ConditionOnset",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 267101005,
+          "display": "Nasal discharge present"
+        }
+      ],
+      "direct_transition": "Determine Headache",
+      "name": "Runny Nose Onset"
+    }
+  }
+}

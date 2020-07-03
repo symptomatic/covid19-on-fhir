@@ -49,22 +49,14 @@ import {
     west_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-<<<<<<< HEAD
-      color: theme.palette.appBar.contrastText,
-=======
       color: palette.appBarTextColor,
->>>>>>> bd042f66bafc02bf7321e624424c1dd1d0f660f7
       marginLeft: '20px',
       marginTop: '10px'
     },
     east_button: {
       cursor: 'pointer',
       justifyContent: 'left',
-<<<<<<< HEAD
-      color: theme.palette.appBar.contrastText,
-=======
       color: palette.appBarTextColor,
->>>>>>> bd042f66bafc02bf7321e624424c1dd1d0f660f7
       right: '20px',
       marginTop: '15px',
       position: 'absolute'
