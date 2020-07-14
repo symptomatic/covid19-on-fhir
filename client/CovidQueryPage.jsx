@@ -1943,7 +1943,7 @@ function CovidQueryPage(props){
     <PageCanvas id='fetchDataFromHospitalPage' headerHeight={headerHeight} >
       <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} local="en">
         <Grid container spacing={3} style={{paddingBottom: '80px'}}>
-          <Grid item md={4} >
+          <Grid item xl={4} >
               <CardHeader 
                 title="Step 1 - Fetch Data From Servers" 
                 style={{fontSize: '100%'}} />            
@@ -2226,7 +2226,7 @@ function CovidQueryPage(props){
               </CardActions>              
             </StyledCard>          
           </Grid>
-          <Grid item md={4} style={{paddingBottom: '80px'}}>
+          <Grid item xl={4} style={{paddingBottom: '40px', width: '100%'}}>
             <CardHeader title="Step 2 - Received Data" style={{fontSize: '100%'}} />  
             { conditionsCard }
             { devicesCard }   
@@ -2241,7 +2241,7 @@ function CovidQueryPage(props){
             { noDataCard }
           </Grid>
           
-          <Grid item md={4}>
+          <Grid item xl={4} style={{paddingBottom: '40px', width: '100%'}}>
             <CardHeader 
                 title="Step 3 - Patient Demographic Lookup" 
                 style={{fontSize: '100%'}} />  

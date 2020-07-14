@@ -70,16 +70,19 @@ let SidebarWorkflows = [{
   primaryText: 'Bulk Data Fetch',
   to: '/bulk-data-fetch',
   iconName: 'fire',
-  workflowTabs: "default"
+  workflowTabs: "default",
+  excludeDevice: ['iPhone', 'iPad']
 }, {
   primaryText: 'Patient Chart',
   to: '/patient-chart',
   iconName: 'user',
-  workflowTabs: "patientchart"
+  workflowTabs: "patientchart",
+  excludeDevice: ['iPhone', 'iPad']
 }, {
   primaryText: 'Quick Chart',
   to: '/patient-quickchart',
-  iconName: 'user'
+  iconName: 'user',
+  excludeDevice: ['iPhone', 'iPad']
 }];
 
 
@@ -90,7 +93,8 @@ let WorkflowTabs = [{
     "/bulk-data-fetch",
     "/geocoding",
     "/map",
-    "/reporting"
+    "/reporting",
+    "/query-fhir-provider"
   ]
 }]
 
