@@ -71,13 +71,15 @@ let SidebarWorkflows = [{
   to: '/bulk-data-fetch',
   iconName: 'fire',
   workflowTabs: "default",
-  excludeDevice: ['iPhone', 'iPad']
+  excludeDevice: ['iPhone', 'iPad'],
+  requireAuth: true
 }, {
   primaryText: 'Patient Chart',
   to: '/patient-chart',
   iconName: 'user',
   workflowTabs: "patientchart",
-  excludeDevice: ['iPhone', 'iPad']
+  excludeDevice: ['iPhone', 'iPad'],
+  requireAuth: true
 }, {
   primaryText: 'Quick Chart',
   to: '/patient-quickchart',
