@@ -1,6 +1,7 @@
 {
   "public": {
-    "title": "Covid19 Geomapping (localhost)",
+    "title": "Covid19 Geomapping",
+    "version": "v0.2.2",
     "fhirVersion": "R4",
     "theme": {
       "showVideoBackground": false,
@@ -31,16 +32,18 @@
         "nivoTheme": "red_grey"
       }
     },
-    "loggingThreshold": "trace",
+    "loggingThreshold": "debug",
     "defaults": {
-      "route": "/example-route",
-      "landingPage": "/example-route",
+      "route": "/",
+      "landingPage": "/",
       "landingModal": {
+        "open": true,
         "title": "Welcome to Covid19 Geomapping on FHIR",
         "component": "AboutDialog"
       },
       "dateFormat": "YYYY-MM-DD",
       "prominantHeader": true,
+
       "displayNavbars": true,
       "disableHeader": false,
       "disableFooter": false,
@@ -71,11 +74,9 @@
           "/devices",
           "/encounters",
           "/example-route",
-          "/export-data",
           "/endpoints",
           "/imaging-studies",
           "/immunizations",
-          "/import-data",
           "/goals",
           "/locations",
           "/measures",
@@ -87,19 +88,20 @@
           "/organizations",
           "/patients",
           "/practitioners",
+          "/patients",
           "/persons",
           "/procedures",
           "/risk-assessments",
           "/subscriptions",
           "/vitals-tracking"
-      ]
+        ]
       }
     },
     "interfaces": {
       "default": {
         "status": "inactive",
         "channel": {
-          "endpoint": "http://localhost:3100/baseR4"
+          "endpoint": "http://hapi.fhir.org/baseR4"
         },
         "auth": {
           "username": "foo",
