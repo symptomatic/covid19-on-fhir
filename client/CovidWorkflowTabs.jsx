@@ -159,11 +159,11 @@ const useTabStyles = makeStyles(theme => ({
 
 
 export function CovidWorkflowTabs(props){
-  console.log('CovidWorkflowTabs.props', props)
+  // console.log('CovidWorkflowTabs.props', props)
   let value = 0;
 
   let location = useLocation();
-  console.log('CovidWorkflowTabs.location', location)
+  // console.log('CovidWorkflowTabs.location', location)
 
   function parseIndexFromLocation(pathname){
     switch (pathname) {
@@ -191,7 +191,7 @@ export function CovidWorkflowTabs(props){
   const [tabIndex, setTabIndex] = useState(0);
 
   function selectSlide(event, newIndex){
-    logger.info('CovidWorkflowTabs.selectSlide', startingIndex);
+    // logger.info('CovidWorkflowTabs.selectSlide', startingIndex);
     setTabIndex(newIndex);    
 
     switch (newIndex) {
