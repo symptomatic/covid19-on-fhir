@@ -2,8 +2,8 @@ import React from 'react';
 
 import CovidQueryPage from './client/CovidQueryPage';
 import AboutDialog from './client/AboutDialog';
-import PrivacyPage from './client/PrivacyPage';
-import TermsAndConditionsPage from './client/TermsAndConditionsPage';
+// import PrivacyPage from './client/PrivacyPage';
+// import TermsAndConditionsPage from './client/TermsAndConditionsPage';
 import ConformanceCheck from './client/ConformanceCheck';
 import CovidLaunchPage from './client/CovidLaunchPage';
 import PopupRedirectPage from './client/PopupRedirectPage';
@@ -35,14 +35,6 @@ let DynamicRoutes = [{
   'name': 'AboutDialog',
   'path': '/info',
   'component': AboutDialog
-}, {
-  'name': 'PrivacyPage',
-  'path': '/privacy',
-  'component': PrivacyPage
-}, {
-  'name': 'TermsAndConditionsPage',
-  'path': '/terms-and-conditions',
-  'component': TermsAndConditionsPage
 }];
 
 
