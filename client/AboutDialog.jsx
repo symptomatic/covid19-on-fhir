@@ -56,8 +56,6 @@ function AboutDialog(props){
   const classes = useStyles();
   
 
-    
-
   return (
     <DialogContent dividers={scroll === 'paper'} style={{minWidth: '600px', fontSize: '120%'}}>
       This project implements the <a href="https://github.com/AudaciousInquiry/saner-ig">Situation Awareness for Novel Epidemic Response</a> Implementation Guide from HL7 International, and has been submitted to the <a href="https://datavant.com/pandemic-response-hackathon/">Datavant Pandemic Response Hackathon</a> and the <a href="https://covid19challenge.mit.edu/">MIT Covid19 Challenge</a>.  This demo site is using SYNTHETIC data generated with the Synthea Covid19 module.  It does not store data anywhere.  
