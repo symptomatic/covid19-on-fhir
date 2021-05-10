@@ -29,7 +29,7 @@ import {github} from 'react-icons-kit/icomoon/github'
 import { Icon } from 'react-icons-kit'
 
 import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
-import { useTracker } from './Tracker';
+import { ReactMeteorData, useTracker } from 'meteor/react-meteor-data';
 
 function DynamicSpacer(props){
   return <br className="dynamicSpacer" style={{height: '40px'}}/>;

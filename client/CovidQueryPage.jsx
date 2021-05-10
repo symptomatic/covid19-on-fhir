@@ -65,7 +65,7 @@ import {
 } from 'meteor/clinical:hl7-fhir-data-infrastructure';
 
 import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
-import { useTracker } from './Tracker';
+import { ReactMeteorData, useTracker } from 'meteor/react-meteor-data';
 
 import FhirUtilities from '../lib/FhirUtilities';
 
