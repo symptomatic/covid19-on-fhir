@@ -167,6 +167,27 @@
     }
   },
   "private": {
-    "initializeHospitalIndex": true
+    "initializeHospitalIndex": true,
+    "fhir": {
+      "disableOauth": true,
+      "schemaValidation": {
+        "filter": false,
+        "validate": false
+      },
+      "fhirPath": "baseR4",
+      "autopublishSubscriptions": true,
+      "rest": {
+        "Observation": {
+          "interactions": ["read", "create", "update", "delete"],
+          "search": true,
+          "publication": true
+        },
+        "Patient": {
+          "interactions": ["read", "create", "update", "delete"],
+          "search": true,
+          "publication": true
+        }
+      }
+    }
   }
 }
