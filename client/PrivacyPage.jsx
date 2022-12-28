@@ -19,7 +19,7 @@ import JSON5 from 'json5';
 
 import moment from 'moment';
 
-import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
+import { PageCanvas, StyledCard, PatientTable } from 'fhir-starter';
 import { ReactMeteorData, useTracker } from 'meteor/react-meteor-data';
 
 function DynamicSpacer(props){

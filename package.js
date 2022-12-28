@@ -1,6 +1,6 @@
 Package.describe({
     name: 'symptomatic:covid19-on-fhir',
-    version: '0.5.0',
+    version: '0.5.1',
     summary: 'COVID19 Hackathon',
     git: 'https://github.com/symptomatic/covid19-hackathon',
     documentation: 'README.md'

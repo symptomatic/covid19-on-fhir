@@ -28,7 +28,7 @@ import moment from 'moment';
 import {github} from 'react-icons-kit/icomoon/github'
 import { Icon } from 'react-icons-kit'
 
-import { PageCanvas, StyledCard, PatientTable } from 'material-fhir-ui';
+import { PageCanvas, StyledCard, PatientTable } from 'fhir-starter';
 import { ReactMeteorData, useTracker } from 'meteor/react-meteor-data';
 
 function DynamicSpacer(props){

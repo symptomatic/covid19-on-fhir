@@ -11,7 +11,7 @@ import { get, has } from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
-import { PageCanvas, StyledCard } from 'material-fhir-ui';
+import { PageCanvas, StyledCard } from 'fhir-starter';
 
 import { Icon } from 'react-icons-kit'
 import { spinner8 } from 'react-icons-kit/icomoon/spinner8'

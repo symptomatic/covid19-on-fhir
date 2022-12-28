@@ -10,7 +10,7 @@ import { get, has } from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
-import { PageCanvas, StyledCard } from 'material-fhir-ui';
+import { PageCanvas, StyledCard } from 'fhir-starter';
 
 function DynamicSpacer(props){
   return <br className="dynamicSpacer" style={{height: '40px'}}/>;
